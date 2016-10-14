@@ -1,12 +1,12 @@
-wm-ota-ui
+electrode-ota-ui
 ===
 A CodePush Managementc UI.
 
 Or run it 
 
 ```sh
-  git clone 
-  cd wm-ota-ui
+  git clone https://github.com/electrode-io/electrode-ota-ui
+  cd electrode-ota-ui
   npm install
   npm run hot &
   open http://localhost:4000
@@ -14,7 +14,7 @@ Or run it
 
 ##Installation
 ```sh
- $ npm install wm-ota-ui
+ $ npm install electrode-ota-ui
 ``
 
 ##Running
@@ -23,10 +23,4 @@ Dev mode
 ```sh
  $npm run hot
  $ open http://localhost:4000
-```
-
-
-##Cli 
-```sh
-$ code-push login http://localhost.walmart.com:9001
 ```
