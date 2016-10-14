@@ -24,12 +24,12 @@
     "subschema-injection": "^1.2.5",
     "subschema-prop-types": "^1.1.4"
   },
-  "repository": "",
+  "repository": "https://github.com/electrode-io/electrode-ota-ui",
   "publishConfig": {
     "registry": ""
   },
-  "author": "",
-  "license": "",
+  "author": "Justin Spears <speajus@gmail.com>",
+  "license": "Apache-2.0",
   "devDependencies": {
     "autoprefixer": "^6.3.3",
     "babel": "^6.5.2",
