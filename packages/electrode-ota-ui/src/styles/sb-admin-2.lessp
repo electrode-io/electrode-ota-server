@@ -923,3 +923,8 @@ table.dataTable thead .sorting:after {
   padding-right: 28px;
   box-sizing: border-box;
 }
+
+.key {
+  display: inline-block;
+  padding: 10px 10px 5px 10px;
+}

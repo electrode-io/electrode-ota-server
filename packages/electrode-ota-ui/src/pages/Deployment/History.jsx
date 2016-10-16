@@ -99,8 +99,8 @@ function PackageMetrics({packageObject, metrics, children}) {
 
 }
 
-const deploymentList = (deployments, metrics)=> deployments.map(function (packageObject) {
-	const totalActive = getTotalActiveFromDeploymentMetrics(metrics);
+const deploymentList = (deployments=[], metrics={})=> deployments.map(function (packageObject) {
+	const totalActive = getTotalActiveFromDeploymentMetrics(metrics || {});
 	const metric = metrics[packageObject.label] || {
 			active: 0,
 			installed: 0,

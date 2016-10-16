@@ -2,8 +2,13 @@ const config = require('./webpack.config');
 const path = require('path');
 const join = path.join.bind(path, __dirname);
 const resolve = Object.assign({}, config.resolve);
-delete resolve.alias['superagent-proxy'];
-resolve.alias['superagent'] = 'superagent/superagent';
+
+//since the target is electron and electron can do superagent, but it uses the top level.
+//we alias it to the browser one.
+//superagent alias so it doesn't use the "main" windows. so we can debug.
+resolve.alias['superagent'] = join('node_modules', 'superagent', 'lib', 'client');
+resolve.alias["reduce"] = "reduce-component";
+resolve.alias["emitter"] = "component-emitter";
 
 module.exports = Object.assign({}, config, {
 	target: 'electron',
@@ -14,7 +19,7 @@ module.exports = Object.assign({}, config, {
 		__filename: false
 	},
 	entry: {
-		electron: process.env.ELECTRODE_ENTRY ? process.env.ELECTRODE_ENTRY : join('src', 'export')
+		electron: join('src', 'export')
 	},
 	resolve,
 	output: {
@@ -26,5 +31,5 @@ module.exports = Object.assign({}, config, {
 		libraryTarget: 'commonjs2'
 	},
 
-	externals: ['electron', 'code-push', 'code-push-cli', 'superagent', 'superagent-proxy', 'fs']
+	externals: ['electron', 'fs']
 });

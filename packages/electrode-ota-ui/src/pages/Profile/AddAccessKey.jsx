@@ -37,7 +37,7 @@ export default function AddAccessKey({onClearAccessKey, value, ...rest}) {
         return (<div className="panel  text-center panel-yellow">
             <h2>Copy this key "{value.name}" someplace safe. It is not recoverable</h2>
             <div className="panel-body text-center">
-				<code>
+				<code className="key">
                 <Copy text={value.key}/>
 				</code>
             </div>
