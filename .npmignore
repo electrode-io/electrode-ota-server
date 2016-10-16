@@ -1,0 +1,13 @@
+*/.DS_Store
+.DS_Store
+.random.json
+.idea
+node_modules
+publish
+users.out
+config/development.json
+example
+test
+server/public/movie.mpg
+docs/img
+test/support/server-ms.js

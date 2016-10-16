@@ -1,0 +1,49 @@
+{
+  "name": "electrode-ota-server",
+  "version": "1.0.0",
+  "description": "Electrode Over The Air Server",
+  "author": "Justin Spears <jspears@walmartlabs.com>",
+  "license": "Apache-2.0",
+  "bugs":{
+    "url":"https://github.com/electrode-io/electrode-ota-server/issues"
+  },
+  "homepage":"https://github.com/electrode-io/electrode-ota-server",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/*-test.js",
+    "start": "node ./index.js"
+  },
+  "bin": {
+    "electrode-ota-server": "./index.js"
+  },
+  "engines": {
+    "node": "6.6.0"
+  },
+  "keywords": [
+    "code-push",
+    "ota",
+    "electrode",
+    "react-native",
+    "cordova"
+  ],
+  "dependencies": {
+    "bell": "^8.0.1",
+    "cassandra-driver": "^3.1.1",
+    "electrode-server": "^1.1.1",
+    "hapi": "^15.1.1",
+    "hapi-auth-bearer-token": "^4.1.1",
+    "hapi-auth-cookie": "^6.1.1",
+    "hapi-server-session": "^3.0.0",
+    "inert": "^4.0.1",
+    "randomstring": "^1.1.5",
+    "semver": "^5.3.0",
+    "shasum": "^1.0.2"
+  },
+  "devDependencies": {
+    "cassandra-server": "^2.2.0",
+    "chai": "^3.5.0",
+    "code-push": "^1.10.2-beta",
+    "mocha": "^2.5.3",
+    "supertest": "^2.0.0"
+  }
+}
