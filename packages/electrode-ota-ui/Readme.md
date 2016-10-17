@@ -15,12 +15,4 @@ Or run it
 ##Installation
 ```sh
  $ npm install electrode-ota-ui
-``
-
-##Running
-
-Dev mode
-```sh
- $npm run hot
- $ open http://localhost:4000
 ```
