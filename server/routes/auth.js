@@ -158,13 +158,15 @@ const register = diregister({
         options.providers.reduce((ret, {
             name,
             auth,
-            redirectTo = '/accesskey',
-            canRegister = true
+            loginPath,
+            registerPath,
+            redirectTo = '/accesskey'
         })=> {
             const strategy = auth || name;
+            loginPath = loginPath ||  `/auth/login/${name}`;
             ret.push({
                 method: 'GET',
-                path: `/auth/login/${name}`,
+                path:loginPath,
                 config: {
                     auth: strategy,
                     handler ({auth:{isAuthenticated, credentials}, cookieAuth}, reply) {
@@ -189,10 +191,11 @@ const register = diregister({
                     }
                 }
             });
-            if (canRegister !== false) {
+            if (registerPath !== false) {
+                registerPath = registerPath || `/auth/register/${name}`;
                 ret.push({
                     method: 'GET',
-                    path: `/auth/register/${name}`,
+                    path: registerPath,
                     config: {
                         auth: strategy,
                         handler ({auth:{isAuthenticated, credentials}, cookieAuth}, reply) {
