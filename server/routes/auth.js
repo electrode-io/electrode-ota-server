@@ -155,12 +155,18 @@ const register = diregister({
             }
         }
     ].concat(
-        options.providers.reduce((ret, provider)=> {
+        options.providers.reduce((ret, {
+            name,
+            auth,
+            redirectTo = '/accesskey',
+            canRegister = true
+        })=> {
+            const strategy = auth || name;
             ret.push({
                 method: 'GET',
-                path: `/auth/login/${provider.name}`,
+                path: `/auth/login/${name}`,
                 config: {
-                    auth: provider.auth || provider.name,
+                    auth: strategy,
                     handler ({auth:{isAuthenticated, credentials}, cookieAuth}, reply) {
                         if (!isAuthenticated) {
                             return reply('Not logged in...').code(401);
@@ -175,22 +181,20 @@ const register = diregister({
                                     return reply(errorPage(e));
                                 }
                                 cookieAuth.set({token: token.name});
-                                reply.redirect('/accesskey').code(302);
+                                reply.redirect(redirectTo).code(302);
                             });
                         } else {
-                            reply.redirect('/accesskey').code(302);
+                            reply.redirect(redirectTo).code(302);
                         }
                     }
                 }
             });
-            if (provider.canRegister !== false) {
+            if (canRegister !== false) {
                 ret.push({
                     method: 'GET',
-                    path: `/auth/register/${provider.name}`,
+                    path: `/auth/register/${name}`,
                     config: {
-                        auth: {
-                            strategy: provider.auth || provider.name
-                        },
+                        auth: strategy,
                         handler ({auth:{isAuthenticated, credentials}, cookieAuth}, reply) {
                             if (!isAuthenticated) {
                                 console.error('request was not authenticated');
@@ -205,7 +209,7 @@ const register = diregister({
                                     return reply(errorPage({message: e.message}));
                                 }
                                 cookieAuth.set({token: token.name});
-                                reply.redirect('/accesskey').code(302);
+                                reply.redirect(redirectTo).code(302);
                             });
 
                         }
