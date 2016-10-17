@@ -40,7 +40,6 @@
     "shasum": "^1.0.2"
   },
   "devDependencies": {
-    "cassandra-server": "^2.2.0",
     "chai": "^3.5.0",
     "code-push": "^1.10.2-beta",
     "mocha": "^2.5.3",
