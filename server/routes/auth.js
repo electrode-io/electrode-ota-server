@@ -113,7 +113,16 @@ const register = diregister({
             }
         },
 
-
+        {
+            method: 'GET',
+            path: '/',
+            config: {
+                auth: false,
+                handler(request, reply){
+                    reply.redirect('/auth/login').code(302);
+                }
+            }
+        },
         {
             method: 'GET',
             path: '/authenticated',
@@ -132,15 +141,19 @@ const register = diregister({
             method: 'GET',
             path: '/logout',
             config: {
-                auth: {mode: 'optional'},
+                auth: {mode: 'optional', strategies: ['session', 'bearer']},
                 handler(request, reply) {
-                    request.cookieAuth.clear();
-                    invalidate(request.cookieAuth.token, ()=> {
+                    invalidate(request.auth.credentials && request.auth.credentials.name, (e)=> {
+                        if (e) {
+                            console.log('error logging out', e);
+                        }
+                        request.cookieAuth && request.cookieAuth.clear();
                         reply.redirect('/');
                     });
                 }
             }
-        }, {
+        },
+        {
             method: 'DELETE',
             path: '/sessions/{session}',
             config: {
@@ -163,10 +176,10 @@ const register = diregister({
             redirectTo = '/accesskey'
         })=> {
             const strategy = auth || name;
-            loginPath = loginPath ||  `/auth/login/${name}`;
+            loginPath = loginPath || `/auth/login/${name}`;
             ret.push({
                 method: 'GET',
-                path:loginPath,
+                path: loginPath,
                 config: {
                     auth: strategy,
                     handler ({auth:{isAuthenticated, credentials}, cookieAuth}, reply) {
