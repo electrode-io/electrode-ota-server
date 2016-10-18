@@ -123,16 +123,6 @@ module.exports = {
                             "height": 50,
                             "width": 50
                         }
-                    },
-                    {
-                        "name": "github",
-                        "auth": "github-oauth",
-                        "label": "GitHub",
-                        "icon": {
-                            "src": "https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png",
-                            "height": 50,
-                            "width": 50
-                        }
                     }
                 ]
             }
