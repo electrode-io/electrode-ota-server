@@ -113,7 +113,16 @@ const register = diregister({
             }
         },
 
-
+        {
+            method: 'GET',
+            path: '/',
+            config: {
+                auth: false,
+                handler(request, reply){
+                    reply.redirect('/auth/login').code(302);
+                }
+            }
+        },
         {
             method: 'GET',
             path: '/authenticated',
@@ -132,15 +141,19 @@ const register = diregister({
             method: 'GET',
             path: '/logout',
             config: {
-                auth: {mode: 'optional'},
+                auth: {mode: 'optional', strategies: ['session', 'bearer']},
                 handler(request, reply) {
-                    request.cookieAuth.clear();
-                    invalidate(request.cookieAuth.token, ()=> {
+                    invalidate(request.auth.credentials && request.auth.credentials.name, (e)=> {
+                        if (e) {
+                            console.log('error logging out', e);
+                        }
+                        request.cookieAuth && request.cookieAuth.clear();
                         reply.redirect('/');
                     });
                 }
             }
-        }, {
+        },
+        {
             method: 'DELETE',
             path: '/sessions/{session}',
             config: {
@@ -155,12 +168,20 @@ const register = diregister({
             }
         }
     ].concat(
-        options.providers.reduce((ret, provider)=> {
+        options.providers.reduce((ret, {
+            name,
+            auth,
+            loginPath,
+            registerPath,
+            redirectTo = '/accesskey'
+        })=> {
+            const strategy = auth || name;
+            loginPath = loginPath || `/auth/login/${name}`;
             ret.push({
                 method: 'GET',
-                path: `/auth/login/${provider.name}`,
+                path: loginPath,
                 config: {
-                    auth: provider.auth || provider.name,
+                    auth: strategy,
                     handler ({auth:{isAuthenticated, credentials}, cookieAuth}, reply) {
                         if (!isAuthenticated) {
                             return reply('Not logged in...').code(401);
@@ -175,22 +196,21 @@ const register = diregister({
                                     return reply(errorPage(e));
                                 }
                                 cookieAuth.set({token: token.name});
-                                reply.redirect('/accesskey').code(302);
+                                reply.redirect(redirectTo).code(302);
                             });
                         } else {
-                            reply.redirect('/accesskey').code(302);
+                            reply.redirect(redirectTo).code(302);
                         }
                     }
                 }
             });
-            if (provider.canRegister !== false) {
+            if (registerPath !== false) {
+                registerPath = registerPath || `/auth/register/${name}`;
                 ret.push({
                     method: 'GET',
-                    path: `/auth/register/${provider.name}`,
+                    path: registerPath,
                     config: {
-                        auth: {
-                            strategy: provider.auth || provider.name
-                        },
+                        auth: strategy,
                         handler ({auth:{isAuthenticated, credentials}, cookieAuth}, reply) {
                             if (!isAuthenticated) {
                                 console.error('request was not authenticated');
@@ -205,7 +225,7 @@ const register = diregister({
                                     return reply(errorPage({message: e.message}));
                                 }
                                 cookieAuth.set({token: token.name});
-                                reply.redirect('/accesskey').code(302);
+                                reply.redirect(redirectTo).code(302);
                             });
 
                         }

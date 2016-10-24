@@ -243,7 +243,7 @@ describe('model/app', function () {
 
                     "releaseMethod": "Rollback",
                     "releasedBy": "test@p.com",
-                    "rollout": 0,
+                    "rollout": 100,
                     "size": "16"
                 },
                 {
@@ -325,7 +325,7 @@ describe('model/app', function () {
                     "packageHash": "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
                     "releaseMethod": "Rollback",
                     "releasedBy": "test@p.com",
-                    "rollout": 0,
+                    "rollout": 100,
                     "size": "16"
                 },
                 {
@@ -362,6 +362,7 @@ describe('model/app', function () {
                 }
             ]));
     });
+//const TOKEN = {profile: {email: 'test@t.com', name: 'test'}, provider: 'GitHub', query: {hostname: 'TestHost'}};
 
     it('should add/remove/transfer collabordators', ()=>ac.createApp({
             email: 'what@p.com',
@@ -376,10 +377,7 @@ describe('model/app', function () {
                 expect(e.message).to.eql(`The specified e-mail address doesn't represent a registered user`);
                 return null;
             }))
-            .then(_=>account.createToken({
-                connection: {info: {host: 'TestHost'}},
-                auth: {credentials: {profile: {email: 'stuff@p.com', name: 'test'}, provider: 'GitHub'}}
-            }))
+            .then(_=>account.createToken( {profile: {email: 'stuff@p.com', name: 'test'}, query:{hostname:'TestHost'},provider: 'GitHub'} ))
             .then(_=>ac.addCollaborator({email: 'what@p.com', app: 'addcollab', collaborator: 'stuff@p.com'}))
             .then(_=>ac.findApp({email: 'what@p.com', app: 'addcollab'}))
             .then(eql({

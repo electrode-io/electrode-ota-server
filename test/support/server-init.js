@@ -2,7 +2,7 @@ const path = require('path');
 const init = require('../../server/dao/cassandra/init')
 const driver = require('cassandra-driver');
 process.env.NODE_ENV = 'test';
-process.env.PORT = 9998;
+process.env.PORT = 9999;
 process.env.OTA_CONFIG_DIR = path.join(__dirname, '..', 'config');
 
 const accountFactory = require('../../server/model/account')
