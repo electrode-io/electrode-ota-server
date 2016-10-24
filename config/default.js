@@ -40,7 +40,7 @@ module.exports = {
             "enable": true
         },
         "electrode-ota-view": {
-            "module": root("server/views")
+            "module": "vision"
         },
         "electrode-ota-server-dao-cassandra": {
             "module": root("server/dao/cassandra/cassandra"),
