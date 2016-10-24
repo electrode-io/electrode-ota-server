@@ -475,6 +475,7 @@ describe('model/app', function () {
 
             })
             ;
-    })
+    });
+
 });
 

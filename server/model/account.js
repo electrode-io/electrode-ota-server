@@ -93,7 +93,8 @@ module.exports = function (dao) {
         linkProvider({email, provider})
         {
             return dao.userByEmail(email).then((user)=> {
-                alreadyExistsMsg(user.linkedProviders.indexOf(provider) > -1, 'Account is already linked to provider');
+                notFound(user, 'User was not found for email');
+                alreadyExistsMsg(!user.linkedProviders.find(v=>v.toLowerCase() == provider.toLowerCase()), 'Account is already linked to provider');
                 user.linkedProviders.push(provider);
                 return dao.updateUser(email, user).then(asTrue);
             });

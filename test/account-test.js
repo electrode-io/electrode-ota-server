@@ -75,4 +75,26 @@ describe('model/account', function () {
         expect(v.name).to.eql(ak.name);
         expect(v.friendlyName).to.eql('stuff');
     })));
+
+    it('should linkProvider', ()=>account.createToken(TOKEN).then(_=>account.linkProvider({
+        email: TOKEN.profile.email,
+        provider: 'stuff'
+    })
+
+        .then(v=>account.findAccount(TOKEN.profile.email))
+        .then(v=> {
+            expect(v).to.exist;
+            expect(v.linkedProviders).to.eql(['GitHub', 'stuff']);
+        })));
+    it('should not linkProvider', ()=>account.createToken(TOKEN).then(_=>account.linkProvider({
+            email: TOKEN.profile.email,
+            provider: 'github'
+        }).then(()=> {
+            throw new Error('Should have failed')
+        }, (e)=> {
+            expect(e).to.exist;
+            expect(e.output.payload.error).to.eql('Conflict');
+            return null;
+        })
+    ));
 });
