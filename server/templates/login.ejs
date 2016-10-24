@@ -1,0 +1,15 @@
+The following authentication providers are avialable:
+<ul>
+    <% providers.map(function({
+            icon:{
+                    height = 50,
+                    width = 50,
+                    src
+            }, name, label
+    }){ %>
+    <li><a href="/auth/<%- type %>/<%- name %>?hostname=<%- hostname %>"><img class="icon <%- name %>"
+                                                                              height="<%- height %>"
+                                                                              width="<%- width %>"
+                                                                              src="<%- src %>"><%- label %></a></li>
+    <% }); %>
+</ul>

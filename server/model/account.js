@@ -1,6 +1,6 @@
 "use strict";
 const {id, values, genString} = require('../util');
-const {notFound, invalidRequest} = require('./errors');
+const {notFound, alreadyExistsMsg} = require('./errors');
 const TTL = 60 * 24 * 3600 * 1000;
 const asTrue = ()=>true;
 const genAccessKey = ({email, createdBy, friendlyName, description, ttl = TTL})=> {
@@ -87,6 +87,14 @@ module.exports = function (dao) {
             return dao.userByEmail(email).then((user)=> {
                 const ak = notFound(user.accessKeys[key] || Object.keys(user.accessKeys).map(ak=>user.accessKeys[ak]).find(findByFriendlyName, key), `AccessKey ${key} not found for user`);
                 delete user.accessKeys[ak.name];
+                return dao.updateUser(email, user).then(asTrue);
+            });
+        },
+        linkProvider({email, provider})
+        {
+            return dao.userByEmail(email).then((user)=> {
+                alreadyExistsMsg(user.linkedProviders.indexOf(provider) > -1, 'Account is already linked to provider');
+                user.linkedProviders.push(provider);
                 return dao.updateUser(email, user).then(asTrue);
             });
         },

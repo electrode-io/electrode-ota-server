@@ -39,6 +39,9 @@ module.exports = {
         "inert": {
             "enable": true
         },
+        "electrode-ota-view": {
+            "module": root("server/views")
+        },
         "electrode-ota-server-dao-cassandra": {
             "module": root("server/dao/cassandra/cassandra"),
             "options": {

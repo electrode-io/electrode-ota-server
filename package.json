@@ -4,10 +4,10 @@
   "description": "Electrode Over The Air Server",
   "author": "Justin Spears <jspears@walmartlabs.com>",
   "license": "Apache-2.0",
-  "bugs":{
-    "url":"https://github.com/electrode-io/electrode-ota-server/issues"
+  "bugs": {
+    "url": "https://github.com/electrode-io/electrode-ota-server/issues"
   },
-  "homepage":"https://github.com/electrode-io/electrode-ota-server",
+  "homepage": "https://github.com/electrode-io/electrode-ota-server",
   "main": "index.js",
   "scripts": {
     "test": "PORT=9999 NODE_TLS_REJECT_UNAUTHORIZED=0 mocha test/*-test.js",
@@ -29,6 +29,7 @@
   "dependencies": {
     "bell": "^8.0.1",
     "cassandra-driver": "^3.1.1",
+    "ejs": "^2.5.2",
     "electrode-server": "^1.1.1",
     "hapi": "^15.1.1",
     "hapi-auth-bearer-token": "^4.1.1",
@@ -37,7 +38,8 @@
     "inert": "^4.0.1",
     "randomstring": "^1.1.5",
     "semver": "^5.3.0",
-    "shasum": "^1.0.2"
+    "shasum": "^1.0.2",
+    "vision": "^4.1.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
