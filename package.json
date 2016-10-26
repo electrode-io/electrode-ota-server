@@ -40,7 +40,8 @@
     "semver": "^5.3.0",
     "shasum": "^1.0.2",
     "vision": "^4.1.0",
-    "yauzl": "^2.7.0"
+    "yauzl": "^2.7.0",
+    "yazl": "^2.4.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",

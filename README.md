@@ -8,9 +8,13 @@ is API compatible with [code-push-cli](https://microsoft.github.io/code-push/doc
 ### Prerequisites
 
 * Node v6 or greater.
-* Apache Cassandra 
 * Github Account (if using github as auth provider)
-
+* Apache Cassandra - You can download [here].
+```sh
+$ curl http://apache.mirrors.hoobly.com/cassandra/3.9/apache-cassandra-3.9-bin.tar.gz | tar -xvzf -
+$ cd apache-cassandra-3.9/
+$ ./bin/cassandra
+```
 
 ### Installation
 This covers a minimal way to install and run electrode-ota-server.  For most scenarios this is 
@@ -48,7 +52,7 @@ for production,test and development.   In production please use TLS/HTTPS for th
             "options": {
                 "contactPoints": [
                     //You can enter an array of cassandra "contactPoints" but you need at least one.
-                    // If you are running cassandra locally you can use localhost.
+                    // If you are running cassandra locally you can use "localhost".
                     "<%=cassandra.hosts%>"
                 ],
                 //Optional username and password.  If you are connceting to a cassandra instance that

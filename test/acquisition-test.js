@@ -5,7 +5,7 @@ const Dao = require('../server/dao/cassandra/dao-cassandra');
 const weighted = require('../server/model/weighted-plugin').weighted;
 const expect = require('chai').expect;
 
-describe('Acquisition API Tests', function () {
+describe('model/acquisition', function () {
     let ac;
     this.timeout(50000);
 
