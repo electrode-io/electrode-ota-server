@@ -4,8 +4,8 @@ const {wrap} = require('../util');
 
 const register = require('../diregister')({
     name: 'authRoute',
-    dependencies: ['electrode:route', 'ota!model', 'electrode:views'],
-}, (options, route, model, views) => {
+    dependencies: ['electrode:route', 'ota!account', 'electrode:views'],
+}, (options, route, acf, views) => {
 
     views({
         engines: options.engines || {ejs: require('ejs')},
@@ -13,8 +13,6 @@ const register = require('../diregister')({
         path: options.path || '../templates',
         layout: options.layout === false ? false : true
     });
-
-    const acf = model.account;
 
     const {invalidate, addAccessKey, createToken, linkProvider} = wrap({
         invalidate: acf.invalidate,

@@ -7,3 +7,4 @@ users.out
 config/development.json
 .random.json
 example
+test/sample/react-native-code-push

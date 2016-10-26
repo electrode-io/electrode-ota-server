@@ -1,6 +1,6 @@
 "use strict";
 const {id, values, genString} = require('../util');
-const {notFound, alreadyExistsMsg} = require('./errors');
+const {notFound, notAuthorized, alreadyExistsMsg} = require('./errors');
 const TTL = 60 * 24 * 3600 * 1000;
 const asTrue = ()=>true;
 const genAccessKey = ({email, createdBy, friendlyName, description, ttl = TTL})=> {
@@ -77,6 +77,7 @@ module.exports = function (dao) {
         {
             return dao.userByAccessKey(token).then(user=> {
                 const account = notFound(user.accessKeys[token], `No token found for ${token}.`);
+                notAuthorized(account.expires > Date.now(), `Token is not valid`);
                 account.lastAccess = Date.now();
                 return dao.updateUser(user.email, user).then(v=>user);
             });

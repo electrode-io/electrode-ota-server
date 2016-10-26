@@ -60,10 +60,7 @@ const notAuthorizedPerm = (app, email, perm, message)=> {
 };
 
 
-const _weighted = (weight) => {
-    return Math.random() < (weight / 100);
-};
-module.exports = (dao, weighted = _weighted) => {
+module.exports = (dao, weighted, upload) => {
     const api = {};
     return Object.assign(api, {
         findApp({email, app}){
@@ -296,19 +293,15 @@ module.exports = (dao, weighted = _weighted) => {
                 notFound(hasDeploymentName(_app, deployment), `Not a valid deployment '${deployment}' for app '${app}'`);
 
                 return dao.deploymentByApp(_app.id, deployment).then(deployments=> {
-                    const packageHash = shasum(vals.package);
                     //noinspection JSUnresolvedVariable
                     const pkg = {
-                        blobUrl: `${downloadUrl}${packageHash}`,
                         description, isDisabled, isMandatory, rollout, appVersion,
-                        packageHash,
-                        size: vals.package.length,
                         releaseMethod: "Upload",
                         uploadTime: Date.now(),
                         label: label || "v" + (deployments.history_ ? deployments.history_.length + 1 : 1),
                         releasedBy: email
                     };
-                    return dao.upload(pkg.packageHash, vals.package).then(v=> dao.addPackage(deployments.key, pkg));
+                    return upload(vals.package).then(resp=> dao.addPackage(deployments.key, Object.assign({}, pkg, resp)));
                 });
             })
         },

@@ -4,12 +4,11 @@ const diregister = require('../diregister');
 
 module.exports.register = diregister({
     name: 'ota!validate',
-    dependencies: ['electrode:expose', 'ota!model'],
+    dependencies: ['electrode:expose', 'ota!account'],
     multiple: false,
     connections: false
-}, (options, expose, model) => {
+}, (options, expose, {validateFunc}) => {
 
-    const {validateFunc} = model.account;
 
     const token = (name, callback)=>validateFunc(name).then(profile=> callback(null, true, {
         email: profile.email,

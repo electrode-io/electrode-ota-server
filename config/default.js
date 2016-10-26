@@ -54,8 +54,17 @@ module.exports = {
         "electrode-ota-server-dao-plugin": {
             "module": root("server/dao/cassandra/plugin")
         },
-        "electrode-ota-server-model": {
-            "module": root("server/model")
+        "electrode-ota-server-fileservice": {
+            "module": root("server/fileservice/cassandra")
+        },
+        "electrode-ota-server-model-weighted": {
+            "module": root("server/model/weighted-plugin")
+        },
+        "electrode-ota-server-model-app": {
+            "module": root("server/model/app-plugin")
+        },
+        "electrode-ota-server-model-account": {
+            "module": root("server/model/account-plugin")
         },
         "electrode-ota-server-auth-validate": {
             "module": root("server/auth/validate"),

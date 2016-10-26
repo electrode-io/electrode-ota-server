@@ -12,15 +12,15 @@ const ok = (reply)=>(e)=>{
 
 const register = diregister({
     name: 'aquisitionRoute',
-    dependencies: ['electrode:route', 'ota!model']
-}, (options, route, model)=> {
+    dependencies: ['electrode:route', 'ota!app']
+}, (options, route, app)=> {
     const {
         download,
         updateCheck,
         downloadReportStatus,
         deployReportStatus
 
-    } = wrap(model.app);
+    } = wrap(app);
 
     route([
 

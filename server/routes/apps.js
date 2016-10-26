@@ -43,8 +43,8 @@ const PARAMS = {
 
 const register = diregister({
         name: 'appsRoute',
-        dependencies: ['electrode:route', 'ota!model']
-    }, (options, route, model)=> {
+        dependencies: ['electrode:route', 'ota!app']
+    }, (options, route, app)=> {
         const {
             createApp,
             findApp,
@@ -77,7 +77,7 @@ const register = diregister({
 
             metrics
 
-        } = wrap(model.app);
+        } = wrap(app);
 
         route([
             {

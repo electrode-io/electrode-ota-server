@@ -40,6 +40,7 @@ module.exports = ()=> init({
         return makeUser('test@walmartlabs.com').then((extraAccessKey)=> makeUser('test2@walmartlabs.com').then(accessKey=> {
             return {
                 serverUrl: `http://localhost.walmart.com:${process.env.PORT}`,
+                aquistionServerUrl:`http://localhost.walmart.com:${process.env.PORT}`,
                 agent: supertest(server.listener),
                 accessKey,
                 extraAccessKey,
