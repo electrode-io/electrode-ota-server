@@ -35,7 +35,7 @@ const options = {
     warnMissing: false,
     failMissing: false,
     context: {
-        deployment: process.env.NODE_ENV || 'development'
+        deployment: process.env.NODE_ENV || 'production'
     }
 };
 
