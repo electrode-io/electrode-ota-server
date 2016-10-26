@@ -6,7 +6,7 @@ module.exports = {
         name: 'ota!app',
         multiple: false,
         connections: false,
-        dependencies: ['ota!dao', 'ota!weighted', 'ota!fileservice']
+        dependencies: ['ota!dao', 'ota!fileservice']
     }, (options, dao, weighted, upload) => app(dao, weighted, upload, options))
 };
 

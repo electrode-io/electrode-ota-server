@@ -8,19 +8,25 @@ const {shasum} = require('../util');
  * use a storage provider for this stuff.
  *
  */
-module.exports.register = diregister({
-    name: "ota!fileservice",
-    multiple: false,
-    connections: false,
-    dependencies: ['ota!dao']
-}, ({downloadUrl}, dao)=> {
-    downloadUrl = downloadUrl.replace((/\/+?$/, ''));
+const fileservice = ({downloadUrl}, dao)=> {
+    downloadUrl = downloadUrl && downloadUrl.replace((/\/+?$/, ''));
     return (file) => {
         const packageHash = shasum(file);
         return dao.upload(packageHash, file).then(()=> ({
             packageHash,
             size: file.length,
-            blobUrl: `${downloadUrl}/${packageHash}`
+            blobUrl: downloadUrl ? `${downloadUrl}/${packageHash}` : packageHash
         }));
     };
-});
+};
+const register = diregister({
+    name: "ota!fileservice",
+    multiple: false,
+    connections: false,
+    dependencies: ['ota!dao']
+}, fileservice);
+
+module.exports = {
+    register,
+    fileservice
+};

@@ -7,7 +7,7 @@ const expect = require('chai').expect;
 describe('dao/cassandra', function () {
     this.timeout(8000);
     let dao;
-    beforeEach(()=> init({contactPoints: ['localhost'], keyspace: 'ota_test'}).connect({reset: true}).then((client)=> {
+    before(()=> init({contactPoints: ['localhost'], keyspace: 'ota_test'}).connect({reset: true}).then((client)=> {
         dao = new Dao({client});
     }));
     it('should insert user', ()=> dao.createUser({email: 'joe@b.com', name: 'Joe'}).then((user)=> {
@@ -25,7 +25,7 @@ describe('dao/cassandra', function () {
         }));
 
     it('should insert and update keys', ()=> dao.createUser({
-        email: 'joe@b.com',
+        email: 'joe1@b.com',
         name: 'Joe',
         accessKeys: {'abc': {name: 'key'}}
     }).then((user)=> {
@@ -67,10 +67,10 @@ describe('dao/cassandra', function () {
         }));
     }));
     it(`should find user based on accessKey`, ()=> dao.createUser({
-            email: 'joe@b.com',
+            email: 'joe2@b.com',
             name: 'Joe',
-            accessKeys: {'abc': {name: 'key'}}
-        }).then(u=>dao.userByAccessKey('abc')
+            accessKeys: {'abc123': {name: 'key'}}
+        }).then(u=>dao.userByAccessKey('abc123')
             .then((fu)=>expect(fu.id.toJSON()).to.eql(u.id.toJSON())))
     );
 
@@ -195,12 +195,12 @@ describe('dao/cassandra', function () {
                     key: '456'
                 }
             },
-            collaborators: {'test@t.com': {permission: 'Owner'}}
+            collaborators: {'addremove@t.com': {permission: 'Owner'}}
         }).then(app=>dao.addPackage('123', {
             packageHash: 'abc',
             description: 'This is a package'
         }).then(_=>dao.removeApp(app.id))
-            .then(_=>dao.appsForCollaborator('test@t.com')))
+            .then(_=>dao.appsForCollaborator('addremove@t.com')))
             .then(apps=>expect(apps).to.eql([]));
 
     });

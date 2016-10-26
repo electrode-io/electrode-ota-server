@@ -8,56 +8,59 @@ const Dao = require('../server/dao/cassandra/dao-cassandra');
 const accountFactory = require('../server/model/account')
 const expect = require('chai').expect;
 const TOKEN = {profile: {email: 'test@t.com', name: 'test'}, provider: 'GitHub', query: {hostname: 'TestHost'}};
+const newToken = (email = 'test@t.com')=> {
+    return {profile: {email, name: 'test'}, provider: 'GitHub', query: {hostname: 'TestHost'}}
+};
 
 describe('model/account', function () {
     this.timeout(10000);
     let account;
-    beforeEach(()=> init({contactPoints: ['localhost'], keyspace: 'ota_test'}).connect({reset: true}).then((client)=> {
+    before(()=> init({contactPoints: ['localhost'], keyspace: 'ota_test'}).connect({reset: true}).then((client)=> {
         account = accountFactory(new Dao({client}));
     }));
 
 
-    it('should createToken', ()=>account.createToken(TOKEN).then((t)=> {
+    it('should createToken', ()=>account.createToken(newToken('createToken@t.com')).then((t)=> {
         expect(t).to.exist;
-        expect(t.email).to.eql("test@t.com");
+        expect(t.email).to.eql("createToken@t.com");
     }));
 
     it('should add accessKey/listAcccessKeys', ()=> account.createToken({
-        profile: {email: 'test@t.com', name: 'test'}, provider: 'GitHub', query: {hostname: 'TestHost'}
+        profile: {email: 'accessKey@t.com', name: 'test'}, provider: 'GitHub', query: {hostname: 'TestHost'}
         //email, createdBy, friendlyName, ttl
     }).then(_=>account.addAccessKey(
-        'test@t.com', 'test', 'newKey', 300
+        'accessKey@t.com', 'test', 'newKey', 300
     )).then(v=> {
         expect(v.friendlyName).to.exist;
         expect(v).to.exist;
-    }).then(_=>account.listAccessKeys('test@t.com'))
+    }).then(_=>account.listAccessKeys('accessKey@t.com'))
         .then(keys=> {
             expect(keys.length).to.eql(2);
             return account.invalidate(keys[1].name);
         })
-        .then(_=>account.listAccessKeys('test@t.com'))
+        .then(_=>account.listAccessKeys('accessKey@t.com'))
         .then(keys=> {
             expect(keys.length).to.eql(1);
 
         }));
 
-    it('should validateFunc', ()=>account.createToken(TOKEN).then(token=>account.validateFunc(token.name).then(v=> {
+    it('should validateFunc', ()=>account.createToken(newToken('validateFunc@t.com')).then(token=>account.validateFunc(token.name).then(v=> {
 
         expect(v).to.exist;
-        expect(v.email).to.eql('test@t.com');
+        expect(v.email).to.eql('validateFunc@t.com');
     })));
 
-    it('should removeAccessKey', ()=>account.createToken(TOKEN).then(_=>account.addAccessKey(
-        'test@t.com',
+    it('should removeAccessKey', ()=>account.createToken(newToken('removeAccessKey@t.com')).then(_=>account.addAccessKey(
+        'removeAccessKey@t.com',
         'test',
         'newKey',
         300
     )).then(v=> {
-        return account.removeAccessKey({email: 'test@t.com', key: 'newKey'})
+        return account.removeAccessKey({email: 'removeAccessKey@t.com', key: 'newKey'})
             .then(v=> {
                 expect(v).to.be.true;
             })
-            .then(_=>account.listAccessKeys('test@t.com')).then(u=> {
+            .then(_=>account.listAccessKeys('removeAccessKey@t.com')).then(u=> {
                 expect(u.length).to.eql(1);
             })
     }));
@@ -76,18 +79,18 @@ describe('model/account', function () {
         expect(v.friendlyName).to.eql('stuff');
     })));
 
-    it('should linkProvider', ()=>account.createToken(TOKEN).then(_=>account.linkProvider({
-        email: TOKEN.profile.email,
+    it('should linkProvider', ()=>account.createToken(newToken('linkProvider@t.com')).then(_=>account.linkProvider({
+        email: 'linkProvider@t.com',
         provider: 'stuff'
     })
 
-        .then(v=>account.findAccount(TOKEN.profile.email))
+        .then(v=>account.findAccount('linkProvider@t.com'))
         .then(v=> {
             expect(v).to.exist;
             expect(v.linkedProviders).to.eql(['GitHub', 'stuff']);
         })));
-    it('should not linkProvider', ()=>account.createToken(TOKEN).then(_=>account.linkProvider({
-            email: TOKEN.profile.email,
+    it('should not linkProvider', ()=>account.createToken(newToken('not-linkProvider@t.com')).then(_=>account.linkProvider({
+            email:'not-linkProvider@t.com',
             provider: 'github'
         }).then(()=> {
             throw new Error('Should have failed')

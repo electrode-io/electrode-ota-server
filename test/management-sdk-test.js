@@ -62,7 +62,8 @@ describe('managment-sdk', function () {
         return new AcquisitionManager({
             request(type, url, body, cb){
                 if (!cb) cb = body;
-                agent[verbs[type]](url).set(configuration.headers).send(body).end(function (err, response) {
+                const req = agent[verbs[type]](url).set(configuration.headers);
+                req.send(body).end(function (err, response) {
                     if (response && typeof response.body === 'object') {
                         response.body = JSON.stringify(response.body);
                     }

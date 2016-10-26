@@ -3,12 +3,12 @@ const eql = require('./support/eql');
 const Dao = require('../server/dao/cassandra/dao-cassandra');
 const appFactory = require('../server/model/app')
 const accountFactory = require('../server/model/account');
-
+const fileservice = require('../server/fileservice/dao').fileservice;
+const expect = require('chai').expect;
 
 const shouldError = ()=> {
     expect(false, 'Should have an error').to.be.true;
 };
-const expect = require('chai').expect;
 const APP = {
     email: 'test@p.com',
     app: 'super'
@@ -24,11 +24,11 @@ const chain = (promise = Promise.resolve(), ...promises)=> {
 describe('model/app', function () {
     this.timeout(50000);
     let account, ac;
-    beforeEach(()=> init({contactPoints: ['localhost'], keyspace: 'ota_test'}).connect({reset: true}).then((client)=> {
+    before(()=> init({contactPoints: ['localhost'], keyspace: 'ota_test'}).connect({reset: true}).then((client)=> {
         const dao = new Dao({client});
         let w = 0;
         account = accountFactory(dao);
-        ac = appFactory(dao, (weight)=>(w = (w += 19) % 100) < weight);
+        ac = appFactory(dao, fileservice({}, dao));
     }));
     it('should create/list/remove an app', ()=> {
         const email = 'test@p.com';
@@ -282,9 +282,9 @@ describe('model/app', function () {
     });
     it('should rollback to label', ()=> {
         const email = 'test@p.com';
-        return ac.createApp({email, name: 'rollback'})
+        return ac.createApp({email, name: 'rollbackToLabel'})
             .then(_=>ac.upload({
-                app: 'rollback',
+                app: 'rollbackToLabel',
                 email,
                 package: `This is a string`,
                 packageInfo: {
@@ -295,7 +295,7 @@ describe('model/app', function () {
                 }
             }))
             .then(_=>ac.upload({
-                app: 'rollback',
+                app: 'rollbackToLabel',
                 email,
                 package: `This is a different string`,
                 packageInfo: {
@@ -305,8 +305,8 @@ describe('model/app', function () {
                     description: 'Not Super Cool'
                 }
             }))
-            .then(_=>ac.rollback({email, app: 'rollback', deployment: 'Staging', label: "v1"}))
-            .then(_=>ac.historyDeployment({email, app: 'rollback', deployment: 'Staging'}))
+            .then(_=>ac.rollback({email, app: 'rollbackToLabel', deployment: 'Staging', label: "v1"}))
+            .then(_=>ac.historyDeployment({email, app: 'rollbackToLabel', deployment: 'Staging'}))
             .then(history=> {
                 expect(history.length, 'history length').to.eql(3);
                 history.forEach(v=>expect(delete v.uploadTime, "should have uploadTime").to.be.true);
@@ -377,7 +377,11 @@ describe('model/app', function () {
                 expect(e.message).to.eql(`The specified e-mail address doesn't represent a registered user`);
                 return null;
             }))
-            .then(_=>account.createToken( {profile: {email: 'stuff@p.com', name: 'test'}, query:{hostname:'TestHost'},provider: 'GitHub'} ))
+            .then(_=>account.createToken({
+                profile: {email: 'stuff@p.com', name: 'test'},
+                query: {hostname: 'TestHost'},
+                provider: 'GitHub'
+            }))
             .then(_=>ac.addCollaborator({email: 'what@p.com', app: 'addcollab', collaborator: 'stuff@p.com'}))
             .then(_=>ac.findApp({email: 'what@p.com', app: 'addcollab'}))
             .then(eql({
@@ -452,30 +456,6 @@ describe('model/app', function () {
             ]))
     );
 
-    it('should be 50% rollout', ()=> {
-        const result = [];
-        const update = (uniqueClientId = 'uniqueClientId',
-                        packageHash = 'packageHash',
-                        ratio = 50)=>()=>ac.isUpdateAble(uniqueClientId, packageHash, ratio).then(r=>result.push(r));
-        const first = update();
-        return first().then(first).then(first).then(_=> {
-            const [r0,r1,r2] = result;
-            expect(r0).to.be.true;
-            expect(r1).to.be.true;
-            expect(r2).to.be.true;
-            result.length = 0;
-        }).then(update('id1', 'hash', 3))
-            .then(update('id1', 'hash', 3))
-            .then(update('id1', 'hash', 99))
-            .then(_=>{
-                const [r0,r1,r2] = result;
-                expect(r0).to.be.false;
-                expect(r1).to.be.false;
-                expect(r2).to.be.true;
-
-            })
-            ;
-    });
 
 });
 

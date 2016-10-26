@@ -158,7 +158,7 @@ function checkIfInstallNeeded(repopath, url) {
 
 }
 
-describe('end to end client test', function () {
+describe.skip('end to end client test', function () {
 
     this.timeout(300000);
     let am;
