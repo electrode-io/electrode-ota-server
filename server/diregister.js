@@ -42,6 +42,7 @@ const diregister = (attributes = {dependencies: []}, fn, handlers = HANDLERS) =>
         attributes = {dependencies: attributes.split(/,\s*/)};
     }
 
+
     const dependencies = attributes.dependencies ? Array.isArray(attributes.dependencies) ? attributes.dependencies : [attributes.dependencies] : [];
 
     const register = (server, options, next)=> {
@@ -63,7 +64,13 @@ const diregister = (attributes = {dependencies: []}, fn, handlers = HANDLERS) =>
                 _next();
             }));
 
-        })).then((args = [])=>fn(options, ...args)).then(_=>next(), error);
+        })).then((args = [])=> {
+            const ret = fn(options, ...args);
+            if (ret !== void(0) && attributes.name &&! server.plugins[attributes.name]) {
+                server.plugins[attributes.name] = ret;
+            }
+            return ret;
+        }).then(_=>next(), error);
 
     };
     register.attributes = attributes;

@@ -8,9 +8,17 @@ is API compatible with [code-push-cli](https://microsoft.github.io/code-push/doc
 ### Prerequisites
 
 * Node v6 or greater.
-* Apache Cassandra 
 * Github Account (if using github as auth provider)
+* Apache Cassandra - You can download [here].
 
+### Running Cassandra
+Books have been written about running and configuring cassandra, this is just the most minimal way you can run
+it.  Please read such books before running this server on a public network.
+```sh
+$ curl http://apache.mirrors.hoobly.com/cassandra/3.9/apache-cassandra-3.9-bin.tar.gz | tar -xvzf -
+$ cd apache-cassandra-3.9/
+$ ./bin/cassandra
+```
 
 ### Installation
 This covers a minimal way to install and run electrode-ota-server.  For most scenarios this is 
@@ -48,7 +56,7 @@ for production,test and development.   In production please use TLS/HTTPS for th
             "options": {
                 "contactPoints": [
                     //You can enter an array of cassandra "contactPoints" but you need at least one.
-                    // If you are running cassandra locally you can use localhost.
+                    // If you are running cassandra locally you can use "localhost".
                     "<%=cassandra.hosts%>"
                 ],
                 //Optional username and password.  If you are connceting to a cassandra instance that
@@ -58,6 +66,15 @@ for production,test and development.   In production please use TLS/HTTPS for th
                 //Optional the keyspace you want to run the server with. 
                 "keyspace":"<%=cassanra.keyspace%>
             }
+        },
+        //This allows for other fileservice mechanisms to be plugged in.  Currently the files are stored
+        // in the cassandra db, but the could be stored in anything really, including the filesystem.
+        "electrode-ota-server-fileservice":{
+              "options": {
+                //this needs to be the url of your acquistion server.  It can be the same as your current
+                // management server.  This value is just an example.
+                "downloadUrl": "http://<%=your_ota_server%>/storagev2/"
+              }
         },
         "electrode-ota-server-auth": {
             "options": {

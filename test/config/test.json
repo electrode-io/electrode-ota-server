@@ -1,6 +1,6 @@
 {
-  "connection":{
-    "port":9999
+  "connection": {
+    "port": 9999
   },
   "app": {
     "downloadUrl": "http://localhost:9001/storagev2/",
@@ -15,6 +15,11 @@
         "keyspace": "ota_server_test"
       }
     },
+    "electrode-ota-server-fileservice": {
+      "options": {
+        "downloadUrl": "http://localhost:9001/storagev2/"
+      }
+    },
     "electrode-ota-server-auth": {
       "options": {
         "strategy": {
@@ -23,7 +28,7 @@
           },
           "session": {
             "isSecure": false,
-            "password":"aasd123123mnl1kj31lk2312l3n1l2312l3kn12l3n12n312kj3n12kj3n12k3jn12k3n12k3n"
+            "password": "aasd123123mnl1kj31lk2312l3n1l2312l3kn12l3n12n312kj3n12kj3n12k3jn12k3n12k3n"
           },
           "basic": {
             "module": "../../test/support/basic.js",

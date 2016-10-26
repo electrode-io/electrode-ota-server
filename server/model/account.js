@@ -1,6 +1,6 @@
 "use strict";
 const {id, values, genString} = require('../util');
-const {notFound, invalidRequest} = require('./errors');
+const {notFound, notAuthorized, alreadyExistsMsg} = require('./errors');
 const TTL = 60 * 24 * 3600 * 1000;
 const asTrue = ()=>true;
 const genAccessKey = ({email, createdBy, friendlyName, description, ttl = TTL})=> {
@@ -77,6 +77,7 @@ module.exports = function (dao) {
         {
             return dao.userByAccessKey(token).then(user=> {
                 const account = notFound(user.accessKeys[token], `No token found for ${token}.`);
+                notAuthorized(account.expires > Date.now(), `Token is not valid`);
                 account.lastAccess = Date.now();
                 return dao.updateUser(user.email, user).then(v=>user);
             });
@@ -87,6 +88,15 @@ module.exports = function (dao) {
             return dao.userByEmail(email).then((user)=> {
                 const ak = notFound(user.accessKeys[key] || Object.keys(user.accessKeys).map(ak=>user.accessKeys[ak]).find(findByFriendlyName, key), `AccessKey ${key} not found for user`);
                 delete user.accessKeys[ak.name];
+                return dao.updateUser(email, user).then(asTrue);
+            });
+        },
+        linkProvider({email, provider})
+        {
+            return dao.userByEmail(email).then((user)=> {
+                notFound(user, 'User was not found for email');
+                alreadyExistsMsg(!user.linkedProviders.find(v=>v.toLowerCase() == provider.toLowerCase()), 'Account is already linked to provider');
+                user.linkedProviders.push(provider);
                 return dao.updateUser(email, user).then(asTrue);
             });
         },

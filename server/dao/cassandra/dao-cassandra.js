@@ -163,8 +163,8 @@ class DaoCassandra extends BaseCassandra {
     }
 
 
-    updateUser(currentEmail, {name, email, accessKeys}) {
-        return this._first(`UPDATE users SET name=?, "accessKeys"=? WHERE email= ?`, [name, accessKeys, currentEmail])
+    updateUser(currentEmail, {name, email, accessKeys, linkedProviders}) {
+        return this._first(`UPDATE users SET name=?, "accessKeys"=?, "linkedProviders"=? WHERE email= ?`, [name, accessKeys, linkedProviders, currentEmail])
             .then(_=>this.userByEmail(email));
     }
 

@@ -1,83 +1,39 @@
 "use strict";
 
 const {wrap} = require('../util');
-const diregister = require('../diregister');
-const _page = (content = '', title = 'Electrode OTA')=>`<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-   <head>
-    <meta charset="utf-8" />
-    <link href="/assets/style.css" rel="stylesheet">
-   <title>${title}</title>
-   </head>
-   <body>
-   
-   <div class="fullscreen-bg">
-    <video loop muted autoplay poster="/assets/background.jpg" class="fullscreen-bg__video">
-        <source src="/assets/movie.mpg" type="video/mp4">
-    </video>
-   </div>
-   <div class="container">
-    ${content}   
-   </div>
- 
-   </body>
-</html>`;
 
-const _tokenPage = ({name})=>_page(`
-    <h1>Over the Air Token</h1>
-    <div>Access Token: <span class="token">${name}</span></div>
-    <span>Please close this window after copying this token</span>
-`);
-const _loginChoice = (type = 'login', providers = [], hostname = "")=>_page(`
-  
-        The following authentication providers are avialable:
-        <ul>            
-            ${providers.map(({
-    icon:{
-        height = 50,
-        width = 50,
-        src
-    }, name, label
-})=>`<li><a href="/auth/${type}/${name}?hostname=${hostname}"><img class="icon ${name}" height="${height}" width="${width}" src="${src}">${label}</a></li>`).join('')}
-        </ul>
-`);
-const _errorPage = ({message = 'Sorry, an error occurred'}, href = "/auth/login")=>_page(`
-<div className="error">
-<a href="${href}">${message || 'Sorry, an error occurred'}</a>
-</div>
-`);
-const register = diregister({
+const register = require('../diregister')({
     name: 'authRoute',
-    dependencies: ['electrode:route', 'ota!model'],
-}, (options, route, model, tokenPage = _tokenPage, loginChoice = _loginChoice, errorPage = _errorPage) => {
+    dependencies: ['electrode:route', 'ota!account', 'electrode:views'],
+}, (options, route, acf, views) => {
 
+    views({
+        engines: options.engines || {ejs: require('ejs')},
+        relativeTo: options.relativeTo || __dirname,
+        path: options.path || '../templates',
+        layout: options.layout === false ? false : true
+    });
 
-    const acf = model.account;
-
-    const {invalidate, addAccessKey, createToken} = wrap({
+    const {invalidate, addAccessKey, createToken, linkProvider} = wrap({
         invalidate: acf.invalidate,
         addAccessKey: acf.addAccessKey,
-        createToken: acf.createToken
+        createToken: acf.createToken,
+        linkProvider: acf.linkProvider
     });
 
     route([
         {
             method: 'GET',
-            path: '/auth/login',
+            path: '/auth/{type}',
             config: {
                 auth: false,
-                handler({query:{hostname}}, reply){
-                    reply(loginChoice("login", options.providers, hostname));
-                }
-            }
-        },
-        {
-            method: 'GET',
-            path: '/auth/register',
-            config: {
-                auth: false,
-                handler({query:{hostname}}, reply){
-                    reply(loginChoice('register', options.providers, hostname));
+                handler(req, reply){
+                    reply.view('login', {
+                        title: 'Login',
+                        providers: options.providers,
+                        hostname: req.query.hostname,
+                        type: req.params.type
+                    });
                 }
             }
         }, {
@@ -98,20 +54,14 @@ const register = diregister({
                         return reply.redirect('/auth/login').code(302);
                     }
                     cookieAuth && cookieAuth.clear();
-                    return reply(tokenPage(credentials));
+                    reply.view('accesskey', {
+                        title: 'Token',
+                        name: credentials.name
+                    });
                 }
             }
         },
-        {
-            method: 'GET',
-            path: '/auth/link',
-            config: {
-                auth: false,
-                handler(request, reply){
-                    reply(loginChoice("login", options.providers));
-                }
-            }
-        },
+
 
         {
             method: 'GET',
@@ -173,6 +123,7 @@ const register = diregister({
             auth,
             loginPath,
             registerPath,
+            linkPath,
             redirectTo = '/accesskey'
         })=> {
             const strategy = auth || name;
@@ -193,7 +144,10 @@ const register = diregister({
                             addAccessKey(email, hostname, displayName || username, void(0), (e, token)=> {
                                 if (e) {
                                     console.error('Error adding key', e);
-                                    return reply(errorPage(e));
+                                    return reply.view('error', {
+                                        title: 'Error adding accesskey',
+                                        message: 'Error adding accesskey'
+                                    });
                                 }
                                 cookieAuth.set({token: token.name});
                                 reply.redirect(redirectTo).code(302);
@@ -205,6 +159,7 @@ const register = diregister({
                 }
             });
             if (registerPath !== false) {
+
                 registerPath = registerPath || `/auth/register/${name}`;
                 ret.push({
                     method: 'GET',
@@ -219,15 +174,49 @@ const register = diregister({
                             createToken(credentials, (e, token)=> {
                                 if (e) {
                                     if (e.output && e.output.payload && e.output.payload.error === 'Conflict') {
-                                        return reply(errorPage({message: 'This account is already registered, try logging in instead.'}, `/auth/login?hostname=${credentials.query && credentials.query.hostname}`))
+                                        return reply.view('error', {
+                                            title: 'Error adding account',
+                                            message: 'This account is already registered, try logging in instead.',
+                                            href: `/auth/login?hostname=${credentials.query && credentials.query.hostname}`
+                                        })
                                     }
                                     console.error('Error creating token', e);
-                                    return reply(errorPage({message: e.message}));
+                                    return reply.view('error', {
+                                        title: 'Error adding account',
+                                        message: e.message
+                                    });
+
                                 }
                                 cookieAuth.set({token: token.name});
                                 reply.redirect(redirectTo).code(302);
                             });
 
+                        }
+                    }
+                });
+                linkPath = linkPath || `/auth/link/${name}`;
+                ret.push({
+                    method: 'GET',
+                    path: linkPath,
+                    config: {
+                        auth: strategy,
+                        handler ({auth:{isAuthenticated, credentials}}, reply) {
+                            if (!isAuthenticated) {
+                                console.error('request was not authenticated');
+                                return reply('Not logged in...').code(401);
+                            }
+                            if (credentials && credentials.profile) {
+                                const {email} = credentials.profile;
+                                linkProvider({email, provider: name}, (e)=> {
+                                    if (e) {
+                                        return reply.view('error', {title: 'Error', message: e.message});
+                                    }
+                                    reply.view('link', {
+                                        title: `Linked to ${name}`,
+                                        provider: name
+                                    });
+                                });
+                            }
                         }
                     }
                 });
