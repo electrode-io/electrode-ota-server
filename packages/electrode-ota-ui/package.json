@@ -25,9 +25,6 @@
     "subschema-prop-types": "^1.1.4"
   },
   "repository": "https://github.com/electrode-io/electrode-ota-ui",
-  "publishConfig": {
-    "registry": ""
-  },
   "author": "Justin Spears <speajus@gmail.com>",
   "license": "Apache-2.0",
   "devDependencies": {
