@@ -37,34 +37,39 @@ By default the server will start with production config.  This can be overridden
 
 ```json
 "scripts":{
-  "start":" node node_modules/.bin/electrode-ota-server"
+  "start":"NODE_ENV=production node node_modules/.bin/electrode-ota-server"
 }
 ```
 
+
+
 ### Configure
 Inside the config create a config/production.json. You can configure different settings
-for production,test and development.   In production please use TLS/HTTPS for the server.
+for production,test and development, by creating seperate json files for each environment.
+In production please use TLS/HTTPS for the server.
+This is loaded via electrode-confippet, you go [here](https://github.com/electrode-io/electrode-confippet)
+ to read more.  
+ 
+**The variables that should be configured is are in <%= variable %>.**
+**And the comments must be removed if using JSON.  
 
-```
-    "app": {
-        "downloadUrl": "http://<%=your_ota_server%>/storagev2/",
-        "electrode": true
-    },
+```js
+{
     "plugins": {
         
         "electrode-ota-server-dao-cassandra": {
             "options": {
+                //You can enter an array of cassandra "contactPoints" but you need at least one.
+                // If you are running cassandra locally you can use "localhost".
                 "contactPoints": [
-                    //You can enter an array of cassandra "contactPoints" but you need at least one.
-                    // If you are running cassandra locally you can use "localhost".
                     "<%=cassandra.hosts%>"
                 ],
-                //Optional username and password.  If you are connceting to a cassandra instance that
-                // requires them.
+                 //Optional - If your cassandra server does not require a password
                 "username": "<%=cassandra.username%>",
+                //Optional - If your cassandra server does not require a password
                 "password": "<%=cassandra.password%>"
-                //Optional the keyspace you want to run the server with. 
-                "keyspace":"<%=cassanra.keyspace%>
+                //Optional the keyspace you want to run the server with, by default the keyspace is "wm_ota". 
+                "keyspace":"<%=cassandra.keyspace%>
             }
         },
         //This allows for other fileservice mechanisms to be plugged in.  Currently the files are stored
@@ -72,7 +77,7 @@ for production,test and development.   In production please use TLS/HTTPS for th
         "electrode-ota-server-fileservice":{
               "options": {
                 //this needs to be the url of your acquistion server.  It can be the same as your current
-                // management server.  This value is just an example.
+                // management server.  
                 "downloadUrl": "http://<%=your_ota_server%>/storagev2/"
               }
         },
@@ -107,14 +112,11 @@ for production,test and development.   In production please use TLS/HTTPS for th
                     
                 }
             }
-        },
+        }
     }
-
+}
 
 ```
-
-
-
 
 
 
