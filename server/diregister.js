@@ -33,21 +33,13 @@ const result = (obj, dep)=> {
 const HANDLERS = {
     electrode: (server, dep, options)=>result(server, dep)
 };
-const resolveable = (name, parent)=> {
-    const ret = {parent};
+const resolveable = (name)=> {
+    const ret = {name};
     ret.promise = new Promise(function (_resolve, _reject) {
         ret.resolve = _resolve;
         ret.reject = _reject;
-    }, 5000, name);
+    });
     return ret;
-};
-
-const tab = (count, repeat = '\t')=> {
-    let str = '';
-    while (count-- > 0) {
-        str += repeat;
-    }
-    return str;
 };
 
 const registerContext = (reg)=> {
@@ -60,10 +52,21 @@ const registerContext = (reg)=> {
     const registering = [];
     const registered = [];
 
+    const notResolvedFilter = (dep)=>!(/:/.test(dep) || (dep in MODULES));
+
+    const printNotResolved = ({name, dependencies = []})=> {
+        let str = `\n${name}`;
+        dependencies = dependencies.filter(notResolvedFilter);
+        if (dependencies && dependencies.length) {
+            str += `\n\t-> unresolved[${dependencies.join(',')}]\n`;
+        }
+        return str;
+    };
+
     reg.on('stop', ()=> {
         if (registering.length !== registered.length) {
-            const delta = registering.filter(inflight=>registered.indexOf(inflight) == -1);
-            console.error(`\n\nThe following component(s) have not resolved \n`, delta.join('\n'))
+            const delta = registering.filter(inflight=>registered.indexOf(inflight.name) == -1);
+            console.error(`\n\nThe following component(s) have not resolved\n%s\n`, delta.map(printNotResolved).join('\n'));
         }
     });
 
@@ -102,7 +105,7 @@ const registerContext = (reg)=> {
 
 
     const resolve = (name, dependencies = [], fn, handlers, server, options, next)=> {
-        registering.push(name);
+        registering.push({name, dependencies});
         dependencies = dependencies || [];
         Promise.all(dependencies.map((dep)=> {
             const [namespace, cmd] = dep.split(':', 2);
