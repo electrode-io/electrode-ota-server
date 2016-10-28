@@ -4,7 +4,7 @@ const {wrap} = require('../util');
 const diregister = require('../diregister');
 const register = diregister({
     name: 'accessKeysRoute',
-    dependencies: ['electrode:route', 'ota!account']
+    dependencies: ['electrode:route', 'ota!account', 'ota!scheme']
 }, (options, route, acf) => {
 
     const {addAccessKey, listAccessKeys, updateAccessKey, removeAccessKey, account} = wrap(acf);

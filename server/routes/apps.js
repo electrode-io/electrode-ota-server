@@ -38,7 +38,7 @@ const PARAMS = {
 
 const register = diregister({
     name: 'appsRoute',
-    dependencies: ['electrode:route', 'ota!app']
+    dependencies: ['electrode:route', 'ota!app', 'ota!scheme']
 }, (options, route, app)=> {
     const {
         createApp,

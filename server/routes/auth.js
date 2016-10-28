@@ -4,7 +4,7 @@ const {wrap} = require('../util');
 
 const register = require('../diregister')({
     name: 'authRoute',
-    dependencies: ['electrode:route', 'ota!account', 'electrode:views'],
+    dependencies: [ 'electrode:route', 'ota!account', 'electrode:views', 'ota!scheme'],
 }, (options, route, acf, views) => {
 
     views({
@@ -79,7 +79,7 @@ const register = require('../diregister')({
             config: {
                 auth: {
                     strategy: "bearer",
-                    mode: 'optional'
+                    mode: 'try'
                 },
                 handler(request, reply){
                     reply({
@@ -132,7 +132,10 @@ const register = require('../diregister')({
                 method: 'GET',
                 path: loginPath,
                 config: {
-                    auth: strategy,
+                    auth: {
+                        mode: "try",
+                        strategy
+                    },
                     handler ({auth:{isAuthenticated, credentials}, cookieAuth}, reply) {
                         if (!isAuthenticated) {
                             return reply('Not logged in...').code(401);

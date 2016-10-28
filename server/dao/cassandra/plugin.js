@@ -10,5 +10,7 @@ module.exports.register = diregister({
     name: "ota!dao",
     multiple: false,
     connections: false,
-    dependencies: ['electrode:plugins', 'ota!cassandra']
-}, (options, plugins, cassandra)=>new Dao(Object.assign({}, cassandra, options)));
+    dependencies: ['ota!cassandra']
+}, (options,  client)=> {
+    return new Dao(Object.assign({}, options, {client}))
+});
