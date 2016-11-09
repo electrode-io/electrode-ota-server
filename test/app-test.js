@@ -5,7 +5,7 @@ const appFactory = require('../server/model/app')
 const accountFactory = require('../server/model/account');
 const upload = require('../server/fileservice/dao/upload').fileservice;
 const download = require('../server/fileservice/dao/download').fileservice;
-const {diffPackageMap} =require('../server/manifest');
+const {diffPackageMap} =require('../server/model/manifest');
 const expect = require('chai').expect;
 
 const shouldError = ()=> {
@@ -120,6 +120,7 @@ describe('model/app', function () {
                     "label": "v2",
                     "originalDeployment": null,
                     "originalLabel": null,
+                    "manifestBlobUrl":null,
                     "packageHash": "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
                     "releaseMethod": "Upload",
                     "releasedBy": "test@p.com",
@@ -132,7 +133,7 @@ describe('model/app', function () {
                     "diffPackageMap": null,
                     "isDisabled": true,
                     "isMandatory": true,
-                    "label": "v1",
+                    "label": "v1", "manifestBlobUrl":null,
                     "originalDeployment": null,
                     "originalLabel": null,
                     "packageHash": "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
@@ -157,6 +158,7 @@ describe('model/app', function () {
                     "isDisabled": false,
                     "isMandatory": true,
                     "label": null,
+                    "manifestBlobUrl":null,
                     "originalDeployment": "Staging",
                     "originalLabel": "v2",
                     "releaseMethod": "Promote",
@@ -190,6 +192,7 @@ describe('model/app', function () {
                 "diffPackageMap": null,
                 "isDisabled": true,
                 "isMandatory": true,
+                "manifestBlobUrl":null,
                 "label": null,
                 "originalDeployment": "Staging",
                 "originalLabel": "v2",
@@ -240,6 +243,7 @@ describe('model/app', function () {
                     "isMandatory": true,
                     "label": "v3",
                     "originalDeployment": null,
+                    "manifestBlobUrl":null,
                     "originalLabel": "v2",
                     "packageHash": "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
                     "blobUrl": "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
@@ -255,6 +259,7 @@ describe('model/app', function () {
                     "diffPackageMap": null,
                     "isDisabled": false,
                     "isMandatory": true,
+                    "manifestBlobUrl":null,
                     "label": "v2",
                     "originalDeployment": null,
                     "originalLabel": null,
@@ -270,6 +275,7 @@ describe('model/app', function () {
                     "description": "Super Cool",
                     "diffPackageMap": null,
                     "isDisabled": true,
+                    "manifestBlobUrl":null,
                     "isMandatory": true,
                     "label": "v1",
                     "originalDeployment": null,
@@ -321,6 +327,8 @@ describe('model/app', function () {
                     "description": "Super Cool",
                     "diffPackageMap": null,
                     "isDisabled": true,
+                    "manifestBlobUrl":null,
+
                     "isMandatory": true,
                     "label": "v3",
                     "originalDeployment": null,
@@ -338,6 +346,7 @@ describe('model/app', function () {
                     "diffPackageMap": null,
                     "isDisabled": false,
                     "isMandatory": true,
+                    "manifestBlobUrl":null,
                     "label": "v2",
                     "originalDeployment": null,
                     "originalLabel": null,
@@ -354,6 +363,7 @@ describe('model/app', function () {
                     "diffPackageMap": null,
                     "isDisabled": true,
                     "isMandatory": true,
+                    "manifestBlobUrl":null,
                     "label": "v1",
                     "originalDeployment": null,
                     "originalLabel": null,
