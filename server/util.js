@@ -8,7 +8,7 @@ const id = (length = 8) =>genString(length);
 
 const values = obj => obj ? Object.keys(obj).map(key => obj[key]) : obj;
 
-const shasum = str => crypto.createHash('sha256').update(str).digest("hex");
+const shasum = (str, hash='sha256', digest='hex') => crypto.createHash(hash).update(str).digest(digest);
 /**
  * Reduces and returns, by default an object.
  * Does not care bout the return of the function.

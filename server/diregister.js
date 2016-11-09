@@ -66,7 +66,10 @@ const registerContext = (reg)=> {
     reg.on('stop', ()=> {
         if (registering.length !== registered.length) {
             const delta = registering.filter(inflight=>registered.indexOf(inflight.name) == -1);
-            console.error(`\n\nThe following component(s) have not resolved\n%s\n`, delta.map(printNotResolved).join('\n'));
+            console.error(`\n\nThe following component(s) have not resolved\n%s\nregistered:\n %s\n`,
+                delta.map(printNotResolved).join('\n'),
+                registered.join('\n')
+            );
         }
     });
 
@@ -137,7 +140,7 @@ const diregister = (attributes = {dependencies: []}, fn, handlers = HANDLERS) =>
 
     register.attributes = attributes;
     //might just get rid of dependencies, as it seems kinda useless.
-    register.attributes.dependencies = dependencies.filter(v=>!/:/.test(v));
+    register.attributes.dependencies = [];
     return register;
 };
 module.exports = diregister;

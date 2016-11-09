@@ -11,7 +11,8 @@
         "keyspace": "ota_server_test"
       }
     },
-    "electrode-ota-server-fileservice": {
+
+    "electrode-ota-server-fileservice-upload": {
       "options": {
         "downloadUrl": "http://localhost:9001/storagev2/"
       }

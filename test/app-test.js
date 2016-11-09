@@ -3,7 +3,9 @@ const eql = require('./support/eql');
 const Dao = require('../server/dao/cassandra/dao-cassandra');
 const appFactory = require('../server/model/app')
 const accountFactory = require('../server/model/account');
-const fileservice = require('../server/fileservice/dao').fileservice;
+const upload = require('../server/fileservice/dao/upload').fileservice;
+const download = require('../server/fileservice/dao/download').fileservice;
+const {diffPackageMap} =require('../server/manifest');
 const expect = require('chai').expect;
 
 const shouldError = ()=> {
@@ -28,7 +30,8 @@ describe('model/app', function () {
         const dao = new Dao({client});
         let w = 0;
         account = accountFactory(dao);
-        ac = appFactory(dao, fileservice({}, dao));
+        const up = upload({}, dao), down = download({}, dao);
+        ac = appFactory(dao, up, (history)=>diffPackageMap( down, up,history));
     }));
     it('should create/list/remove an app', ()=> {
         const email = 'test@p.com';

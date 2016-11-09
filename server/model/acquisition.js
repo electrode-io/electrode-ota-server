@@ -7,10 +7,10 @@ const {missingParameter} = require('./errors');
 const fixver = (ver)=>ver ? ('' + ver).replace(/^(\d+?)$/, '$1.0.0') : '0.0.0';
 const version = require('semver');
 
-module.exports = (dao, weighted)=> {
+module.exports = (dao, weighted, _download, manifest)=> {
     const api = {
         download(hash){
-            return dao.download(hash);
+            return _download(hash);
         },
 
         /**
@@ -39,13 +39,14 @@ module.exports = (dao, weighted)=> {
                         shouldRunBinaryVersion: false
                     }
                 }
+
                 let isNotAvailable = pkg.packageHash == params.packageHash || !('clientUniqueId' in params);
 
                 const appVersion = fixver(pkg.appVersion);
 
                 function makeReturn(isAvailable) {
                     const packageSize = pkg && pkg.size && (pkg.size - 0) || 0;
-                    return {
+                    const ret = {
                         downloadURL: pkg.blobUrl,
                         isAvailable,
                         isMandatory: pkg.isMandatory,
@@ -57,7 +58,34 @@ module.exports = (dao, weighted)=> {
                         "updateAppVersion": version.lt(fixver(params.appVersion), appVersion),
                         //TODO - find out what this should be
                         "shouldRunBinaryVersion": false
+                    };
+                    if (isAvailable) {
+                        if (pkg.manifestBlobUrl) {
+                            const diffPackageMap = pkg.diffPackageMap || {};
+                            const partial = diffPackageMap[params.packageHash];
+                            if (partial) {
+                                ret.downloadURL = partial.url;
+                                ret.packageSize = partial.size;
+                                return ret;
+                            } else {
+                                return dao.historyByIds(deployment.history_)
+                                    .then(history=>history.filter(v=>v.packageHash == params.packageHash))
+                                    .then(matches=> manifest(matches.concat(pkg)).then(v=> {
+                                        return dao.updatePackage(deployment.key, v[v.length-1]).then((pkgLast)=> {
+                                            const p2 = pkgLast.diffPackageMap && pkgLast.diffPackageMap[params.packageHash];
+                                            if (p2) {
+                                                ret.downloadURL = p2.url;
+                                                ret.packageSize = p2.size;
+                                            }
+                                            return ret;
+                                        })
+                                    }));
+
+                            }
+                        }
                     }
+
+                    return ret;
                 }
 
                 return isNotAvailable ? makeReturn(isNotAvailable) : api.isUpdateAble(params.clientUniqueId, pkg.packageHash, pkg.rollout).then(makeReturn);

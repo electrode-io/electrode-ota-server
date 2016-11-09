@@ -2,8 +2,7 @@
 
 const {id, key, remove} = require('../util');
 
-
-
+const {isZip, generate} = require('./manifest');
 const {alreadyExists, alreadyExistsMsg, notFound, missingParameter, notAuthorized, invalidRequest} = require('./errors');
 
 const excludeNull = obj=> Object.keys(obj).reduce((ret, key)=> {
@@ -18,7 +17,7 @@ const Perms = {
     Collaborator: ['Collaborator'],
     Any: ['Owner', 'Collaborator']
 };
-
+const toBuffer = (obj)=>JSON.stringify(obj);
 
 const hasDeploymentName = ({deployments}, deployment) => {
     if (!deployments)return false;
@@ -59,7 +58,7 @@ const notAuthorizedPerm = (app, email, perm, message)=> {
 };
 
 
-module.exports = (dao,upload) => {
+module.exports = (dao, upload) => {
     const api = {};
     return Object.assign(api, {
         findApp({email, app}){
@@ -287,9 +286,11 @@ module.exports = (dao,upload) => {
                     isDisabled = false, label, isMandatory = false, rollout = 100, appVersion = '1.0.0'
                 }
             } = vals;
+
             return api.findApp({email, app}).then(_app=> {
 
                 notFound(hasDeploymentName(_app, deployment), `Not a valid deployment '${deployment}' for app '${app}'`);
+                const zip = isZip('', vals.package);
 
                 return dao.deploymentByApp(_app.id, deployment).then(deployments=> {
                     //noinspection JSUnresolvedVariable
@@ -300,7 +301,20 @@ module.exports = (dao,upload) => {
                         label: label || "v" + (deployments.history_ ? deployments.history_.length + 1 : 1),
                         releasedBy: email
                     };
-                    return upload(vals.package).then(resp=> dao.addPackage(deployments.key, Object.assign({}, pkg, resp)));
+                    return upload(vals.package)
+                        .then((resp)=> {
+                            if (zip) {
+                                return generate(vals.package).then(toBuffer).then(upload)
+                                    .then(({blobUrl})=> {
+                                        resp.manifestBlobUrl = blobUrl;
+                                        return resp;
+                                    });
+                            }
+                            return resp;
+                        })
+                        .then(resp=> {
+                            return dao.addPackage(deployments.key, Object.assign({}, pkg, resp))
+                        });
                 });
             })
         },
