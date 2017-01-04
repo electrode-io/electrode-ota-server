@@ -48,7 +48,6 @@ describe('managment-sdk', function () {
     let extraCollaborator;
     let aquistionServerUrl;
     let stop;
-    const proxy = env.CP_HTTP_PROXY || 'http://localhost:8888';
 
     before(()=>server().then((setup)=> {
         updateServerUrl = setup.serverUrl;

@@ -85,7 +85,7 @@ describe('manifest', function () {
 
         };
 
-        return manifest.diffPackageMap(download, upload, test).then(debug).then(eql([
+        return manifest.diffPackageMap(download, upload, test).then(eql([
             {
                 "description": "",
                 "isDisabled": false,

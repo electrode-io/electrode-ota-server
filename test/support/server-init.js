@@ -10,7 +10,23 @@ const Dao = require('../../server/dao/cassandra/dao-cassandra');
 const otaServer = require("../../index");
 const supertest = require('supertest');
 const {makeRequester, tokenRe, auth} = require('./request');
+const wrapAgent = (agent)=>{
+    return {
+        put(...args){
 
+        },
+        post(...args){
+
+        },
+        del(...args){
+
+        },
+        get(...args){
+
+        }
+    }
+
+};
 module.exports = ()=> init({
     contactPoints: ['localhost'],
     keyspace: 'ota_server_test'
