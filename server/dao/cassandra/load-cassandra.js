@@ -73,7 +73,7 @@ module.exports = function loadCassandra(keyspace) {
     "appVersion" text,
     "blobUrl" text,
     description text,
-    rollout tinyint,
+    rollout int,
     size varint,
     "uploadTime" timestamp,
     "releaseMethod" text,
