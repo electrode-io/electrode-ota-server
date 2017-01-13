@@ -28,57 +28,119 @@ const result = (obj, dep)=> {
     }
     return obj[dep];
 };
+
 //Allow for different handlers.
 const HANDLERS = {
     electrode: (server, dep, options)=>result(server, dep)
 };
-const error = (e)=> {
-    console.error('Error', e);
+const resolveable = (name)=> {
+    const ret = {name};
+    ret.promise = new Promise(function (_resolve, _reject) {
+        ret.resolve = _resolve;
+        ret.reject = _reject;
+    });
+    return ret;
 };
-const diregister = (attributes = {dependencies: []}, fn, handlers = HANDLERS) => {
-    if (Array.isArray(attributes)) {
-        attributes = {dependencies: attributes};
-    } else if (typeof attributes === 'string') {
-        attributes = {dependencies: attributes.split(/,\s*/)};
+
+const registerContext = (reg)=> {
+    if (reg.plugins.diregister) {
+        return reg.plugins.diregister;
     }
+    const PROMISES = {};
+    const MODULES = {};
+
+    const registering = [];
+    const registered = [];
+
+    const notResolvedFilter = (dep)=>!(/:/.test(dep) || (dep in MODULES));
+
+    const printNotResolved = ({name, dependencies = []})=> {
+        let str = `\n${name}`;
+        dependencies = dependencies.filter(notResolvedFilter);
+        if (dependencies && dependencies.length) {
+            str += `\n\t-> unresolved[${dependencies.join(',')}]\n`;
+        }
+        return str;
+    };
+
+    reg.on('stop', ()=> {
+        if (registering.length !== registered.length) {
+            const delta = registering.filter(inflight=>registered.indexOf(inflight.name) == -1);
+            console.error(`\n\nThe following component(s) have not resolved\n%s\nregistered:\n %s\n`,
+                delta.map(printNotResolved).join('\n'),
+                registered.join('\n')
+            );
+        }
+    });
 
 
-    const dependencies = attributes.dependencies ? Array.isArray(attributes.dependencies) ? attributes.dependencies : [attributes.dependencies] : [];
+    const waitForModule = (name, parent)=> {
+        if (name in MODULES) {
+            return MODULES[name]
+        }
+        const ref = PROMISES[name] || (PROMISES[name] = resolveable(name));
+        if (parent) {
+            if (ref.parents) {
+                ref.parents.push(parent);
+            } else {
+                ref.parents = [parent];
+            }
+        }
+        return ref.promise;
+    };
 
-    const register = (server, options, next)=> {
+    const resolveModule = (name, value = null)=> {
+        if (name in MODULES) {
+            if (MODULES[name] !== value) {
+                throw new Error(`${name} resolves to different value`);
+            }
+            return MODULES[name];
+        } else {
+            MODULES[name] = value;
+        }
+        const promise = PROMISES[name];
+        if (promise && promise.promise) {
+            promise.promise = false;
+            promise.resolve(value);
+        }
+        return value;
+    };
 
+
+    const resolve = (name, dependencies = [], fn, handlers, server, options, next)=> {
+        registering.push({name, dependencies});
+        dependencies = dependencies || [];
         Promise.all(dependencies.map((dep)=> {
             const [namespace, cmd] = dep.split(':', 2);
             if (cmd && handlers[namespace]) {
                 return handlers[namespace](server, cmd, options);
             }
-            //I dunno why this is needed but, it is.
-            if (server.plugins[dep]) {
-                return server.plugins[dep];
-            }
-            return new Promise((resolve)=> server.dependency(dep, (_server, _next)=> {
-                if (!(dep in _server.plugins)) {
-                    return _next(new Error(`Could not resolve dependency "${dep}" being included from "${attributes.name}"`))
-                }
-                resolve(_server.plugins[dep]);
-                _next();
-            }));
-
-        })).then((args = [])=> {
-            const ret = fn(options, ...args);
-            if (ret !== void(0) && attributes.name &&! server.plugins[attributes.name]) {
-                server.plugins[attributes.name] = ret;
-            }
-            return ret;
-        }).then(_=>next(), error);
-
+            return waitForModule(dep, name);
+        })).then((args = [], next)=>fn(options, ...args)).then((value)=> {
+            registered.push(name);
+            next();
+            return resolveModule(name, value);
+        }, next);
     };
+
+    return (reg.plugins.diregister = resolve);
+};
+
+
+module.exports.HANDLERS = HANDLERS;
+
+
+const diregister = (attributes = {dependencies: []}, fn, handlers = HANDLERS) => {
+
+
+    const name = attributes.name;
+    const dependencies = attributes.dependencies ? Array.isArray(attributes.dependencies) ? attributes.dependencies : attributes.dependencies : [];
+
+    const register = (server, options, next)=> registerContext(server)(name, dependencies, fn, handlers, server, options, next);
+
     register.attributes = attributes;
     //might just get rid of dependencies, as it seems kinda useless.
-    register.attributes.dependencies = dependencies.filter(v=>!/:/.test(v));
+    register.attributes.dependencies = [];
     return register;
 };
-//expose
-diregister.HANDLERS = HANDLERS;
-
 module.exports = diregister;

@@ -1,7 +1,11 @@
 "use strict";
 const diregister = require('../diregister');
 
-module.exports.register = diregister({
-    name: 'static',
-    dependencies: ['electrode:route', 'inert']
-}, (options, route) => route(options));
+const register = (server, options, next) => {
+    server.route(options);
+    return next();
+};
+
+register.attributes = {name:'electrode-ota-server-static'}
+
+module.exports = {register};

@@ -7,15 +7,11 @@ process.env.PORT = 9999;
 process.env.OTA_CONFIG_DIR = path.join(__dirname, 'config');
 const otaServer = require("../index");
 const expect = require("chai").expect;
-const _ = require("lodash");
 const {
-    P,
     auth,
-    all,
     makeRequester,
     body,
     match,
-    handle,
     tokenRe
 } =require('./support/request');
 
@@ -37,9 +33,15 @@ describe('electrode-ota-server', function () {
     before(() => init({
         contactPoints: ['localhost'],
         keyspace: 'ota_server_test'
-    }).connect({reset: true}).then((client)=>{
+    }).connect({reset: true}).then((client)=> {
         return otaServer().then(r=>server = r)
-    }));
+    })
+/*        .then((resp)=> {
+        return new Promise(function (resolve) {
+            setTimeout(resolve, 1000, resp);
+        });
+    })*/
+    );
 
     after(() => server && server.stop());
 

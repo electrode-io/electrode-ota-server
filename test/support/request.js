@@ -11,7 +11,15 @@ const body = eql=>r=> expect(r.body).to.eql(eql);
 const match = (re)=>r=>expect(r.result).to.match(re);
 
 const all = (checks)=> (checks == null || checks.length == 0) ? null : (...args)=> Array.isArray(checks) ? Promise.all(checks.map(fn=>fn && fn(...args))) : checks(...args);
-const makeRequester = (server)=>(options, check, errorCheck)=>P(resolve => server.inject(options, handle(resolve))).then(all(check), all(errorCheck));
+const makeRequester = (server)=>(options, check, errorCheck)=>{
+    return P(resolve => server.inject(options, handle(resolve)))
+        .then(function(resp){
+            console.log('request', options, resp.body, resp.statusCode);
+            return resp;
+        })
+
+        .then(all(check), all(errorCheck));
+};
 const auth = (username, password)=> 'Basic ' + new Buffer(`${username}:${password}`).toString('base64');
 
 const tokenRe = /<span class="token">([a-z0-9A-Z]+?)<\/span>/;

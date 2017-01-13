@@ -1,5 +1,5 @@
-const diregister = require('../diregister');
-const {shasum} = require('../util');
+const diregister = require('../../diregister');
+const {shasum} = require('../../util');
 /**
  * The fileservice is meant to be plugable.
  *
@@ -9,18 +9,21 @@ const {shasum} = require('../util');
  *
  */
 const fileservice = ({downloadUrl}, dao)=> {
-    downloadUrl = downloadUrl && downloadUrl.replace((/\/+?$/, ''));
+    downloadUrl = downloadUrl && downloadUrl.replace(/\/+?$/, '');
     return (file) => {
         const packageHash = shasum(file);
         return dao.upload(packageHash, file).then(()=> ({
             packageHash,
             size: file.length,
             blobUrl: downloadUrl ? `${downloadUrl}/${packageHash}` : packageHash
-        }));
+        }), (err)=>{
+            console.log('upload error', err);
+            throw err;
+        });
     };
 };
 const register = diregister({
-    name: "ota!fileservice",
+    name: "ota!fileservice-upload",
     multiple: false,
     connections: false,
     dependencies: ['ota!dao']

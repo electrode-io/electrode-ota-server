@@ -29,6 +29,7 @@ const PACKAGE_FIELDS = [
     "releasedBy",
     "diffPackageMap",
     "isDisabled",
+    "manifestBlobUrl",
     "packageHash",
     "isMandatory"];
 
@@ -38,7 +39,8 @@ const PACKAGE_UPDATE_FIELDS = [
     "isMandatory",
     "isDisabled",
     "rollout",
-    "label"
+    "label",
+    "diffPackageMap"
 ];
 
 const {
@@ -172,7 +174,12 @@ class DaoCassandra extends BaseCassandra {
         return this._deploymentByAppAndName(appId, deploymentName)
             .then(deployment=>deployment.history_ ? this._all(`SELECT * FROM packages WHERE id_ IN ?`, [deployment.history_]).then(historySort).then(removeCreated) : []);
     }
-
+    historyByIds(historyIds){
+        if (historyIds == null || historyIds.length == 0){
+            return Promise.resolve([]);
+        }
+        return this._all(`SELECT * FROM packages WHERE id_ IN ?`, [historyIds]);
+    }
     /**
      * Keep the actual history so that the label can update correctly.
      * @param appId

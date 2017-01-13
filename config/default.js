@@ -3,6 +3,9 @@ var root = path.join.bind(path, __dirname, '..');
 
 
 module.exports = {
+    "app": {
+        "electrode": true
+    },
     "connections": {
         "default": {
             "port": process.env.port || process.env.PORT || 9001,
@@ -54,8 +57,17 @@ module.exports = {
         "electrode-ota-server-dao-plugin": {
             "module": root("server/dao/cassandra/plugin")
         },
+        "electrode-ota-server-fileservice-upload": {
+            "module": root("server/fileservice/dao/upload")
+        },
+        "electrode-ota-server-fileservice-download": {
+            "module": root("server/fileservice/dao/download")
+        },
         "electrode-ota-server-fileservice": {
             "module": root("server/fileservice/dao")
+        },
+        "electrode-ota-server-model-manifest": {
+            "module": root("server/model/manifest-plugin")
         },
         "electrode-ota-server-model-weighted": {
             "module": root("server/model/weighted-plugin")
@@ -69,6 +81,7 @@ module.exports = {
         "electrode-ota-server-model-acquisition": {
             "module": root("server/model/acquisition-plugin")
         },
+
         "electrode-ota-server-auth-validate": {
             "module": root("server/auth/validate"),
             "options": {}

@@ -13,44 +13,32 @@ const fs = require('fs-extra');
 const server = process.env.MS_CONFIG ? require('./support/server-ms') : require('./support/server-init');
 const AccountManager = require('code-push/script/management-sdk');
 
-function exec(cmd, ...args) {
-    return new Promise((resolve, reject)=> {
-        const c = spawn(cmd, args);
-        c.stdout.on('data', function (data) {
-            text += data;
+function exists(path) {
+    try {
+        fs.lstatSync(path);
+        return true;
+    } catch (e) {
 
-            console.log(data + '');
-        });
-        let text = '';
-        c.stderr.on('data', function (data) {
-            console.log('stderr: ' + data.toString());
-        });
+    }
+    return false;
+}
+
+function execEnvInCwd(addEnv, cwd, cmd, ...args) {
+    const env = Object.assign({}, process.env, addEnv);
+    console.log(`running in ${cwd}\n\t${cmd} ${args.join(' ')}\n`);
+    return new Promise((resolve, reject)=> {
+        const c = spawn(cmd, args, {env, cwd});
+        c.stdout.pipe(process.stdout);
+        c.stderr.pipe(process.stderr);
 
         c.on('exit', function (code) {
-            if (!code) return resolve(text);
+            if (!code) return resolve(true);
             reject(new Error('child process exited with code ' + code))
         });
     });
 }
-function execEnvInCwd(addEnv, cwd, cmd, ...args) {
-    const env = Object.assign({}, process.env, addEnv);
-
-    return new Promise((resolve, reject)=> {
-        const c = spawn(cmd, args, {env, cwd});
-        c.stdout.on('data', function (data) {
-            console.log('stdout: ' + data.toString());
-        });
-        let text = '';
-        c.stderr.on('data', function (data) {
-            console.log('stderr: ' + data.toString());
-            text += data;
-        });
-
-        c.on('exit', function (code) {
-            if (!code) return resolve(text);
-            reject(new Error('child process exited with code ' + code))
-        });
-    });
+function execInDir(indir, ...args) {
+    return execEnvInCwd(null, indir, ...args);
 }
 function releaseReact(addEnv, cwd, cmd, ...args) {
     const env = Object.assign({}, process.env, addEnv);
@@ -62,7 +50,7 @@ function releaseReact(addEnv, cwd, cmd, ...args) {
             const str = data.toString();
             console.log(str);
             const parts = /bundle output to:\s*(.*\/main.jsbundle)/.exec(str);
-            if (parts[1]) {
+            if (parts && parts[1]) {
                 bundle = parts[1];
             }
             //*argv	char *	"/Users/jspear1/Library/Developer/CoreSimulator/Devices/18AAFFC5-2FFD-45E8-A8A7-F3F047861138/data/Containers/Bundle/Application/44E48764-2D17-493E-976B-FCA4907DD8C8/CodePushDemoApp.app/CodePushDemoApp"	0x00007fff56ab78a0
@@ -70,14 +58,10 @@ function releaseReact(addEnv, cwd, cmd, ...args) {
                 fs.copySync(bundle, demo('ios', 'main.jsbundle'));
             }
         });
-        let text = '';
-        c.stderr.on('data', function (data) {
-            console.log('stderr: ' + data.toString());
-            text += data;
-        });
+        c.stderr.pipe(process.stderr);
 
         c.on('exit', function (code) {
-            if (!code) return resolve(text);
+            if (!code) return resolve(true);
             reject(new Error('child process exited with code ' + code))
         });
     });
@@ -113,21 +97,7 @@ function iosUpdate(working_dir, name, CodePushServerURL, CodePushDeploymentKey) 
     }
     return Promise.resolve(out);
 }
-function execInDir(indir, cmd, ...args) {
-    console.log(`running in ${indir}\n\t${cmd} ${args.join(' ')}\n`);
-    const opwd = process.cwd();
-    try {
-        process.chdir(indir);
-    } catch (e) {
-        return Promise.reject(e);
-    }
-    return exec(cmd, ...args).then((ret)=> {
-        process.chdir(opwd);
-        return ret;
-    }, (ret)=> {
-        process.chdir(opwd);
-    })
-}
+
 function runInXcodeTest() {
     return execInDir(demo('ios', 'CodePushDemoApp.xcodeproj'), 'xcodebuild', '-workspace', 'project.xcworkspace',
         '-scheme', 'CodePushDemoAppTests',
@@ -138,19 +108,16 @@ function runInXcodeTest() {
 }
 function checkIfInstallNeeded(repopath, url) {
     return new Promise((resolve, reject)=> {
-        try {
-            fs.lstatSync(repopath);
+        if (exists(repopath)) {
             return execInDir(repopath, 'git', 'remote', 'update').then(()=> execInDir(repopath, 'git', 'status', '-s', '-u', 'no').then(resp=> {
                 if (!resp) {
                     //nothing has changed
-                    return resolve(true);
+                    return resolve(exists(rncp("node_modules") && exists(demo("node_modules"))));
                 }
-
                 return execInDir(repopath, 'git', 'reset', '--hard', 'origin/master').then(()=>resolve(false), reject);
             }), reject);
-        } catch (e) {
-            console.log('e', e);
-            return execInDir(path.dirname(repopath), 'git', 'clone', url).then(()=> {
+        } else {
+            execInDir(path.dirname(repopath), 'git', 'clone', url).then(()=> {
                 resolve(false)
             }, reject);
         }
@@ -180,7 +147,11 @@ describe.skip('end to end client test', function () {
         am = new AccountManager(setup.accessKey, {}, setup.serverUrl);
         stop = setup.stop;
     }).then(()=>checkIfInstallNeeded(rncp(), 'https://github.com/Microsoft/react-native-code-push.git')
-        .then((resp)=>resp ? null : execInDir(demo(), 'npm', 'install'))));
+        .then((resp)=> {
+            if (resp) return true;
+
+            return execInDir(rncp(), 'npm', 'install').then(()=>execInDir(demo(), 'npm', 'install'))
+        })));
 
     after(()=> {
         return stop && stop();
@@ -199,7 +170,7 @@ describe.skip('end to end client test', function () {
                     iosUpdate(demo(), 'CodePushDemoAppTests', aquistionServerUrl, deployment.key);
                     return releaseReact({LOCALAPPDATA}, demo(), 'code-push', 'release-react', appname, 'ios', '--deploymentName', 'Staging');
                 })
-                    //.then(runInXcodeTest)
+                //.then(runInXcodeTest)
                     .then(()=> {
                         try {
                             fs.unlinkSync(path.join(LOCALAPPDATA, '.code-push.config'))

@@ -1,7 +1,10 @@
 const {env} = process;
+const uuid = require('uuid');
 //EVIL - But we need snoopage
 env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
+const path = require('path');
+const join = path.join.bind(path, __dirname);
 const AccountManager = require('code-push/script/management-sdk');
 const {expect} = require('chai');
 const {AcquisitionManager, AcquisitionStatus} = require('code-push/script/acquisition-sdk');
@@ -12,8 +15,13 @@ const uploadFile = "./test/fixtures/upload.zip";
 const uploadFile2 = "./test/fixtures/upload2.zip";
 const uploadFile3 = "./test/fixtures/upload3.zip";
 
-const clientUniqueId = '6451410-77F2-423C-836C-623AA5F586B5';
-const clientUniqueId2 = '2451410-77F2-423C-836C-623AA5F586B5';
+const step1 = join('./fixtures/step.1.blob.zip');
+const step2 = join('./fixtures/step.2.blob.zip');
+const step3 = join('./fixtures/step.3.blob.zip');
+
+
+const clientUniqueId = uuid().toUpperCase();
+const clientUniqueId2 = uuid().toUpperCase();
 
 const expected = (eql = null)=>(result)=>expect(result).to.eql(eql);
 const contains = (eql = null)=>(result)=> {
@@ -26,6 +34,10 @@ const hasKeys = (...keys)=>(obj)=> {
         expect(key in obj).to.be.true;
     }
 };
+const last = (val)=>val && val.length ? val[val.length - 1] : val;
+
+const delay = (timeout)=>(...args)=>new Promise(resolve=>setTimeout(resolve, timeout, ...args));
+
 describe('managment-sdk', function () {
     this.timeout(50000);
 
@@ -36,7 +48,6 @@ describe('managment-sdk', function () {
     let extraCollaborator;
     let aquistionServerUrl;
     let stop;
-    const proxy = env.CP_HTTP_PROXY || 'http://localhost:8888';
 
     before(()=>server().then((setup)=> {
         updateServerUrl = setup.serverUrl;
@@ -427,21 +438,68 @@ describe('managment-sdk', function () {
 
         describe('release', ()=> {
             const name = `release-${Date.now()}`;
+            console.log('testing release', name);
             it('should release', ()=> am.addApp(name)
-                .then(_=>am.release(name, 'Production', uploadFile, '1.2.3', {
+                .then(_=>am.release(name, 'Production', step1, '1.2.3', {
                     isDisabled: true,
                     description: 'super',
                     isMandatory: true
                 }))
-                .then(_=>am.getDeployment(name, 'Production'))
-                .then(({name, package:{appVersion, isDisabled, isMandatory, description}})=> {
-                    expect(name).to.eql('Production');
-                    expect(appVersion).to.eql('1.2.3');
-                    expect(isDisabled).to.be.true;
-                    expect(isMandatory).to.be.true;
-                    expect(description).to.eql('super');
-                }));
+                .then(_=>am.getDeployment(name, 'Production').then((deployment)=> {
+                        return am.getDeploymentHistory(name, 'Production')
+                            .then(last)
+                            .then(resp=> {
+                                const {appVersion, manifestBlobUrl, label, isDisabled, packageHash, isMandatory, description} = resp;
+                                expect(appVersion).to.eql('1.2.3');
+                                expect(isDisabled).to.be.true;
+                                expect(isMandatory).to.be.true;
+                                expect(!manifestBlobUrl).to.be.false;
+                                expect(description).to.eql('super');
+                                return am.release(name, 'Production', step2, '1.2.3', {
+                                    isDisabled: false,
+                                    description: 'super',
+                                    isMandatory: true
+                                })
+                                //Delay makes it work, apparently the MS Server takes a few seconds to do its magic.
+                                    .then(delay(2000))
+                                    .then((npackage)=>P((resolve, reject)=> {
+                                            //The MS Server does diffPackageMap lazily, so we have to call and do a check.
+                                            //for it for it to return with the magic.
+                                            const aaq = aq({
+                                                clientUniqueId,
+                                                deploymentKey: deployment.key,
+                                                headers: {
+                                                    'Accept': 'application/text',
+                                                    'content-type': 'application/json'
+                                                }
+                                            });
+                                            return aaq.queryUpdateWithCurrentPackage({
+                                                appVersion: '1.2.3',
+                                                label,
+                                                packageHash
+                                            }, (e, o)=>e ? reject(e) : resolve(o))
+                                        }).then(shouldUpdate=> {
+                                            expect(shouldUpdate.appVersion, 'appVersion').to.eql('1.2.3');
+                                            expect(shouldUpdate.deploymentKey, 'deploymentKey').to.eql(deployment.key);
+                                            expect(shouldUpdate.isMandatory, 'isMandatory').to.eql(true);
 
+
+                                            return am.getDeploymentHistory(name, 'Production')
+                                                .then(resp=> {
+                                                    const {appVersion, manifestBlobUrl, diffPackageMap, isDisabled, isMandatory, description} = resp[0];
+                                                    expect(appVersion, 'appVersion').to.eql('1.2.3');
+                                                    expect(isDisabled, 'isDisabled').to.be.false;
+                                                    expect(isMandatory, 'isMandatory').to.be.true;
+                                                    expect(!manifestBlobUrl, 'manifestBlobUrl').to.be.false;
+                                                    expect(description, 'description').to.eql('super');
+                                                    expect(diffPackageMap[packageHash].url, `diffPackageMap[${shouldUpdate.packageHash}].url`).to.eql(shouldUpdate.downloadUrl);
+                                                });
+
+                                        })
+                                    );
+                            })
+                    })
+                ));
 
         });
 

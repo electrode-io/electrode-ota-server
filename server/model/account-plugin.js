@@ -4,7 +4,9 @@ const register = require('../diregister')({
     multiple: false,
     connections: false,
     dependencies: ['ota!dao']
-}, (options, dao) => account(dao, options));
+}, (options, dao) => {
+    return account(dao, options);
+});
 
 module.exports = {
     register

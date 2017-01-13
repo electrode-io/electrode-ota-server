@@ -81,6 +81,7 @@ module.exports = function loadCassandra(keyspace) {
     "originalDeployment" text,
     label text,
     "releasedBy" text,
+    "manifestBlobUrl" text,
     "diffPackageMap" map<text, frozen<packagemap>>,
     "isDisabled" boolean,
     "isMandatory" boolean,

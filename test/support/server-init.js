@@ -11,43 +11,43 @@ const otaServer = require("../../index");
 const supertest = require('supertest');
 const {makeRequester, tokenRe, auth} = require('./request');
 
-module.exports = ()=> init({
+module.exports = () => init({
     contactPoints: ['localhost'],
     keyspace: 'ota_server_test'
-}).connect({reset: true}).then(client=> {
+}).connect({reset: true}).then(client => {
 
-    return otaServer().then((server)=> {
+    return otaServer().then((server) => {
         const request = makeRequester(server);
-        const makeUser = (user)=> {
+        const makeUser = (user) => {
             return request({
                 method: 'GET',
                 url: '/auth/register/basic',
                 headers: {
                     authorization: auth(user, "abc123")
                 }
-            }, ({statusCode, headers})=> {
+            }, ({statusCode, headers}) => {
                 return request({
                         url: headers.location,
                         headers: {
                             Cookie: headers['set-cookie'][0].split(';')[0]
                         }
                     },
-                    ({result})=> (tokenRe.exec(result)[1])
+                    ({result}) => (tokenRe.exec(result)[1])
                 )
             });
         };
 
-        return makeUser('test@walmartlabs.com').then((extraAccessKey)=> makeUser('test2@walmartlabs.com').then(accessKey=> {
+        return makeUser('test@walmartlabs.com').then((extraAccessKey) => makeUser('test2@walmartlabs.com').then(accessKey => {
             return {
                 serverUrl: `http://localhost.walmart.com:${process.env.PORT}`,
-                aquistionServerUrl:`/`,
+                aquistionServerUrl: `/`,
                 agent: supertest(server.listener),
                 accessKey,
                 extraAccessKey,
                 collaborator: 'test2@walmartlabs.com',
                 extraCollaborator: 'test@walmartlabs.com',
                 stop(){
-                   return server && server.stop();
+                    return server && server.stop();
                 }
             }
         }));

@@ -20,14 +20,18 @@ const validate = (users)=> {
     }
 };
 
-const authentication = function (server, {unauthorizedAttributes, allowEmptyUsername = false, users = {}, validateFunc}) {
+const authentication = function (server, {unauthorizedAttributes, realm, allowEmptyUsername = false, users = {}, validateFunc}) {
 
     validateFunc = validateFunc || validate(users);
 
     return {
         authenticate(request, reply) {
 
-            const {headers:{authorization}} = request;
+            const {authorization} = request.headers;
+            if (realm &! authorization) {
+                reply.setHeader('WWW-Authenticate', `Basic realm="${realm}"`);
+                return reply.code(402);
+            }
 
             if (!authorization) {
                 return reply(Boom.unauthorized(null, 'Basic', unauthorizedAttributes));
