@@ -7,6 +7,9 @@ const loadCassandraFactory = require('.././cassandra/load-cassandra');
 module.exports = function (conf = {contactPoints: ['localhost'], keyspace: 'ota'}) {
     const keyspace = conf.keyspace;
     const loadCassandra = loadCassandraFactory(keyspace);
+    if (conf.username && conf.password){
+        conf.authProvider = new cassandra.auth.PlainTextAuthProvider(conf.username, conf.password);
+    }
     let client = new cassandra.Client(conf);
 
 
