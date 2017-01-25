@@ -3,6 +3,9 @@ var root = path.join.bind(path, __dirname, '..');
 
 
 module.exports = {
+    "app": {
+        "electrode": true
+    },
     "connections": {
         "default": {
             "port": process.env.port || process.env.PORT || 9001,
