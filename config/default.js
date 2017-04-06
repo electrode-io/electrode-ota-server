@@ -123,7 +123,12 @@ module.exports = {
             "module": root("server/routes/accessKeys")
         },
         "electrode-ota-server-routes-apps": {
-            "module": root("server/routes/apps")
+            "module": root("server/routes/apps"),
+            "options": {
+                "payload": {
+                    "maxBytes": 10485760,
+                },
+            }
         },
         "electrode-ota-server-routes-acquisition": {
             "module": root("server/routes/acquisition")

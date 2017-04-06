@@ -9,7 +9,7 @@ const {shasum} = require('../util');
  *
  */
 const fileservice = ({downloadUrl}, dao)=> {
-    downloadUrl = downloadUrl && downloadUrl.replace((/\/+?$/, ''));
+    downloadUrl = downloadUrl && downloadUrl.replace(/\/+?$/, '');
     return (file) => {
         const packageHash = shasum(file);
         return dao.upload(packageHash, file).then(()=> ({
