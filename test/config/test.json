@@ -2,10 +2,6 @@
   "connection": {
     "port": 9999
   },
-  "app": {
-    "downloadUrl": "http://localhost:9001/storagev2/",
-    "electrode": true
-  },
   "plugins": {
     "electrode-ota-server-dao-cassandra": {
       "options": {
@@ -15,7 +11,8 @@
         "keyspace": "ota_server_test"
       }
     },
-    "electrode-ota-server-fileservice": {
+
+    "electrode-ota-server-fileservice-upload": {
       "options": {
         "downloadUrl": "http://localhost:9001/storagev2/"
       }

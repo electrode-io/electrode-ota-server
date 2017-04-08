@@ -2,7 +2,6 @@ const acquisition = require('../server/model/acquisition');
 const init = require('../server/dao/cassandra/init');
 const eql = require('./support/eql');
 const Dao = require('../server/dao/cassandra/dao-cassandra');
-const weighted = require('../server/model/weighted-plugin').weighted;
 const expect = require('chai').expect;
 
 describe('model/acquisition', function () {
@@ -10,7 +9,11 @@ describe('model/acquisition', function () {
     this.timeout(50000);
 
     before(()=> init({contactPoints: ['localhost'], keyspace: 'ota_test'}).connect({reset: true}).then((client)=> {
-        ac = acquisition(new Dao({client}), weighted);
+        let i = 0;
+        ac = acquisition(new Dao({client}), (ratio)=> {
+            const ret = ratio % (i+=25) == 0;
+            return ret;
+        });
     }));
 
     it('should be 50% rollout', ()=> {
@@ -32,7 +35,7 @@ describe('model/acquisition', function () {
                 const [r0,r1,r2] = result;
                 expect(r0).to.be.false;
                 expect(r1).to.be.false;
-                expect(r2).to.be.true;
+                expect(r2).to.be.false;
             });
     });
 

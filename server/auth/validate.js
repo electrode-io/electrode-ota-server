@@ -4,10 +4,10 @@ const diregister = require('../diregister');
 
 module.exports.register = diregister({
     name: 'ota!validate',
-    dependencies: ['electrode:expose', 'ota!account'],
+    dependencies: ['ota!account'],
     multiple: false,
     connections: false
-}, (options, expose, {validateFunc}) => {
+}, (options, {validateFunc}) => {
 
 
     const token = (name, callback)=>validateFunc(name).then(profile=> callback(null, true, {
@@ -15,13 +15,12 @@ module.exports.register = diregister({
         name
     }), ()=>callback(null, false));
 
-    expose({
+    const session = (request, session, callback)=> {
+        return token(session.token, callback);
+    };
+
+    return {
         token,
-        session(request, session, callback){
-            return token(session.token, callback);
-        }
-    });
-
-    return null;
-
+        session
+    };
 });
