@@ -1,4 +1,4 @@
-const acquisition = require('../server/model/acquisition');
+const acquisition = require('../server/service/acquisition');
 const init = require('../server/dao/cassandra/init');
 const eql = require('./support/eql');
 const Dao = require('../server/dao/cassandra/dao-cassandra');

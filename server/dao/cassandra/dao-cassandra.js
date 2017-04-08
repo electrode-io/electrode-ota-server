@@ -2,7 +2,7 @@
 
 const BaseCassandra = require('./base-cassandra');
 const {promiseMap, reducer, remove} = require('../../util');
-const {alreadyExistsMsg} = require('../../model/errors');
+const {alreadyExistsMsg} = require('../../service/errors');
 const historySort = history=> history && history.sort((a, b)=>b.created_.getTime() - a.created_.getTime());
 
 const removeCreated = v => {

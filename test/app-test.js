@@ -1,11 +1,11 @@
 const init = require('../server/dao/cassandra/init');
 const eql = require('./support/eql');
 const Dao = require('../server/dao/cassandra/dao-cassandra');
-const appFactory = require('../server/model/app')
-const accountFactory = require('../server/model/account');
+const appFactory = require('../server/service/app')
+const accountFactory = require('../server/service/account');
 const upload = require('../server/fileservice/dao/upload').fileservice;
 const download = require('../server/fileservice/dao/download').fileservice;
-const {diffPackageMap} =require('../server/model/manifest');
+const {diffPackageMap} =require('../server/service/manifest');
 const expect = require('chai').expect;
 
 const shouldError = ()=> {

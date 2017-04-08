@@ -1,4 +1,4 @@
-const manifest = require('../server/model/manifest');
+const manifest = require('../server/service/manifest');
 const expect = require('chai').expect;
 const path = require('path');
 const join = path.join.bind(path, __dirname);

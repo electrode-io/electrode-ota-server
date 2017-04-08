@@ -5,7 +5,7 @@
 const init = require('../server/dao/cassandra/init')
 const driver = require('cassandra-driver');
 const Dao = require('../server/dao/cassandra/dao-cassandra');
-const accountFactory = require('../server/model/account')
+const accountFactory = require('../server/service/account')
 const expect = require('chai').expect;
 const TOKEN = {profile: {email: 'test@t.com', name: 'test'}, provider: 'GitHub', query: {hostname: 'TestHost'}};
 const newToken = (email = 'test@t.com')=> {

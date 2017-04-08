@@ -67,19 +67,19 @@ module.exports = {
             "module": root("server/fileservice/dao")
         },
         "electrode-ota-server-model-manifest": {
-            "module": root("server/model/manifest-plugin")
+            "module": root("server/service/manifest-plugin")
         },
         "electrode-ota-server-model-weighted": {
-            "module": root("server/model/weighted-plugin")
+            "module": root("server/service/weighted-plugin")
         },
         "electrode-ota-server-model-app": {
-            "module": root("server/model/app-plugin")
+            "module": root("server/service/app-plugin")
         },
         "electrode-ota-server-model-account": {
-            "module": root("server/model/account-plugin")
+            "module": root("server/service/account-plugin")
         },
         "electrode-ota-server-model-acquisition": {
-            "module": root("server/model/acquisition-plugin")
+            "module": root("server/service/acquisition-plugin")
         },
 
         "electrode-ota-server-auth-validate": {
