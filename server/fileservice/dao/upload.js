@@ -8,21 +8,21 @@ import {shasum} from '../../util';
  * use a storage provider for this stuff.
  *
  */
-const fileservice = ({downloadUrl}, dao)=> {
+const fileservice = ({downloadUrl}, dao) => {
     downloadUrl = downloadUrl && downloadUrl.replace(/\/+?$/, '');
     return (file) => {
         const packageHash = shasum(file);
-        return dao.upload(packageHash, file).then(()=> ({
+        return dao.upload(packageHash, file).then(() => ({
             packageHash,
             size: file.length,
             blobUrl: downloadUrl ? `${downloadUrl}/${packageHash}` : packageHash
-        }), (err)=>{
+        }), (err) => {
             console.log('upload error', err);
             throw err;
         });
     };
 };
-const register = diregister({
+export const register = diregister({
     name: "ota!fileservice-upload",
     multiple: false,
     connections: false,

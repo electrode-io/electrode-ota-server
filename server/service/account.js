@@ -1,8 +1,12 @@
-"use strict";
 import {id, values, genString} from '../util';
 import {notFound, notAuthorized, alreadyExistsMsg} from './errors';
+
 const TTL = 60 * 24 * 3600 * 1000;
 const asTrue = () => true;
+const findByFriendlyName = function ({friendlyName}) {
+    return friendlyName == this;
+};
+
 const genAccessKey = ({email, createdBy, friendlyName, description, ttl = TTL}) => {
 
     const createdTime = Date.now();
@@ -120,7 +124,4 @@ export default function (dao) {
             return dao.userByEmail(email);
         }
     }
-};
-const findByFriendlyName = function ({friendlyName}) {
-    return friendlyName == this;
 };

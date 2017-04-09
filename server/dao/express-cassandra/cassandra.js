@@ -1,6 +1,3 @@
-"use strict";
-
-import cassandra from 'cassandra-driver';
 import diregister from '../../diregister';
 import client from './index';
 

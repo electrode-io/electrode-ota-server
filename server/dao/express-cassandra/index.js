@@ -1,14 +1,13 @@
 import models from 'express-cassandra';
 import udts from './models/UDTS';
 
-
-const CLIENT_OPTIONS = {
+export const CLIENT_OPTIONS = {
     contactPoints: ['127.0.0.1'],
     protocolOptions: {port: 9042},
     queryOptions: {consistency: models.consistencies.one}
 };
 
-const ORM_OPTIONS = {
+export const ORM_OPTIONS = {
     //If your keyspace doesn't exist it will be created automatically
     //using the default replication strategy provided here.
     defaultReplicationStrategy: {

@@ -1,11 +1,8 @@
-"use strict";
-import diregister from '../diregister';
-
-const register = (server, options, next) => {
+export const register = (server, options, next) => {
     server.route(options);
     return next();
 };
 
-register.attributes = {name:'electrode-ota-server-static'}
+register.attributes = {name: 'electrode-ota-server-static'};
 
-module.exports = {register};
+export default {register};

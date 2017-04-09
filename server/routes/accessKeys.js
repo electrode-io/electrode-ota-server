@@ -2,7 +2,7 @@
 
 import {wrap} from '../util';
 import diregister from '../diregister';
-const register = diregister({
+export const register = diregister({
     name: 'accessKeysRoute',
     dependencies: ['electrode:route', 'ota!account', 'ota!scheme']
 }, (options, route, acf) => {
@@ -16,7 +16,7 @@ const register = diregister({
 
             config: {
                 handler (request, reply) {
-                    account(request.auth.credentials.email, (e, {account:{linkedProviders = ['GitHub'], name, email}})=> {
+                    account(request.auth.credentials.email, (e, {account: {linkedProviders = ['GitHub'], name, email}}) => {
                         if (e) return reply(e);
                         reply({account: {linkedProviders, name, email}});
                     })
@@ -29,14 +29,19 @@ const register = diregister({
             config: {
                 handler(request, reply){
 
-                    const {auth:{credentials:{email, name}}, payload = {}, params:{key}} = request;
+                    const {auth: {credentials: {email, name}}, payload = {}, params: {key}} = request;
                     //email, createdBy, friendlyName, ttl
-                    addAccessKey(email || name, request.connection.info.host, payload.friendlyName, payload.ttl, (e, accessKey)=> {
+                    addAccessKey(email || name, request.connection.info.host, payload.friendlyName, payload.ttl, (e, accessKey) => {
                         if (e) return reply(e);
                         const {createdBy, friendlyName, description, name, createdTime, expires} = accessKey;
                         reply({
                             accessKey: {
-                                createdBy, friendlyName, description, name, createdTime:toTime(createdTime), expires:toTime(expires)
+                                createdBy,
+                                friendlyName,
+                                description,
+                                name,
+                                createdTime: toTime(createdTime),
+                                expires: toTime(expires)
                             }
                         });
                     })
@@ -48,8 +53,8 @@ const register = diregister({
             path: '/accessKeys/{key?}',
             config: {
                 handler(request, reply){
-                    const {auth:{credentials:{email, name}}, payload, params:{key}} = request;
-                    updateAccessKey(Object.assign({}, payload, {email, key}), (e, accessKey)=> {
+                    const {auth: {credentials: {email, name}}, payload, params: {key}} = request;
+                    updateAccessKey(Object.assign({}, payload, {email, key}), (e, accessKey) => {
                         if (e) return reply(e);
                         const {createdBy, friendlyName, description, createdTime, expires} = accessKey;
                         reply({
@@ -57,7 +62,7 @@ const register = diregister({
                                 createdBy,
                                 friendlyName,
                                 description,
-                                name:`(hidden)`,
+                                name: `(hidden)`,
                                 createdTime: toTime(createdTime),
                                 expires: toTime(expires)
                             }
@@ -72,14 +77,14 @@ const register = diregister({
             config: {
                 handler(request, reply){
                     const {email, name} = request.auth.credentials;
-                    listAccessKeys(email, (e, accessKeys)=> {
+                    listAccessKeys(email, (e, accessKeys) => {
                         if (e) return reply(e);
                         reply({
-                            accessKeys: accessKeys.map(v=> {
-                                const {createdTime, createdBy, expires, friendlyName, description, id}= v;
+                            accessKeys: accessKeys.map(v => {
+                                const {createdTime, createdBy, expires, friendlyName, description, id} = v;
 
                                 const ret = {
-                                    name:`(hidden)`,
+                                    name: `(hidden)`,
                                     createdTime: toTime(createdTime),
                                     createdBy,
                                     expires: toTime(expires),
@@ -102,8 +107,8 @@ const register = diregister({
             path: '/accessKeys/{key}',
             config: {
                 handler(request, reply){
-                    const {auth:{credentials:{email}}, params:{key}} = request;
-                    removeAccessKey({email, key}, (e, o)=> {
+                    const {auth: {credentials: {email}}, params: {key}} = request;
+                    removeAccessKey({email, key}, (e, o) => {
                         if (e) return reply(e);
                         reply().code(204)
                     });
@@ -112,7 +117,7 @@ const register = diregister({
         }
     ]);
 });
-const toTime = (value)=> {
+const toTime = (value) => {
     if (!value) return value;
     if (typeof value === 'string') {
         return new Date(value).getTime();
@@ -123,4 +128,4 @@ const toTime = (value)=> {
     return value;
 
 };
-module.exports = {register};
+export default {register};

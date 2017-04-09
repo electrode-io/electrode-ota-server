@@ -1,19 +1,19 @@
 "use strict";
 import {wrap} from '../util';
 import diregister from '../diregister';
-const noContent = (reply)=>(e)=> {
+const noContent = (reply) => (e) => {
     if (e) return reply(e);
     reply().code(204);
 };
-const ok = (reply)=>(e)=>{
+const ok = (reply) => (e) => {
     if (e) return reply(e);
     reply('OK').code(200);
 };
 
-const register = diregister({
+export const register = diregister({
     name: 'acquisitionRoute',
     dependencies: ['electrode:route', 'ota!acquisition']
-}, (options, route, acquisition)=> {
+}, (options, route, acquisition) => {
     const {
         download,
         updateCheck,
@@ -31,7 +31,7 @@ const register = diregister({
                 auth: false,
                 handler(request, reply)
                 {
-                    updateCheck(request.query, (e, updateInfo)=> {
+                    updateCheck(request.query, (e, updateInfo) => {
                         if (e) {
                             console.log('error making update check ', request.query, e.message);
                             return reply(e);
@@ -47,7 +47,7 @@ const register = diregister({
             config: {
                 auth: false,
                 handler(request, reply){
-                    download(request.params.packageHash, (e, o)=> {
+                    download(request.params.packageHash, (e, o) => {
                         if (e) return reply(e);
                         reply(o);
                     })
@@ -77,4 +77,4 @@ const register = diregister({
     ]);
 });
 
-module.exports = {register};
+export default {register};

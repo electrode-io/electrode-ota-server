@@ -1,5 +1,4 @@
 import diregister from '../../diregister';
-import {shasum} from '../../util';
 /**
  * The fileservice is meant to be plugable.
  *
@@ -9,7 +8,7 @@ import {shasum} from '../../util';
  *
  */
 
-const fileservice = (options, dao)=> {
+export const fileservice = (options, dao)=> {
     return (packageHash, url, type) => {
         const hash = packageHash
             || url.split('/').pop();
@@ -23,14 +22,14 @@ const fileservice = (options, dao)=> {
         return p;
     };
 };
-const register = diregister({
+export const register = diregister({
     name: "ota!fileservice-download",
     multiple: false,
     connections: false,
     dependencies: ['ota!dao']
 }, fileservice);
 
-module.exports = {
+export default({
     register,
     fileservice
-};
+})

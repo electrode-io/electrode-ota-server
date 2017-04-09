@@ -1,7 +1,4 @@
-"use strict";
-
 import {id, key, remove} from '../util';
-
 import {isZip, generate} from './manifest';
 import {alreadyExists, alreadyExistsMsg, notFound, missingParameter, notAuthorized, invalidRequest} from './errors';
 
@@ -18,7 +15,7 @@ const toJSON = (v, exclude) => {
     else if (Array.isArray(v)) return v.map(toJSON);
     return v;
 };
-const Perms = {
+export const Perms = {
     Owner: ['Owner'],
     Collaborator: ['Collaborator'],
     Any: ['Owner', 'Collaborator']
@@ -64,7 +61,7 @@ const notAuthorizedPerm = (app, email, perm, message) => {
 };
 
 
-module.exports = (dao, upload) => {
+export default (dao, upload) => {
     const api = {};
     return Object.assign(api, {
         findApp({email, app}){

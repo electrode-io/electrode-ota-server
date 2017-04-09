@@ -7,8 +7,3 @@ export const register = diregister({
     connections: false,
     dependencies: ['ota!fileservice-download', 'ota!fileservice-upload']
 }, (options, download, upload) => diffPackageMapCurrent.bind(null, download, upload));
-
-export default ({
-    register
-});
-

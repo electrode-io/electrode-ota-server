@@ -1,13 +1,8 @@
-/* download,
- updateCheck,
- downloadReportStatus,
- deployReportStatus*/
-
 import {missingParameter} from './errors';
-const fixver = (ver)=>ver ? ('' + ver).replace(/^(\d+?)$/, '$1.0.0') : '0.0.0';
 import version from 'semver';
+const fixver = (ver)=>ver ? ('' + ver).replace(/^(\d+?)$/, '$1.0.0') : '0.0.0';
 
-module.exports = (dao, weighted, _download, manifest)=> {
+export default (dao, weighted, _download, manifest)=> {
     const api = {
         download(hash){
             return _download(hash);
