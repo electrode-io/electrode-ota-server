@@ -13,7 +13,9 @@
     "test-legacy": "DAO=cassandra PORT=9999 NODE_TLS_REJECT_UNAUTHORIZED=0 mocha --compilers js:babel-register test/*-test.js",
 
     "test": "PORT=9999 NODE_TLS_REJECT_UNAUTHORIZED=0 mocha --compilers js:babel-register test/*-test.js",
-    "start": "node ./index.js"
+    "start": "node ./index.js",
+    "prepublish":"babel ./server/ ./index.js --out-dir dist/server && babel index.js --out-dir dist/"
+
   },
   "bin": {
     "electrode-ota-server": "./index.js"

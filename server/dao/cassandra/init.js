@@ -9,6 +9,7 @@ export default function (conf = {contactPoints: ['localhost'], keyspace: 'ota'})
     const loadCassandra = loadCassandraFactory(keyspace);
     let client = new cassandra.Client(conf);
 
+    console.log(`[legacy-cassandra] using keyspace ${keyspace}`);
 
     const cp = (...args)=> new Promise((resolve, reject)=> client.execute(...args, (e, o)=> e ? reject(e) : resolve(o)));
     const order = (queries) => {

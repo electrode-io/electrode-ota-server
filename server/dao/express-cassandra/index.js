@@ -25,7 +25,7 @@ export default async function ({clientOptions = {}, ormOptions = {}} = {}, drop)
         clientOptions: Object.assign({}, CLIENT_OPTIONS, clientOptions),
         ormOptions: Object.assign({}, ORM_OPTIONS, ormOptions)
     };
-    console.log(`using keyspace ${conf.clientOptions.keyspace}`);
+    console.log(`[expresss-cassandra] using keyspace ${conf.clientOptions.keyspace}`);
     if (drop === true) {
         console.log(`dropping keyspace ${conf.clientOptions.keyspace}`);
         const client = await models.createClient(conf);
