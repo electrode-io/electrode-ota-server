@@ -1,6 +1,5 @@
-"use strict";
 import {types} from 'dse-driver';
-import {promiseMap, reducer, remove} from '../../util';
+import {promiseMap, reducer, remove, toJSON} from '../../util';
 import {alreadyExistsMsg} from '../../service/errors';
 import UDTS from './models/UDTS';
 
@@ -292,7 +291,7 @@ export default class DaoExpressCassandra {
         const user = await this.userByEmail(currentEmail);
         apply(user, update);
         await user.saveAsync();
-        const js = user.toJSON();
+        const js = toJSON(user);
 
         for (const key of Object.keys(js.accessKeys)) {
             nullUnlessValue(js.accessKeys[key], ACCESSKEY);
@@ -412,7 +411,7 @@ export default class DaoExpressCassandra {
         let dep = await this.Deployment.findOneAsync({key: deploymentKey});
 
         if (dep && isNotEmpty(dep.history_)) {
-            dep = dep.toJSON();
+            dep = toJSON(dep);
             dep.package = await this.Package.findOneAsync({id_: dep.history_[0]});
             return dep;
         }

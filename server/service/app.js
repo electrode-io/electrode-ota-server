@@ -1,4 +1,4 @@
-import {id, key, remove} from '../util';
+import {id, key, toJSON} from '../util';
 import {isZip, generate} from './manifest';
 import {alreadyExists, alreadyExistsMsg, notFound, missingParameter, notAuthorized, invalidRequest} from './errors';
 
@@ -8,13 +8,7 @@ const excludeNull = obj => Object.keys(obj).reduce((ret, key) => {
     return ret;
 }, {});
 
-const toJSON = (v, exclude) => {
-    if (v && v.toJSON) {
-        return v.toJSON();
-    }
-    else if (Array.isArray(v)) return v.map(toJSON);
-    return v;
-};
+
 export const Perms = {
     Owner: ['Owner'],
     Collaborator: ['Collaborator'],
