@@ -1,10 +1,9 @@
-"use strict";
-
 import {wrap} from '../util';
+import diregister from '../diregister';
 
-const register = require('../diregister')({
+export const register = diregister({
     name: 'authRoute',
-    dependencies: [ 'electrode:route', 'ota!account', 'electrode:views', 'ota!scheme'],
+    dependencies: ['electrode:route', 'ota!account', 'electrode:views', 'ota!scheme'],
 }, (options, route, acf, views) => {
 
     views({
@@ -44,12 +43,12 @@ const register = require('../diregister')({
                     mode: "try",
                     strategy: "session"
                 },
-                handler({cookieAuth, auth:{isAuthenticated, credentials}} = {
-                    auth: {
-                        isAuthenticated: false,
-                        credentials: {}
-                    }
-                }, reply) {
+                handler({cookieAuth, auth: {isAuthenticated, credentials}} = {
+                            auth: {
+                                isAuthenticated: false,
+                                credentials: {}
+                            }
+                        }, reply) {
                     if (!isAuthenticated) {
                         return reply.redirect('/auth/login').code(302);
                     }
@@ -93,7 +92,7 @@ const register = require('../diregister')({
             config: {
                 auth: {mode: 'optional', strategies: ['session', 'bearer']},
                 handler(request, reply) {
-                    invalidate(request.auth.credentials && request.auth.credentials.name, (e)=> {
+                    invalidate(request.auth.credentials && request.auth.credentials.name, (e) => {
                         if (e) {
                             console.log('error logging out', e);
                         }
@@ -109,7 +108,7 @@ const register = require('../diregister')({
             config: {
                 auth: {mode: 'required'},
                 handler(request, reply){
-                    invalidate(request.cookieAuth.token, ()=> {
+                    invalidate(request.cookieAuth.token, () => {
                         request.cookieAuth.clear();
                         reply();
                     });
@@ -119,13 +118,13 @@ const register = require('../diregister')({
         }
     ].concat(
         options.providers.reduce((ret, {
-            name,
-            auth,
-            loginPath,
-            registerPath,
-            linkPath,
-            redirectTo = '/accesskey'
-        })=> {
+                                      name,
+                                      auth,
+                                      loginPath,
+                                      registerPath,
+                                      linkPath,
+                                      redirectTo = '/accesskey'
+                                  }) => {
             const strategy = auth || name;
             loginPath = loginPath || `/auth/login/${name}`;
             ret.push({
@@ -136,15 +135,15 @@ const register = require('../diregister')({
                         mode: "try",
                         strategy
                     },
-                    handler ({auth:{isAuthenticated, credentials}, cookieAuth}, reply) {
+                    handler ({auth: {isAuthenticated, credentials}, cookieAuth}, reply) {
                         if (!isAuthenticated) {
                             return reply('Not logged in...').code(401);
                         }
                         if (credentials && credentials.profile) {
                             const {email, displayName, username} = credentials.profile;
-                            const {hostname} =credentials.query || {};
+                            const {hostname} = credentials.query || {};
                             //(email, createdBy, friendlyName, ttl
-                            addAccessKey(email, hostname, displayName || username, void(0), (e, token)=> {
+                            addAccessKey(email, hostname, displayName || username, void(0), (e, token) => {
                                 if (e) {
                                     console.error('Error adding key', e);
                                     return reply.view('error', {
@@ -169,12 +168,12 @@ const register = require('../diregister')({
                     path: registerPath,
                     config: {
                         auth: strategy,
-                        handler ({auth:{isAuthenticated, credentials}, cookieAuth}, reply) {
+                        handler ({auth: {isAuthenticated, credentials}, cookieAuth}, reply) {
                             if (!isAuthenticated) {
                                 console.error('request was not authenticated');
                                 return reply('Not logged in...').code(401);
                             }
-                            createToken(credentials, (e, token)=> {
+                            createToken(credentials, (e, token) => {
                                 if (e) {
                                     if (e.output && e.output.payload && e.output.payload.error === 'Conflict') {
                                         return reply.view('error', {
@@ -203,14 +202,14 @@ const register = require('../diregister')({
                     path: linkPath,
                     config: {
                         auth: strategy,
-                        handler ({auth:{isAuthenticated, credentials}}, reply) {
+                        handler ({auth: {isAuthenticated, credentials}}, reply) {
                             if (!isAuthenticated) {
                                 console.error('request was not authenticated');
                                 return reply('Not logged in...').code(401);
                             }
                             if (credentials && credentials.profile) {
                                 const {email} = credentials.profile;
-                                linkProvider({email, provider: name}, (e)=> {
+                                linkProvider({email, provider: name}, (e) => {
                                     if (e) {
                                         return reply.view('error', {title: 'Error', message: e.message});
                                     }
@@ -229,4 +228,5 @@ const register = require('../diregister')({
         }, [])));
 
 });
-module.exports = {register};
+
+export default({register});

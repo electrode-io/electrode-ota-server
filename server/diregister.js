@@ -21,7 +21,7 @@
  * @param dep
  * @returns {*}
  */
-const result = (obj, dep)=> {
+const result = (obj, dep) => {
     if (!obj)return obj;
     if (typeof obj[dep] === 'function') {
         return obj[dep].bind(obj);
@@ -30,10 +30,10 @@ const result = (obj, dep)=> {
 };
 
 //Allow for different handlers.
-const HANDLERS = {
-    electrode: (server, dep, options)=>result(server, dep)
+export const HANDLERS = {
+    electrode: (server, dep, options) => result(server, dep)
 };
-const resolveable = (name)=> {
+const resolveable = (name) => {
     const ret = {name};
     ret.promise = new Promise(function (_resolve, _reject) {
         ret.resolve = _resolve;
@@ -42,7 +42,7 @@ const resolveable = (name)=> {
     return ret;
 };
 
-const registerContext = (reg)=> {
+const registerContext = (reg) => {
     if (reg.plugins.diregister) {
         return reg.plugins.diregister;
     }
@@ -52,9 +52,9 @@ const registerContext = (reg)=> {
     const registering = [];
     const registered = [];
 
-    const notResolvedFilter = (dep)=>!(/:/.test(dep) || (dep in MODULES));
+    const notResolvedFilter = (dep) => !(/:/.test(dep) || (dep in MODULES));
 
-    const printNotResolved = ({name, dependencies = []})=> {
+    const printNotResolved = ({name, dependencies = []}) => {
         let str = `\n${name}`;
         dependencies = dependencies.filter(notResolvedFilter);
         if (dependencies && dependencies.length) {
@@ -63,9 +63,9 @@ const registerContext = (reg)=> {
         return str;
     };
 
-    reg.on('stop', ()=> {
+    reg.on('stop', () => {
         if (registering.length !== registered.length) {
-            const delta = registering.filter(inflight=>registered.indexOf(inflight.name) == -1);
+            const delta = registering.filter(inflight => registered.indexOf(inflight.name) == -1);
             console.error(`\n\nThe following component(s) have not resolved\n%s\nregistered:\n %s\n`,
                 delta.map(printNotResolved).join('\n'),
                 registered.join('\n')
@@ -74,7 +74,7 @@ const registerContext = (reg)=> {
     });
 
 
-    const waitForModule = (name, parent)=> {
+    const waitForModule = (name, parent) => {
         if (name in MODULES) {
             return MODULES[name]
         }
@@ -89,7 +89,7 @@ const registerContext = (reg)=> {
         return ref.promise;
     };
 
-    const resolveModule = (name, value = null)=> {
+    const resolveModule = (name, value = null) => {
         if (name in MODULES) {
             if (MODULES[name] !== value) {
                 throw new Error(`${name} resolves to different value`);
@@ -107,16 +107,16 @@ const registerContext = (reg)=> {
     };
 
 
-    const resolve = (name, dependencies = [], fn, handlers, server, options, next)=> {
+    const resolve = (name, dependencies = [], fn, handlers, server, options, next) => {
         registering.push({name, dependencies});
         dependencies = dependencies || [];
-        Promise.all(dependencies.map((dep)=> {
+        Promise.all(dependencies.map((dep) => {
             const [namespace, cmd] = dep.split(':', 2);
             if (cmd && handlers[namespace]) {
                 return handlers[namespace](server, cmd, options);
             }
             return waitForModule(dep, name);
-        })).then((args = [], next)=>fn(options, ...args)).then((value)=> {
+        })).then((args = [], next) => fn(options, ...args)).then((value) => {
             registered.push(name);
             next();
             return resolveModule(name, value);
@@ -127,20 +127,16 @@ const registerContext = (reg)=> {
 };
 
 
-module.exports.HANDLERS = HANDLERS;
-
-
-const diregister = (attributes = {dependencies: []}, fn, handlers = HANDLERS) => {
+export default function diregister(attributes = {dependencies: []}, fn, handlers = HANDLERS) {
 
 
     const name = attributes.name;
     const dependencies = attributes.dependencies ? Array.isArray(attributes.dependencies) ? attributes.dependencies : attributes.dependencies : [];
 
-    const register = (server, options, next)=> registerContext(server)(name, dependencies, fn, handlers, server, options, next);
+    const register = (server, options, next) => registerContext(server)(name, dependencies, fn, handlers, server, options, next);
 
     register.attributes = attributes;
     //might just get rid of dependencies, as it seems kinda useless.
     register.attributes.dependencies = [];
     return register;
 };
-module.exports = diregister;

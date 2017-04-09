@@ -1,5 +1,6 @@
 import account from './account';
-const register = require('../diregister')({
+import diregister from '../diregister';
+const register = diregister({
     name: 'ota!account',
     multiple: false,
     connections: false,

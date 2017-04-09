@@ -24,8 +24,7 @@ const genAccessKey = ({email, createdBy, friendlyName, description, ttl = TTL}) 
         id: id()
     };
 };
-
-module.exports = function (dao) {
+export default function (dao) {
     return {
 
         listAccessKeys(email) {

@@ -1,12 +1,13 @@
-import path from 'path';
 import yauzl from 'yauzl';
 import yazl from 'yazl';
 import crypto from 'crypto';
-const MTIME = new Date(0);
-const all = (arr, fn)=>Promise.all(arr.map(fn));
 import fileType from 'file-type';
 
-const isZip = (fileName, content)=> {
+const MTIME = new Date(0);
+const all = (arr, fn)=>Promise.all(arr.map(fn));
+
+
+export const isZip = (fileName, content)=> {
     if (typeof content === 'string') {
         content = new Buffer(content);
     }
@@ -14,7 +15,8 @@ const isZip = (fileName, content)=> {
     return (type && type.mime === 'application/zip');
 };
 
-const toBuf = stream => new Promise((resolve, reject)=> {
+
+export const toBuf = stream => new Promise((resolve, reject)=> {
     const bufs = [];
     stream.on('data', function (d) {
         bufs.push(d);
@@ -24,8 +26,10 @@ const toBuf = stream => new Promise((resolve, reject)=> {
         resolve(Buffer.concat(bufs));
     });
 });
-const zipToBuf = zip=> toBuf(zip.outputStream);
-const streamHash = (stream, hashType = 'sha256', digestType = 'hex')=> {
+
+export const zipToBuf = zip=> toBuf(zip.outputStream);
+
+export const streamHash = (stream, hashType = 'sha256', digestType = 'hex')=> {
     return new Promise(function (resolve, reject) {
         const hash = crypto.createHash(hashType);
 
@@ -38,7 +42,8 @@ const streamHash = (stream, hashType = 'sha256', digestType = 'hex')=> {
         });
     });
 };
-const generate = (buffer)=> new Promise(function (resolve, reject) {
+
+export const generate = (buffer)=> new Promise(function (resolve, reject) {
     if (buffer instanceof Uint8Array) {
         buffer = Buffer.from(buffer);
     }
@@ -72,7 +77,8 @@ const generate = (buffer)=> new Promise(function (resolve, reject) {
         });
     });
 });
-const delta = (manifest, buffer)=> {
+
+export const delta = (manifest, buffer)=> {
     if (buffer instanceof Uint8Array) {
         buffer = Buffer.from(buffer);
     }
@@ -134,7 +140,8 @@ const delta = (manifest, buffer)=> {
  * @param histories
  */
 
-const downloadOrGenerateManifest = (download, upload, current)=> {
+
+export const downloadOrGenerateManifest = (download, upload, current)=> {
     if (current.manifestBlobUrl) {
         return download(null, current.manifestBlobUrl, 'application/json');
     }
@@ -148,7 +155,8 @@ const downloadOrGenerateManifest = (download, upload, current)=> {
 
 };
 
-const genDiffPackageMap = (download, upload, current, histories = [])=> {
+
+export const genDiffPackageMap = (download, upload, current, histories = [])=> {
 
     return downloadOrGenerateManifest(download, upload, current)
         .then(manifest=> {
@@ -177,7 +185,8 @@ const genDiffPackageMap = (download, upload, current, histories = [])=> {
  * @returns {Promise.<[{history}>}
  */
 
-const diffPackageMap = (download, upload, histories)=> {
+
+export const diffPackageMap = (download, upload, histories)=> {
     const promises = [];
     for (let i = histories.length - 1; i > -1; i--) {
         promises.push(genDiffPackageMap(download, upload, histories[i], histories.slice(0, i)));
@@ -185,12 +194,12 @@ const diffPackageMap = (download, upload, histories)=> {
     return Promise.all(promises).then(()=>histories);
 };
 
-const diffPackageMapCurrent = (download, upload, current)=> {
+export const diffPackageMapCurrent = (download, upload, current)=> {
     const last = current.length - 1;
     return genDiffPackageMap(download, upload, current[last], current.slice(0, last)).then(_=>current);
 };
 
-module.exports = {
+export default ({
     isZip,
     zipToBuf,
     diffPackageMapCurrent,
@@ -198,4 +207,4 @@ module.exports = {
     generate,
     delta,
     streamHash
-};
+});

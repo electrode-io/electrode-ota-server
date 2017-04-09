@@ -1,5 +1,6 @@
 import aquistion from './acquisition';
-const register = require('../diregister')({
+import diregister from '../diregister';
+const register = diregister({
     name: 'ota!acquisition',
     multiple: false,
     connections: false,
