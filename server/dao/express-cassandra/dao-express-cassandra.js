@@ -10,6 +10,14 @@ const removeCreated = v => {
             return rest;
         });
 };
+const toLowerCaseKeys = (obj) => {
+    if (!obj) return obj;
+    const ret = {};
+    for (const key of Object.keys(obj)) {
+        ret[key.toLowerCase()] = obj[key];
+    }
+    return ret;
+};
 const ACCESSKEY = Object.keys(UDTS.accesskey);
 const asKeyAll = (v, arr = []) => {
     v = Array.isArray(v) ? v : [v];
@@ -153,7 +161,7 @@ class DaoExpressCassandra {
     }
 
     newMetric(metric) {
-        return new this.Metric(metric);
+        return new this.Metric(toLowerCaseKeys(metric));
     }
 
     newPackageContent(content) {
@@ -393,6 +401,9 @@ class DaoExpressCassandra {
 
     async history(appId, deploymentName) {
         const deployment = await this._deploymentByAppAndName(appId, deploymentName);
+        if (!deployment.history_) {
+            return [];
+        }
         const pkgs = await this.Package.findAsync({id_: within(deployment.history_)});
 
         const sort = historySort(pkgs);
@@ -529,8 +540,10 @@ class DaoExpressCassandra {
     }
 
     async  deploymentForKey(deploymentKey) {
-        const dep = await this.Deployment.findOneAsync({key: deploymentKey});
+        let dep = await this.Deployment.findOneAsync({key: deploymentKey});
+
         if (dep && isNotEmpty(dep.history_)) {
+            dep = dep.toJSON();
             dep.package = await this.Package.findOneAsync({id_: dep.history_[0]});
             return dep;
         }
@@ -598,24 +611,10 @@ class DaoExpressCassandra {
      clientUniqueId text,
      deploymentKey text,
      label text,*/
-    insertMetric({
-                     appVersion,
-                     status,
-                     previousLabelOrAppVersion,
-                     previousDeploymentKey,
-                     clientUniqueId,
-                     deploymentKey,
-                     label
-                 }) {
-        return (this.newMetric({
-            appVersion,
-            status,
-            previousLabelOrAppVersion,
-            previousDeploymentKey,
-            clientUniqueId,
-            deploymentKey,
-            label
-        })).saveAsync();
+    async insertMetric(obj) {
+        const metric = await this.newMetric(obj);
+        await metric.saveAsync();
+        return metric;
         /*return this._first(`INSERT INTO metrics (id,  appVersion, status,  previousLabelOrAppVersion,  previousDeploymentKey, clientUniqueId, deploymentKey,  label) values (now(), ?,?,?,?,?,?,? )`, [appVersion,
          *   status,
          *   previousLabelOrAppVersion,

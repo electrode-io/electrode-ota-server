@@ -1,18 +1,15 @@
+
 const path = require('path');
-const init = require('../../server/dao/cassandra/init')
-const driver = require('cassandra-driver');
+const init = require('./init-dao');
+process.env.OTA_CONFIG_DIR = path.join(__dirname, '..', 'config');
 process.env.NODE_ENV = 'test';
 process.env.PORT = 9999;
-process.env.OTA_CONFIG_DIR = path.join(__dirname, '..', 'config');
 
 const otaServer = require("../../index");
 const supertest = require('supertest');
 const {makeRequester, tokenRe, auth} = require('./request');
 
-module.exports = () => init({
-    contactPoints: ['localhost'],
-    keyspace: 'ota_server_test'
-}).connect({reset: true}).then(client => {
+module.exports = () => init().then(client => {
 
     return otaServer().then((server) => {
         const request = makeRequester(server);

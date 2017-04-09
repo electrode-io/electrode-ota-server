@@ -68,7 +68,7 @@ module.exports = (dao, upload) => {
     const api = {};
     return Object.assign(api, {
         findApp({email, app}){
-            return dao.appForCollaborator(email, app).then(result => notFound(result, `App not found ${app}`));
+            return dao.appForCollaborator(email, app).then(result => notFound(result, `App not found ${app}`)).then(toJSON);
         },
         _findApp(find, perm = 'Owner', errorMessage = `Do not have permission to do this operation.`){
             return api.findApp(find).then(app => notAuthorizedPerm(app, find.email, perm, errorMessage));
@@ -115,20 +115,24 @@ module.exports = (dao, upload) => {
                 const transfer = app.collaborators[find.transfer] || (app.collaborators[find.transfer] = {});
                 owner.permission = 'Collaborator';
                 transfer.permission = 'Owner';
-                return dao.updateApp(app.id, app);
+                return dao.updateApp(app.id, app).then(toJSON);
             }));
         },
 
         listApps({email}){
-            return dao.appsForCollaborator(email);
+            return dao.appsForCollaborator(email).then(toJSON);
         },
 
         listDeployments(find){
             return api.findApp(find).then(app => dao.deploymentsByApp(app.id, app.deployments)
-                .then(deployments => app.deployments.map(name => deployments[name])));
+                .then(deployments => {
+                    return app.deployments.map(name => deployments[name])
+                }));
         },
-        getDeployment(find){
-            return api.findApp(find).then(app => dao.deploymentByApp(app.id, find.deployment));
+        async getDeployment(find){
+            const app = await api.findApp(find);
+            const deployment = await dao.deploymentByApp(app.id, find.deployment);
+            return deployment;
         },
         removeDeployment(params){
             return api.findApp(params).then(app => dao.removeDeployment(app.id, params.deployment));

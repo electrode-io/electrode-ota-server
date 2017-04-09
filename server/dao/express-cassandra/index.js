@@ -5,7 +5,6 @@ const udts = require('./models/UDTS');
 const CLIENT_OPTIONS = {
     contactPoints: ['127.0.0.1'],
     protocolOptions: {port: 9042},
-    keyspace: 'express_test',
     queryOptions: {consistency: models.consistencies.one}
 };
 
@@ -22,9 +21,26 @@ const ORM_OPTIONS = {
 };
 
 
-module.exports = function ({clientOptions = {}, ormOptions = {}} = {}) {
-    return models.setDirectory(__dirname + '/models').bindAsync({
+module.exports = async function ({clientOptions = {}, ormOptions = {}} = {}, drop) {
+    const conf = {
         clientOptions: Object.assign({}, CLIENT_OPTIONS, clientOptions),
         ormOptions: Object.assign({}, ORM_OPTIONS, ormOptions)
-    }).then(() => models);
+    };
+    console.log(`using keyspace ${conf.clientOptions.keyspace}`);
+    if (drop === true) {
+        console.log(`dropping keyspace ${conf.clientOptions.keyspace}`);
+        const client = await models.createClient(conf);
+
+        try {
+            const connection = await client.connectAsync();
+            const raw = connection._get_system_client();
+            await  raw.executeAsync(`DROP KEYSPACE ${conf.clientOptions.keyspace}`);
+        } catch (e) {
+            console.trace(e);
+        } finally {
+            await client.close();
+        }
+    }
+    await  models.setDirectory(__dirname + '/models').bindAsync(conf);
+    return models;
 };

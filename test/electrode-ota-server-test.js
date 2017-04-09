@@ -1,11 +1,11 @@
 "use strict";
 
-const init = require('../server/dao/cassandra/init');
 const path = require("path");
 process.env.NODE_ENV = 'test';
 process.env.PORT = 9999;
 process.env.OTA_CONFIG_DIR = path.join(__dirname, 'config');
 const otaServer = require("../index");
+const initDao = require('./support/init-dao');
 const expect = require("chai").expect;
 const {
     auth,
@@ -13,7 +13,7 @@ const {
     body,
     match,
     tokenRe
-} =require('./support/request');
+} = require('./support/request');
 
 /**
  *  **** IMPORTANT ***
@@ -30,22 +30,11 @@ const {
 describe('electrode-ota-server', function () {
     this.timeout(10000);
     let server;
-    before(() => init({
-        contactPoints: ['localhost'],
-        keyspace: 'ota_server_test'
-    }).connect({reset: true}).then((client)=> {
-        return otaServer().then(r=>server = r)
-    })
-/*        .then((resp)=> {
-        return new Promise(function (resolve) {
-            setTimeout(resolve, 1000, resp);
-        });
-    })*/
-    );
+    before(() => initDao().then(()=>otaServer().then(r => server = r)));
 
     after(() => server && server.stop());
 
-    const request = (options, check, errorCheck)=>()=>makeRequester(server)(options, check, errorCheck);
+    const request = (options, check, errorCheck) => () => makeRequester(server)(options, check, errorCheck);
 
     it("should be authenticated false", request({method: 'GET', url: '/authenticated'}, body({authenticated: false})));
     it("should show register options", request({
@@ -60,9 +49,9 @@ describe('electrode-ota-server', function () {
         headers: {
             authorization: auth("test@walmartlabs.com", "abc123")
         }
-    }, ({statusCode, headers})=> {
+    }, ({statusCode, headers}) => {
         expect(statusCode).to.eql(302);
-        expect(headers.location).to.eql('/accesskey');
+        expect(headers).to.have.property("location", "/accesskey");
         return request({
             url: headers.location,
             headers: {
@@ -70,7 +59,7 @@ describe('electrode-ota-server', function () {
             }
         }, [
             match(tokenRe),
-            ({result})=>request({
+            ({result}) => request({
                 url: '/authenticated',
                 headers: {
                     authorization: `Bearer ${tokenRe.exec(result)[1]}`

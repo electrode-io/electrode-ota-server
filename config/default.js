@@ -1,6 +1,6 @@
 var path = require('path');
 var root = path.join.bind(path, __dirname, '..');
-
+var dao = process.env.DAO || 'express-cassandra';
 
 module.exports = {
     "app": {
@@ -46,7 +46,7 @@ module.exports = {
             "module": "vision"
         },
         "electrode-ota-server-dao-cassandra": {
-            "module": root("server/dao/cassandra/cassandra"),
+            "module": root(`server/dao/${dao}/cassandra`),
             "options": {
                 "contactPoints": [
                     "localhost"
@@ -55,7 +55,7 @@ module.exports = {
             }
         },
         "electrode-ota-server-dao-plugin": {
-            "module": root("server/dao/cassandra/plugin")
+            "module": root(`server/dao/${dao}/plugin`)
         },
         "electrode-ota-server-fileservice-upload": {
             "module": root("server/fileservice/dao/upload")
