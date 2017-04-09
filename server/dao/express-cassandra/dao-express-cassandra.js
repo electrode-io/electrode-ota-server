@@ -1,15 +1,11 @@
 "use strict";
 const {types} = require('dse-driver');
 const {promiseMap, reducer, remove} = require('../../util');
-const historySort = history => history && history.sort((a, b) => b.created_.getTime() - a.created_.getTime())
 const {alreadyExistsMsg} = require('../../service/errors');
 const UDTS = require('./models/UDTS');
-const removeCreated = v => {
-    return v && v.map(b => {
-            const {created_, ...rest} = b.toJSON ? b.toJSON() : b;
-            return rest;
-        });
-};
+
+const historySort = history => history && history.sort((a, b) => b.created_.getTime() - a.created_.getTime());
+
 const toLowerCaseKeys = (obj) => {
     if (!obj) return obj;
     const ret = {};
@@ -18,7 +14,9 @@ const toLowerCaseKeys = (obj) => {
     }
     return ret;
 };
+
 const ACCESSKEY = Object.keys(UDTS.accesskey);
+
 const asKeyAll = (v, arr = []) => {
     v = Array.isArray(v) ? v : [v];
     for (const _v of v)
@@ -32,53 +30,18 @@ const historyAll = (v, arr = []) => {
         _v.history_ && arr.push(..._v.history_);
     return arr;
 };
-const updater = (fields, obj) => {
-    if (!obj) return {};
-    const ret = {};
-    for (const key of fields) {
-        if (obj.hasOwnProperty(key)) {
-            ret[key] = obj[key];
-        }
-    }
-    return ret;
-};
-const PACKAGE_FIELDS = [
-    "appVersion",
-    "blobUrl",
-    "description",
-    "rollout",
-    "size",
-    "uploadTime",
-    "releaseMethod",
-    "originalLabel",
-    "originalDeployment",
-    "label",
-    "releasedBy",
-    "diffPackageMap",
-    "isDisabled",
-    "manifestBlobUrl",
-    "packageHash",
-    "isMandatory"];
-
-const PACKAGE_UPDATE_FIELDS = [
-    "appVersion",
-    "description",
-    "isMandatory",
-    "isDisabled",
-    "rollout",
-    "label",
-    "diffPackageMap"
-];
-
 
 const BATCH = {return_query: true};
+
 const nullUnlessValue = (obj, keys) => {
     for (const key of keys) {
         if (obj[key] === void(0)) {
             obj[key] = null;
         }
     }
+    return obj;
 };
+
 const notimplement = () => {
     throw new Error(`Method is not implemented`);
 };
@@ -88,6 +51,7 @@ const isEmpty = (arr) => {
     return false;
 };
 const isNotEmpty = (arr) => !isEmpty(arr);
+
 const apply = (target, source) => {
     if (!source) {
         return target;
@@ -101,16 +65,15 @@ const apply = (target, source) => {
     }
     return target;
 };
-const within = (arr) => {
-    if (isEmpty(arr)) {
+
+const within = ($in) => {
+    if (isEmpty($in)) {
         throw new Error(`Can not look within an empty array!`);
     }
-    if (arr.length === 1) {
-        return arr[0];
+    if ($in.length === 1) {
+        return $in[0];
     }
-    return {
-        $in: arr
-    }
+    return {$in};
 };
 
 const Mock = {
@@ -122,9 +85,8 @@ const Mock = {
     findAsync: notimplement,
 };
 
-const ifExists = (result) => {
-    return result.rows && result.rows[0]['[applied]'] != false;
-};
+const ifExists = (result) => result.first().get('[applied]') != false;
+
 
 class DaoExpressCassandra {
     //these are just here for autocomplete.
@@ -230,8 +192,7 @@ class DaoExpressCassandra {
     async _deploymentByAppAndName(appId, deploymentName) {
         const key = await this._deploymentKeyByAppAndName(appId, deploymentName);
         return this.Deployment.findOneAsync({key});
-        /*        return this._deploymentKeyByAppAndName(appId, deploymentName)
-         .then(key=>this._first(`SELECT * FROM deployments WHERE key = ?`, [key]));*/
+
     }
 
     async addDeployment(app, name, {key}) {
@@ -246,12 +207,7 @@ class DaoExpressCassandra {
             this.newDeploymentAppName({key, app, name}).save(BATCH),
             this.App.update({id: app}, {deployments}, BATCH)
         );
-        /*
-         .then(deployments => this._batch([
-         q(`INSERT INTO deployments ("createdTime", id, name, key) VALUES ( toUnixTimestamp(now()),  now(), ?, ?)`, name, key),
-         q(`INSERT INTO deployments_app_name (key, app, name) VALUES (?, ? , ?)`, key, appId, name),
-         q(`UPDATE apps SET deployments = ? WHERE id = ?`, deployments ? deployments.concat(name) : [name], appId)
-         ]));*/
+
 
     }
 
@@ -268,20 +224,6 @@ class DaoExpressCassandra {
             isNotEmpty(history_) && this.Package.delete({id_: within(history_)}, BATCH)
         );
 
-        /*  return this._deploymentsByAppId(appId)
-         .then((dep) => this._deploymentKeyByAppAndName(appId, deploymentName)
-         .then(key => this._first(`SELECT key, history_ FROM deployments WHERE key = ?`, [key]))
-         .then(({key, history_}) => {
-         const batch = [
-         q(`DELETE FROM deployments_app_name WHERE app = ? AND name = ?`, appId, deploymentName),
-         q(`UPDATE apps SET deployments =  ? WHERE id = ?`, remove(dep, deploymentName), appId),
-         q(`DELETE FROM deployments WHERE key = ?`, key),
-         ];
-         if (history_ && history_.length) {
-         batch.push(q(`DELETE FROM packages WHERE id_ in ?`, history_ || []));
-         }
-         return this._batch(batch)
-         }));*/
     }
 
     _batch(...queries) {
@@ -302,16 +244,7 @@ class DaoExpressCassandra {
             this.App.update({id: appId}, {deployments: remove(deps, oname).concat(nname)}, BATCH),
             this.Deployment.update({key}, {name: nname}, BATCH)
         );
-        /*
-         *       return this._deploymentsByAppId(appId)
-         *           .then(deps => this._deploymentKeyByAppAndName(appId, oname)
-         *               .then(key => this._batch([
-         *                   q(`DELETE FROM deployments_app_name WHERE app = ? AND name = ?`, appId, oname),
-         *                   q(`INSERT INTO deployments_app_name (key, app, name) VALUES (?,?,?)`, key, appId, nname),
-         *                   q(`UPDATE apps SET deployments = ? WHERE id = ?`, remove(deps, oname).concat(nname), appId),
-         *                   q(`UPDATE deployments SET name = ? WHERE key = ?`, nname, key)
-         *               ])));
-         */
+
     }
 
     async _historyForDeployment(key) {
@@ -333,22 +266,7 @@ class DaoExpressCassandra {
         await this.Deployment.updateAsync({key: deploymentKey}, {history_});
         pkg.history_ = history_;
         return pkg;
-        /**        return this._first(`SELECT history_ FROM deployments WHERE key = ?`, [deploymentKey], v => v ? v.history_ : [])
-         *           .then(history => {
-         *               const pkgId = tuuid();
-         *
-         *       //add pkgId first.
-         *        if (history) {
-         *            history.unshift(pkgId);
-         *        } else {
-         *            history = [pkgId]
-         *        }
-         *        return this._batch([
-         *            q(`UPDATE deployments SET history_ = ?  WHERE key = ?`, history, deploymentKey),
-         *            q(`UPDATE packages SET created_ = toUnixTimestamp(now()), ${update} WHERE "id_" = ?`, ...params, pkgId)
-         *        ]).then(_ => this._first(`SELECT * FROM packages WHERE id_ = ?`, [pkgId]));
-         *    });
-         */
+
     }
 
     async  updatePackage(deploymentKey, pkg, label) {
@@ -366,20 +284,7 @@ class DaoExpressCassandra {
         apply(rpkg, pkg);
         await rpkg.saveAsync();
         return rpkg;
-        /*
-         *       return this._first(`SELECT history_ FROM deployments WHERE key = ? `, [deploymentKey], v => v.history_ || []).then((ids) => {
-         *
-         *           if (label) {
-         *               const qp = [...params, ids, label];
-         *               return this._first(`UPDATE packages SET ${update} WHERE "id_" in ? AND label = ?`, qp)
-         *                   .then(_ => this._first(`SELECT * FROM packages WHERE id_ in ? AND label = ?`, qp));
-         *           } else {
-         *               const qp = [...params, ids[0]];
-         *               return this._first(`UPDATE packages SET  ${update} WHERE "id_" = ?`, qp)
-         *                   .then(_ => this._first(`SELECT * FROM packages WHERE id_ = ?`, [ids[0]]));
-         *           }
-         *       });
-         */
+
     }
 
 
@@ -393,10 +298,7 @@ class DaoExpressCassandra {
             nullUnlessValue(js.accessKeys[key], ACCESSKEY);
         }
         return js;
-        /**
-         * return this._first(`UPDATE users SET name=?, "accessKeys"=?, "linkedProviders"=? WHERE email= ?`, [name, accessKeys, linkedProviders, currentEmail])
-         *   .then(_ => this.userByEmail(email));
-         **/
+
     }
 
     async history(appId, deploymentName) {
@@ -408,9 +310,7 @@ class DaoExpressCassandra {
 
         const sort = historySort(pkgs);
         return sort;
-        /*        return this._deploymentByAppAndName(appId, deploymentName)
-         *           .then(deployment => deployment.history_ ? this._all(`SELECT * FROM packages WHERE id_ IN ?`, [deployment.history_]).then(historySort).then(removeCreated) : []);
-         */
+
     }
 
     historyByIds(historyIds) {
@@ -418,7 +318,6 @@ class DaoExpressCassandra {
             return [];
         }
         return this.Package.findAsync({id_: within(historyIds)});
-//        return this._all(`SELECT * FROM packages WHERE id_ IN ?`, [historyIds]);
     }
 
     /**
@@ -432,9 +331,6 @@ class DaoExpressCassandra {
         if (deployment && isNotEmpty(deployment.history_)) {
             return this.Package.delete({id_: within(deployment.history_)});
         }
-        /*        return this._deploymentByAppAndName(appId, deploymentName)
-         .then(deployment => deployment.history_ ? this._first(`DELETE FROM packages WHERE id_ in ?`, [deployment.history_]) : []);*/
-
     }
 
     async historyLabel(appId, deploymentName, label) {
@@ -453,15 +349,12 @@ class DaoExpressCassandra {
                 }
             }
         }
-        /*        return this._deploymentByAppAndName(appId, deploymentName)
-         .then(deployment => deployment.history_ && this._all(`SELECT * FROM packages WHERE id_ IN ?`, [deployment.history_]).then(pkgs => pkgs && pkgs.find(v => v.label == label)));
-         */
+
     }
 
     async packageById(pkg) {
         if (!pkg) return;
         return this.Package.findOneAsync({id_: pkg});
-//        return this._first(`SELECT * FROM packages WHERE id_ = ?`, [pkg]);
     }
 
     async removeApp(appId) {
@@ -479,47 +372,25 @@ class DaoExpressCassandra {
             isNotEmpty(packages) && this.Package.delete({id_: within(packages)}, BATCH),
             isNotEmpty(keys) && this.Deployment.delete({key: within(keys)}, BATCH)
         );
-        /*      return this._all(`SELECT key FROM deployments_app_name  WHERE app = ?`, [appId], asKeyAll)
-         *         .then(keys => {
-         *             return this._all(`SELECT history_ FROM deployments WHERE key IN  ?`, [keys], historyAll)
-         *                 .then(packages => {
-         *                     const batch = [
-         *                         q(`DELETE FROM deployments_app_name WHERE app = ?`, appId),
-         *                         q(`DELETE FROM apps WHERE id = ?`, appId)
-         *                     ];
 
-         *                        if (packages && packages.length) {
-         *                         batch.push(q(`DELETE FROM packages WHERE id_ IN ?`, packages));
-         *                     }
-
-         *                        if (keys && keys.length) {
-         *                         batch.unshift(q(`DELETE FROM deployments WHERE key IN ?`, keys));
-         *                     }
-         *                     return this._batch(batch);
-         *                 })
-         *         });*/
     }
 
     userByAccessKey(accessKey) {
         return this.User.findOneAsync({accessKeys: {$contains_key: accessKey}});
-        //        return this._first(`SELECT * FROM users WHERE "accessKeys" CONTAINS KEY ?`, [accessKey]);
     }
 
 
     userById(id) {
         return this.User.findOneAsync({id});
-        //        return this._first(`SELECT * FROM users WHERE id = ?`, [id]);
     }
 
     async userByEmail(email) {
         return this.User.findOneAsync({email});
 
-//        return this._first(`SELECT * FROM users WHERE email = ?`, [email]);
     }
 
     appById(id) {
         return this.App.findOneAsync({id});
-//        return this._first(`SELECT * FROM apps WHERE id = ?`, [id]);
     }
 
     async upload(packageHash, content) {
@@ -529,14 +400,12 @@ class DaoExpressCassandra {
         const pkg = this.newPackageContent({packageHash, content});
         const result = await pkg.saveAsync({if_not_exist: true});
         return ifExists(result);
-//        return this._first(`INSERT INTO packages_content ("packageHash", content) VALUES(?,?) IF NOT EXISTS`, [packageHash, content]).then(insertError)
     }
 
     async download(packageHash) {
         const pkg = await this.PackageContent.findOneAsync({packageHash});
         if (pkg != null)
             return pkg.content;
-        //return this._first(`SELECT content FROM packages_content WHERE "packageHash" = ? `, [packageHash]).then(v => v.content);
     }
 
     async  deploymentForKey(deploymentKey) {
@@ -548,14 +417,6 @@ class DaoExpressCassandra {
             return dep;
         }
         return dep;
-        /**   return this._first(`SELECT * FROM deployments WHERE key = ?`, [deploymentKey])
-         *     .then(dep => dep && dep.history_ ? this._first(`SELECT * FROM packages WHERE id_ = ?`, [dep.history_[0]])
-         *         .then(pkg => {
-         *             dep.package = pkg;
-         *             return dep;
-         *         }) : dep);
-         */
-
     }
 
     async deploymentsByApp(appId, deployments) {
@@ -564,25 +425,17 @@ class DaoExpressCassandra {
         }
         const deps = await this.DeploymentAppName.findAsync({app: appId, name: within(deployments)});
         if (isEmpty(deps)) return [];
-        const depMap = await promiseMap(reducer(deps, (ret, d) => (ret[d.name] = this.deploymentForKey(d.key))));
-
-        return depMap;
-        /*  return this._all(`select key,name FROM deployments_app_name WHERE app = ? AND name IN ?`, [appId, deployments])
-         .then(deps => promiseMap(reducer(deps, (ret, d) => (ret[d.name] = this.deploymentForKey(d.key)))));*/
+        return promiseMap(reducer(deps, (ret, d) => (ret[d.name] = this.deploymentForKey(d.key))));
     }
 
     async deploymentByApp(appId, deployment) {
         const d = await this.DeploymentAppName.findOneAsync({app: appId, name: deployment});
         if (!d) return;
         return this.deploymentForKey(d.key);
-        /*   return this._first(`select key,name FROM deployments_app_name WHERE app = ? AND name = ?`, [appId, deployment])
-         .then(d => d && this.deploymentForKey(d.key));*/
-
     }
 
     appsForCollaborator(email) {
         return this.App.findAsync({collaborators: {$contains_key: email}});
-        // return this._all(`SELECT * FROM apps WHERE collaborators CONTAINS KEY ?`, [email]);
     }
 
     async  appForCollaborator(email, name) {
@@ -594,14 +447,11 @@ class DaoExpressCassandra {
             app.deployments = [];
         }
         return app;
-        //return this._first(`SELECT * FROM apps WHERE collaborators CONTAINS KEY ? AND name = ? ALLOW FILTERING`, [email, name]);
     }
 
     async appForDeploymentKey(deploymentKey) {
         const {app} = this.DeploymentAppName.findOneAsync({key: deploymentKey});
         return this.appById(app);
-        /*    return this._first(`select app FROM deployments_app_name WHERE key = ?`, [deploymentKey])
-         .then(({app}) => this.appById(app));*/
     }
 
     /*  appVersion text,
@@ -615,33 +465,18 @@ class DaoExpressCassandra {
         const metric = await this.newMetric(obj);
         await metric.saveAsync();
         return metric;
-        /*return this._first(`INSERT INTO metrics (id,  appVersion, status,  previousLabelOrAppVersion,  previousDeploymentKey, clientUniqueId, deploymentKey,  label) values (now(), ?,?,?,?,?,?,? )`, [appVersion,
-         *   status,
-         *   previousLabelOrAppVersion,
-         *   previousDeploymentKey,
-         *   clientUniqueId,
-         *   deploymentKey,
-         *   label]);*/
     }
 
     metrics(deploymentkey) {
         return this.Metric.findAsync({deploymentkey})
-        //return this._all(`SELECT * FROM metrics WHERE deploymentkey = ?`, [deploymentKey]);
     }
 
     clientRatio(clientUniqueId, packageHash) {
         return this.ClientRatio.findOneAsync({clientUniqueId, packageHash});
-        //return this._first(`SELECT *  FROM client_ratio WHERE "clientUniqueId" = ? and "packageHash" = ?`, [clientUniqueId, packageHash]);
     }
 
     insertClientRatio(clientUniqueId, packageHash, ratio, updated) {
         return (this.newClientRatio({clientUniqueId, packageHash, ratio, updated})).saveAsync();
-        /*        return this._first(`INSERT INTO client_ratio (
-         "inserted",
-         "clientUniqueId",
-         "packageHash",
-         ratio,
-         updated) values (toUnixTimestamp(now()), ?,?,?,?)`, [clientUniqueId, packageHash, ratio, updated]);*/
     }
 
 }

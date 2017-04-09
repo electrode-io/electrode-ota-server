@@ -73,7 +73,6 @@ describe('managment-sdk', function () {
         return new AcquisitionManager({
             request(type, url, body, cb){
                 if (!cb) cb = body;
-                console.log('url', url);
                 const req = agent[verbs[type]](url).set(configuration.headers);
                 req.send(body).end(function (err, response) {
                     if (response && typeof response.body === 'object') {
@@ -330,11 +329,7 @@ describe('managment-sdk', function () {
             const name = `deployment-metrics-${Date.now()}`;
             return am.addApp(name)
                 .then(_ => am.getDeploymentMetrics(name, 'Staging'))
-                .then((r) => {
-                    console.log('r', r);
-                })
                 .then(_ => am.getDeployment(name, 'Staging'))
-
                 .then(deployment => P((resolve, reject) => {
                     return aq({
                         clientUniqueId,
@@ -439,7 +434,6 @@ describe('managment-sdk', function () {
 
         describe('release', () => {
             const name = `release-${Date.now()}`;
-            console.log('testing release', name);
             it('should release', () => am.addApp(name)
                 .then(_ => am.release(name, 'Production', step1, '1.2.3', {
                     isDisabled: true,

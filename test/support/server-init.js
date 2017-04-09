@@ -49,4 +49,3 @@ module.exports = () => init().then(client => {
     });
 });
 
-//require('./management-sdk-suite');
