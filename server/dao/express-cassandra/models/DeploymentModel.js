@@ -5,7 +5,7 @@ module.exports = {
         key: "text",
         createdTime: {
             type: "timestamp",
-            default: {"$db_function": "toTimestamp(now())"}
+            default: {"$db_function": "toUnixTimestamp(now())"}
         },
         history_: {
             type: "list",

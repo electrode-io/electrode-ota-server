@@ -1,12 +1,14 @@
 "use strict";
-
+const {types} = require('dse-driver');
 const {promiseMap, reducer, remove} = require('../../util');
-const historySort = history => history && history.sort((a, b) => b.created_.getTime() - a.created_.getTime());
+const historySort = history => history && history.sort((a, b) => b.created_.getTime() - a.created_.getTime())
 const {alreadyExistsMsg} = require('../../service/errors');
 const UDTS = require('./models/UDTS');
 const removeCreated = v => {
-    v && v.forEach(b => delete b.created_);
-    return v;
+    return v && v.map(b => {
+            const {created_, ...rest} = b.toJSON ? b.toJSON() : b;
+            return rest;
+        });
 };
 const ACCESSKEY = Object.keys(UDTS.accesskey);
 const asKeyAll = (v, arr = []) => {
@@ -113,7 +115,7 @@ const Mock = {
 };
 
 const ifExists = (result) => {
-    return result.rows && result.rows[0]['[applied]'] === true;
+    return result.rows && result.rows[0]['[applied]'] != false;
 };
 
 class DaoExpressCassandra {
@@ -132,8 +134,49 @@ class DaoExpressCassandra {
         this._models = client;
     }
 
+    newApp(app) {
+        app.id = this._models.uuid();
+        return new this.App(app);
+    }
+
+    newClientRatio(ratio) {
+        return new this.ClientRatio(ratio);
+    }
+
+    newDeploymentAppName(dan) {
+        return new this.DeploymentAppName(dan);
+    }
+
+    newDeployment(dep) {
+        dep.id = this._models.uuid();
+        return new this.Deployment(dep);
+    }
+
+    newMetric(metric) {
+        return new this.Metric(metric);
+    }
+
+    newPackageContent(content) {
+        return new this.PackageContent(content);
+    }
+
+    newPackage(pkg) {
+        pkg.id_ = this._models.uuid();
+        pkg.created_ = Date.now();
+        if (pkg.size)
+            pkg.size = types.Integer.fromNumber(pkg.size);
+
+        return new this.Package(pkg);
+    }
+
+    newUser(user) {
+        user.id = this._models.uuid();
+        return new this.User(user);
+    }
+
+
     async createUser({email, name, accessKeys, linkedProviders = ['GitHub']}) {
-        const user = new this.User({email, name, accessKeys, linkedProviders});
+        const user = this.newUser({email, name, accessKeys, linkedProviders});
         const result = await user.saveAsync({if_not_exist: true});
         alreadyExistsMsg(ifExists(result), `User already exists ${email}`)
 
@@ -143,17 +186,19 @@ class DaoExpressCassandra {
     async createApp({name, deployments = {}, collaborators}) {
         const deps = Object.keys(deployments);
 
-        const app = new this.App({name, collaborators});
+        const app = this.newApp({name, collaborators});
         await app.saveAsync();
         if (isNotEmpty(deps)) {
-            await Promise.all(deps.map(name => this.addDeployment(app.id, name, deployments[name])))
+            for (const name of deps) {
+                await this.addDeployment(app.id, name, deployments[name]);
+            }
         }
         app.deployments = deps;
         return app;
     }
 
     async updateApp(id, {name, collaborators}) {
-        const app = await this.App.findOneAsync({name});
+        const app = await this.App.findOneAsync({id});
         app.name = name;
         app.collaborators = collaborators;
         await app.saveAsync();
@@ -175,8 +220,10 @@ class DaoExpressCassandra {
     }
 
     async _deploymentByAppAndName(appId, deploymentName) {
-        const key = await this._deploymentByAppAndName(appId, deploymentName);
+        const key = await this._deploymentKeyByAppAndName(appId, deploymentName);
         return this.Deployment.findOneAsync({key});
+        /*        return this._deploymentKeyByAppAndName(appId, deploymentName)
+         .then(key=>this._first(`SELECT * FROM deployments WHERE key = ?`, [key]));*/
     }
 
     async addDeployment(app, name, {key}) {
@@ -187,8 +234,8 @@ class DaoExpressCassandra {
             deployments = deployments.concat(name);
         }
         return this._batch(
-            new this.Deployment({name, key}).save(BATCH),
-            new this.DeploymentAppName({key, app, name}).save(BATCH),
+            this.newDeployment({name, key}).save(BATCH),
+            this.newDeploymentAppName({key, app, name}).save(BATCH),
             this.App.update({id: app}, {deployments}, BATCH)
         );
         /*
@@ -205,10 +252,10 @@ class DaoExpressCassandra {
         const dep = await this._deploymentsByAppId(appId);
         const key = await this._deploymentKeyByAppAndName(appId, deploymentName);
         const history_ = await this._historyForDeployment(key);
-
+        const deployments = remove(dep, deploymentName);
         return this._batch(
             this.DeploymentAppName.delete({app: appId, name: deploymentName}, BATCH),
-            this.App.update({id: appId}, {deployments: remove(dep, deploymentName)}, BATCH),
+            this.App.update({id: appId}, {deployments}, BATCH),
             this.Deployment.delete({key}, BATCH),
             isNotEmpty(history_) && this.Package.delete({id_: within(history_)}, BATCH)
         );
@@ -230,7 +277,8 @@ class DaoExpressCassandra {
     }
 
     _batch(...queries) {
-        return this._models.doBatchAsync(queries.filter(Boolean));
+        const execute = queries.filter(Boolean);
+        return this._models.doBatchAsync(execute);
     }
 
     async renameDeployment(appId, oname, nname) {
@@ -242,7 +290,7 @@ class DaoExpressCassandra {
 
         return this._batch(
             this.DeploymentAppName.delete({app: appId, name: oname}, BATCH),
-            (new this.DeploymentAppName({key, app: appId, name: nname}).save(BATCH)),
+            (this.newDeploymentAppName({key, app: appId, name: nname}).save(BATCH)),
             this.App.update({id: appId}, {deployments: remove(deps, oname).concat(nname)}, BATCH),
             this.Deployment.update({key}, {name: nname}, BATCH)
         );
@@ -259,17 +307,15 @@ class DaoExpressCassandra {
     }
 
     async _historyForDeployment(key) {
-        const res = await this.Deployment.findOneAsync({key}, {select: 'history_ as history'});
-        return res.history;
+        const res = await this.Deployment.findOneAsync({key});
+        return res.history_;
     }
 
     async addPackage(deploymentKey, value) {
-        const params = updater(PACKAGE_FIELDS, value);
 
         let history_ = await this._historyForDeployment(deploymentKey);
-
-        const pkg = new this.Package(params);
-        await pkg.saveAsync();
+        const pkg = this.newPackage(value);
+        const res = await pkg.saveAsync({if_not_exist: true});
 
         if (isEmpty(history_)) {
             history_ = [pkg.id_];
@@ -277,6 +323,7 @@ class DaoExpressCassandra {
             history_ = [pkg.id_, ...history_];
         }
         await this.Deployment.updateAsync({key: deploymentKey}, {history_});
+        pkg.history_ = history_;
         return pkg;
         /**        return this._first(`SELECT history_ FROM deployments WHERE key = ?`, [deploymentKey], v => v ? v.history_ : [])
          *           .then(history => {
@@ -297,15 +344,20 @@ class DaoExpressCassandra {
     }
 
     async  updatePackage(deploymentKey, pkg, label) {
-        const params = updater(PACKAGE_UPDATE_FIELDS, pkg);
         const history_ = await this._historyForDeployment(deploymentKey);
         if (isEmpty(history_)) {
             throw new Error(`Can not update a package without history, probably means things have gone awry.`);
         }
+        let rpkg;
+
         if (label) {
-            return this.Package.updateAsync({id_: within(history_), label}, params);
+            rpkg = await this.Package.findOneAsync({id_: within(history_), label});
+        } else {
+            rpkg = await this.Package.findOneAsync({id_: within(history_)});
         }
-        return this.Package.updateAsync({id_: within(history_)}, params);
+        apply(rpkg, pkg);
+        await rpkg.saveAsync();
+        return rpkg;
         /*
          *       return this._first(`SELECT history_ FROM deployments WHERE key = ? `, [deploymentKey], v => v.history_ || []).then((ids) => {
          *
@@ -340,9 +392,11 @@ class DaoExpressCassandra {
     }
 
     async history(appId, deploymentName) {
-        const dep = await this._deploymentByAppAndName(appId, deploymentName);
-        const pkgs = await this.Package.findAsync({id_: dep.history_});
-        return removeCreated(historySort(pkgs));
+        const deployment = await this._deploymentByAppAndName(appId, deploymentName);
+        const pkgs = await this.Package.findAsync({id_: within(deployment.history_)});
+
+        const sort = historySort(pkgs);
+        return sort;
         /*        return this._deploymentByAppAndName(appId, deploymentName)
          *           .then(deployment => deployment.history_ ? this._all(`SELECT * FROM packages WHERE id_ IN ?`, [deployment.history_]).then(historySort).then(removeCreated) : []);
          */
@@ -393,7 +447,7 @@ class DaoExpressCassandra {
          */
     }
 
-    packageById(pkg) {
+    async packageById(pkg) {
         if (!pkg) return;
         return this.Package.findOneAsync({id_: pkg});
 //        return this._first(`SELECT * FROM packages WHERE id_ = ?`, [pkg]);
@@ -457,11 +511,12 @@ class DaoExpressCassandra {
 //        return this._first(`SELECT * FROM apps WHERE id = ?`, [id]);
     }
 
-    upload(packageHash, content) {
+    async upload(packageHash, content) {
         if (!Buffer.isBuffer(content)) {
             content = Buffer.from(content, 'utf8')
         }
-        const result = (new this.PackageContent({packageHash, content})).saveAsync({if_not_exist: true})
+        const pkg = this.newPackageContent({packageHash, content});
+        const result = await pkg.saveAsync({if_not_exist: true});
         return ifExists(result);
 //        return this._first(`INSERT INTO packages_content ("packageHash", content) VALUES(?,?) IF NOT EXISTS`, [packageHash, content]).then(insertError)
     }
@@ -496,8 +551,9 @@ class DaoExpressCassandra {
         }
         const deps = await this.DeploymentAppName.findAsync({app: appId, name: within(deployments)});
         if (isEmpty(deps)) return [];
-        return promiseMap(reducer(deps, (ret, d) => (ret[d.name] = this.deploymentForKey(d.key))));
+        const depMap = await promiseMap(reducer(deps, (ret, d) => (ret[d.name] = this.deploymentForKey(d.key))));
 
+        return depMap;
         /*  return this._all(`select key,name FROM deployments_app_name WHERE app = ? AND name IN ?`, [appId, deployments])
          .then(deps => promiseMap(reducer(deps, (ret, d) => (ret[d.name] = this.deploymentForKey(d.key)))));*/
     }
@@ -516,8 +572,15 @@ class DaoExpressCassandra {
         // return this._all(`SELECT * FROM apps WHERE collaborators CONTAINS KEY ?`, [email]);
     }
 
-    appForCollaborator(email, name) {
-        return this.App.findOneAsync({collaborators: {$contains_key: email}, name}, {allow_filtering: true});
+    async  appForCollaborator(email, name) {
+        const app = await  this.App.findOneAsync({
+            collaborators: {$contains_key: email},
+            name
+        }, {allow_filtering: true});
+        if (app && app.deployments == null) {
+            app.deployments = [];
+        }
+        return app;
         //return this._first(`SELECT * FROM apps WHERE collaborators CONTAINS KEY ? AND name = ? ALLOW FILTERING`, [email, name]);
     }
 
@@ -544,7 +607,7 @@ class DaoExpressCassandra {
                      deploymentKey,
                      label
                  }) {
-        return (new this.Metric({
+        return (this.newMetric({
             appVersion,
             status,
             previousLabelOrAppVersion,
@@ -573,7 +636,7 @@ class DaoExpressCassandra {
     }
 
     insertClientRatio(clientUniqueId, packageHash, ratio, updated) {
-        return (new this.ClientRatio({clientUniqueId, packageHash, ratio, updated})).saveAsync();
+        return (this.newClientRatio({clientUniqueId, packageHash, ratio, updated})).saveAsync();
         /*        return this._first(`INSERT INTO client_ratio (
          "inserted",
          "clientUniqueId",

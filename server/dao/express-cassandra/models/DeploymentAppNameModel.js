@@ -1,4 +1,4 @@
-module.exports =  ({
+module.exports = ({
     fields: {
         app: "uuid",
         name: "text",
@@ -9,4 +9,4 @@ module.exports =  ({
         name: "asc"
     },
     table_name: "deployments_app_name"
-})
+});

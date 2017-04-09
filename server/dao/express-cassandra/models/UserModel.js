@@ -6,12 +6,11 @@ module.exports = ({
             "type": "map",
             "typeDef": "<text, frozen<accesskey>>",
         },
-        "createdTime": "timestamp",
+        "createdTime": {
+            type: "timestamp", default: {"$db_function": "toUnixTimestamp(now())"}
+        },
         "id": {
-            type: "uuid",
-            default(){
-                return (this.id = ec.uuid());
-            }
+            type: "uuid"
         },
         "linkedProviders": {
             "type": "list",

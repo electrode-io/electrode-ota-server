@@ -1,19 +1,15 @@
 const ec = require('express-cassandra');
-
 module.exports = {
     fields: {
         id: {
-            type: 'uuid',
-            default(){
-                return (this.id = ec.uuid());
-            }
+            type: 'uuid'
         },
         collaborators: {
             type: "map",
             typeDef: "<text, frozen<collaborator>>"
         },
         deployments: {
-            type: "list",
+            type: "set",
             typeDef: "<text>"
         },
         name: "text"

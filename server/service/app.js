@@ -5,19 +5,25 @@ const {id, key, remove} = require('../util');
 const {isZip, generate} = require('./manifest');
 const {alreadyExists, alreadyExistsMsg, notFound, missingParameter, notAuthorized, invalidRequest} = require('./errors');
 
-const excludeNull = obj=> Object.keys(obj).reduce((ret, key)=> {
+const excludeNull = obj => Object.keys(obj).reduce((ret, key) => {
     if (obj[key] == null) return ret;
     ret[key] = obj[key];
     return ret;
 }, {});
 
-
+const toJSON = (v, exclude) => {
+    if (v && v.toJSON) {
+        return v.toJSON();
+    }
+    else if (Array.isArray(v)) return v.map(toJSON);
+    return v;
+};
 const Perms = {
     Owner: ['Owner'],
     Collaborator: ['Collaborator'],
     Any: ['Owner', 'Collaborator']
 };
-const toBuffer = (obj)=>JSON.stringify(obj);
+const toBuffer = (obj) => JSON.stringify(obj);
 
 const hasDeploymentName = ({deployments}, deployment) => {
     if (!deployments)return false;
@@ -27,14 +33,14 @@ const hasDeploymentName = ({deployments}, deployment) => {
     return deployment in deployments;
 };
 
-const hasPerm = (app, email, perms = Perms.Any)=> {
+const hasPerm = (app, email, perms = Perms.Any) => {
     missingParameter(app, 'app');
     missingParameter(email, 'email');
     const c = app.collaborators[email];
     return c && perms.indexOf(c.permission) > -1;
 };
 
-const _newDeployment = name=> {
+const _newDeployment = name => {
     return {
         "createdTime": Date.now(),
         name,
@@ -43,14 +49,14 @@ const _newDeployment = name=> {
         "package": null
     }
 };
-const _addDeployment = (app, name)=> {
+const _addDeployment = (app, name) => {
     if (!app.deployments) {
         app.deployments = {};
     }
     return (app.deployments[name] = _newDeployment(name));
 };
 
-const notAuthorizedPerm = (app, email, perm, message)=> {
+const notAuthorizedPerm = (app, email, perm, message) => {
     if (hasPerm(app, email, Perms[perm] || perm)) {
         return app;
     }
@@ -65,13 +71,13 @@ module.exports = (dao, upload) => {
             return dao.appForCollaborator(email, app).then(result => notFound(result, `App not found ${app}`));
         },
         _findApp(find, perm = 'Owner', errorMessage = `Do not have permission to do this operation.`){
-            return api.findApp(find).then(app =>notAuthorizedPerm(app, find.email, perm, errorMessage));
+            return api.findApp(find).then(app => notAuthorizedPerm(app, find.email, perm, errorMessage));
         },
         createApp({email, name, deployments = ["Production", "Staging"]}) {
             if (!name) {
-                return new Promise((r, reject)=> missingParameter(name, 'name'));
+                return Promise.reject(missingParameter(name, 'name'));
             }
-            return dao.appForCollaborator(email, name).then(check=> {
+            return dao.appForCollaborator(email, name).then(check => {
                 alreadyExists(!check, name);
 
                 const app = ({
@@ -80,29 +86,30 @@ module.exports = (dao, upload) => {
                         [email]: {
                             "permission": "Owner"
                         }
-                    }
+                    },
+                    "deployments": {}
                 });
 
-                deployments.forEach((name) => _addDeployment(app, name));
+                deployments.forEach((name) => app.deployments[name] = _addDeployment(app, name));
                 return dao.createApp(app);
             });
         },
 
         removeApp(find) {
             return api._findApp(find, 'Owner', 'Must be owner of app to remove')
-                .then(app=> dao.removeApp(app.id).then(v=>app));
+                .then(app => dao.removeApp(app.id).then(v => app));
         },
 
         renameApp(find){
-            return api._findApp(find, 'Owner', 'Must be owner of app to rename').then(app=> {
+            return api._findApp(find, 'Owner', 'Must be owner of app to rename').then(app => {
                 app.name = find.name;
-                return dao.updateApp(app.id, app).then(v=>app);
+                return dao.updateApp(app.id, app).then(v => app);
             });
         },
 
         transferApp(find)
         {
-            return api._findApp(find, 'Owner', 'Must be owner of app to transfer').then(app=>dao.userByEmail(find.transfer).then(u=> {
+            return api._findApp(find, 'Owner', 'Must be owner of app to transfer').then(app => dao.userByEmail(find.transfer).then(u => {
                 notFound(u, `The specified e-mail address doesn't represent a registered user`);
                 const owner = app.collaborators[find.email];
                 const transfer = app.collaborators[find.transfer] || (app.collaborators[find.transfer] = {});
@@ -117,18 +124,18 @@ module.exports = (dao, upload) => {
         },
 
         listDeployments(find){
-            return api.findApp(find).then(app=>dao.deploymentsByApp(app.id, app.deployments)
-                .then(deployments=>app.deployments.map(name=>deployments[name])));
+            return api.findApp(find).then(app => dao.deploymentsByApp(app.id, app.deployments)
+                .then(deployments => app.deployments.map(name => deployments[name])));
         },
         getDeployment(find){
-            return api.findApp(find).then(app=>dao.deploymentByApp(app.id, find.deployment));
+            return api.findApp(find).then(app => dao.deploymentByApp(app.id, find.deployment));
         },
         removeDeployment(params){
-            return api.findApp(params).then(app=> dao.removeDeployment(app.id, params.deployment));
+            return api.findApp(params).then(app => dao.removeDeployment(app.id, params.deployment));
         },
 
         renameDeployment(params){
-            return api.findApp(params).then(app=> {
+            return api.findApp(params).then(app => {
                 const {deployment, name} = params;
                 notFound(hasDeploymentName(app, deployment), `Deployment '${deployment}' not found ${params.app}`);
                 alreadyExists(!hasDeploymentName(app, name), name, 'deployment');
@@ -138,9 +145,9 @@ module.exports = (dao, upload) => {
 
         promoteDeployment(params)
         {
-            return api.findApp(params).then(app=> {
+            return api.findApp(params).then(app => {
 
-                return dao.deploymentsByApp(app.id, [params.deployment, params.to]).then(deployments=> {
+                return dao.deploymentsByApp(app.id, [params.deployment, params.to]).then(deployments => {
                     const f = deployments[params.deployment];
 
                     notFound(f && f.package, `Deployment "${params.deployment}" does not exist.`);
@@ -170,15 +177,22 @@ module.exports = (dao, upload) => {
             });
         },
 
-        historyDeployment(params)
+        async historyDeployment({app, deployment, email})
         {
-            return api.findApp(params).then(app=>dao.history(app.id, params.deployment));
+            const capp = await api.findApp({app, deployment, email});
+            const all = await dao.history(capp.id, deployment);
+            const map = all.map(toJSON);
+            //TODO -make less worse.
+            for (let i = map.length - 1; i >= 0; --i) {
+                delete map[i].created_;
+            }
+            return map;
         },
 
 
         updateDeployment(params)
         {
-            return api.findApp(params).then(app=>dao.deploymentByApp(app.id, params.deployment).then(deployment=> {
+            return api.findApp(params).then(app => dao.deploymentByApp(app.id, params.deployment).then(deployment => {
                 notFound(deployment, `Deployment not found '${params.deployment}'`);
                 notFound(deployment.package, `Deployment has no releases.`);
 
@@ -189,7 +203,7 @@ module.exports = (dao, upload) => {
                     rollout = pkg.rollout,
                     appVersion = pkg.appVersion,
                     description = pkg.description
-                } =  excludeNull(params);
+                } = excludeNull(params);
 
                 invalidRequest(!(params.rollout != null && (pkg.rollout != null && params.rollout < pkg.rollout)), `Can not set rollout below existing rollout ${pkg.rollout}`);
 
@@ -202,7 +216,7 @@ module.exports = (dao, upload) => {
                 };
 
                 return dao.updatePackage(deployment.key, npkg);
-            }));
+            })).then(toJSON);
         },
 
         addDeployment({email, app, name})
@@ -210,7 +224,7 @@ module.exports = (dao, upload) => {
             return api._findApp({
                 email,
                 app
-            }, 'Any', `Do not have permission to  add deployment to '${app}'.`).then(app=> {
+            }, 'Any', `Do not have permission to  add deployment to '${app}'.`).then(app => {
 
                 alreadyExists(!hasDeploymentName(app, name), name, `deployment`);
                 return dao.addDeployment(app.id, name, _newDeployment(name));
@@ -219,7 +233,7 @@ module.exports = (dao, upload) => {
 
         removeCollaborator({email, app, collaborator})
         {
-            return api._findApp({email, app}, 'Owner', `Must be owner to remove a collaborator`).then(app=> {
+            return api._findApp({email, app}, 'Owner', `Must be owner to remove a collaborator`).then(app => {
 
                 notAuthorized(app.collaborators[collaborator].permission !== 'Owner',
                     `Cannot remove the owner of the app from collaborator list.`);
@@ -234,18 +248,18 @@ module.exports = (dao, upload) => {
 
         addCollaborator({email, app, collaborator})
         {
-            return api._findApp({email, app}, 'Owner', `Must be owner to add collaborator`).then(app=> {
+            return api._findApp({email, app}, 'Owner', `Must be owner to add collaborator`).then(app => {
                 alreadyExistsMsg(!(collaborator in app.collaborators), `The given account is already a collaborator for this app.`);
 
 
-                return dao.userByEmail(collaborator).then(a=> {
+                return dao.userByEmail(collaborator).then(a => {
 
                     notFound(a, `The specified e-mail address doesn't represent a registered user`);
 
                     app.collaborators[collaborator] = {
                         "permission": "Collaborator"
                     };
-                    return dao.updateApp(app.id, app).then(v=>true);
+                    return dao.updateApp(app.id, app).then(v => true);
                 });
             });
         },
@@ -287,12 +301,12 @@ module.exports = (dao, upload) => {
                 }
             } = vals;
 
-            return api.findApp({email, app}).then(_app=> {
+            return api.findApp({email, app}).then(_app => {
 
                 notFound(hasDeploymentName(_app, deployment), `Not a valid deployment '${deployment}' for app '${app}'`);
                 const zip = isZip('', vals.package);
 
-                return dao.deploymentByApp(_app.id, deployment).then(deployments=> {
+                return dao.deploymentByApp(_app.id, deployment).then(deployments => {
                     //noinspection JSUnresolvedVariable
                     const pkg = {
                         description, isDisabled, isMandatory, rollout, appVersion,
@@ -302,17 +316,17 @@ module.exports = (dao, upload) => {
                         releasedBy: email
                     };
                     return upload(vals.package)
-                        .then((resp)=> {
+                        .then((resp) => {
                             if (zip) {
                                 return generate(vals.package).then(toBuffer).then(upload)
-                                    .then(({blobUrl})=> {
+                                    .then(({blobUrl}) => {
                                         resp.manifestBlobUrl = blobUrl;
                                         return resp;
                                     });
                             }
                             return resp;
                         })
-                        .then(resp=> {
+                        .then(resp => {
                             return dao.addPackage(deployments.key, Object.assign({}, pkg, resp))
                         });
                 });
@@ -326,14 +340,14 @@ module.exports = (dao, upload) => {
 
         metrics(params)
         {
-            return api.findApp(params).then(app=> {
+            return api.findApp(params).then(app => {
 
                 notFound(hasDeploymentName(app, params.deployment), params.deployment, 'deployment');
-                return dao.deploymentByApp(app.id, params.deployment).then((deployment)=>dao.metrics(deployment.key).then((metrics = [])=> {
+                return dao.deploymentByApp(app.id, params.deployment).then((deployment) => dao.metrics(deployment.key).then((metrics = []) => {
 
-                    const {label} =deployment.package || {};
+                    const {label} = deployment.package || {};
                     //    "DeploymentSucceeded" |  "DeploymentFailed" |  "Downloaded";
-                    return metrics.reduce((obj, val)=> {
+                    return metrics.reduce((obj, val) => {
                         const key = val.label || val.appversion;
                         const ret = obj[key] || (obj[key] = {
                                 active: 0,
@@ -373,22 +387,22 @@ module.exports = (dao, upload) => {
 
         rollback(params)
         {
-            return api.findApp(params).then(app=> {
+            return api.findApp(params).then(app => {
                 if (params.label) {
-                    return dao.historyLabel(app.id, params.deployment, params.label).then(rollto=>dao.deploymentByApp(app.id, params.deployment).then(deployment => ({
+                    return dao.historyLabel(app.id, params.deployment, params.label).then(rollto => dao.deploymentByApp(app.id, params.deployment).then(deployment => ({
                         rollto,
                         deployment
                     })));
                 } else {
                     return dao.deploymentByApp(app.id, params.deployment)
-                        .then(deployment=>deployment.history_ && dao.packageById(deployment.history_[1]).then(rollto => ({
+                        .then(deployment => deployment.history_ && dao.packageById(deployment.history_[1]).then(rollto => ({
                             deployment,
                             rollto
                         })));
                 }
-            }).then(({rollto, deployment})=> {
+            }).then(({rollto, deployment}) => {
                 notFound(rollto, `Cannot perform rollback because there are no releases on this deployment.`);
-                const {history_}= deployment;
+                const {history_} = deployment;
                 const dpkg = deployment.package;
                 const pkg = Object.assign({}, rollto, {
                     uploadTime: Date.now(),
@@ -398,7 +412,7 @@ module.exports = (dao, upload) => {
                     originalLabel: dpkg.label,
                     label: `v${history_.length + 1}`
                 });
-                return dao.addPackage(deployment.key, pkg).then(v=>pkg);
+                return dao.addPackage(deployment.key, pkg).then(v => pkg);
             });
 
         }

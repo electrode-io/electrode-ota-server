@@ -10,7 +10,7 @@
   "homepage": "https://github.com/electrode-io/electrode-ota-server",
   "main": "index.js",
   "scripts": {
-    "test": "PORT=9999 NODE_TLS_REJECT_UNAUTHORIZED=0 mocha test/*-test.js",
+    "test": "PORT=9999 NODE_TLS_REJECT_UNAUTHORIZED=0 mocha --compilers js:babel-register test/*-test.js",
     "start": "node ./index.js"
   },
   "bin": {
@@ -28,7 +28,6 @@
   ],
   "dependencies": {
     "bell": "^8.0.1",
-    "cassandra-driver": "^3.1.1",
     "ejs": "^2.5.2",
     "electrode-server": "^1.1.1",
     "express-cassandra": "^1.7.5",

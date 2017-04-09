@@ -3,7 +3,6 @@ module.exports = ({
         id: {
             type: "timeuuid",
             default: {"$db_function": "now()"}
-
         },
         deploymentkey: "text",
         appversion: "text",

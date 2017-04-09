@@ -1,16 +1,16 @@
-const ec = require('express-cassandra');
-
+const models = require('express-cassandra');
 module.exports = ({
     fields: {
         id_: {
-            type: 'uuid',
-            default(){
-                return (this.id_ = ec.uuid());
-            }
+            type: 'uuid'
         },
         "appVersion": "text",
         "blobUrl": "text",
-        created_: "timestamp",
+        created_: {
+            type: "timestamp",
+
+            // default: {"$db_function": "toUnixTimestamp(now())"}
+        },
         description: "text",
         "diffPackageMap": {
             type: "map",
@@ -32,4 +32,4 @@ module.exports = ({
     key: [["id_"]],
     indexes: ["label"],
     table_name: "packages"
-})
+});
