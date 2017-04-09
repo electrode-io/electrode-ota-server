@@ -10,6 +10,8 @@
   "homepage": "https://github.com/electrode-io/electrode-ota-server",
   "main": "index.js",
   "scripts": {
+    "test-legacy": "DAO=cassandra PORT=9999 NODE_TLS_REJECT_UNAUTHORIZED=0 mocha --compilers js:babel-register test/*-test.js",
+
     "test": "PORT=9999 NODE_TLS_REJECT_UNAUTHORIZED=0 mocha --compilers js:babel-register test/*-test.js",
     "start": "node ./index.js"
   },

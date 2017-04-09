@@ -4,7 +4,7 @@ import cassandra from 'cassandra-driver';
 import loadCassandraFactory from '.././cassandra/load-cassandra';
 
 
-module.exports = function (conf = {contactPoints: ['localhost'], keyspace: 'ota'}) {
+export default function (conf = {contactPoints: ['localhost'], keyspace: 'ota'}) {
     const keyspace = conf.keyspace;
     const loadCassandra = loadCassandraFactory(keyspace);
     let client = new cassandra.Client(conf);

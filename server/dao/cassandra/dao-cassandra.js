@@ -51,7 +51,7 @@ const {
     insertError,
 } = BaseCassandra;
 
-class DaoCassandra extends BaseCassandra {
+export default class DaoCassandra extends BaseCassandra {
 
 
     createUser({email, name, accessKeys = {}, linkedProviders = ['GitHub']}) {
@@ -333,4 +333,3 @@ class DaoCassandra extends BaseCassandra {
     }
 
 }
-module.exports = DaoCassandra;
