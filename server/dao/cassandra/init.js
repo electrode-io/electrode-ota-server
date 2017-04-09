@@ -1,7 +1,7 @@
-const cassandra = require('cassandra-driver');
+import cassandra from 'cassandra-driver';
 
 
-const loadCassandraFactory = require('.././cassandra/load-cassandra');
+import loadCassandraFactory from '.././cassandra/load-cassandra';
 
 
 module.exports = function (conf = {contactPoints: ['localhost'], keyspace: 'ota'}) {

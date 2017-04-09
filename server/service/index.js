@@ -1,6 +1,6 @@
 "use strict";
 
-const diregister = require('../diregister');
+import diregister from '../diregister';
 
 module.exports = {
     register: diregister({

@@ -1,4 +1,4 @@
-const providers = require('bell/lib/providers');
+import providers from 'bell/lib/providers';
 const github = providers.github;
 const primary = v=>v.primary;
 module.exports = providers.github = (options={})=> {

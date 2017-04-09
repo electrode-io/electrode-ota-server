@@ -1,5 +1,5 @@
 "use strict";
-const diregister = require('../diregister');
+import diregister from '../diregister';
 
 const register = (server, options, next) => {
     server.route(options);

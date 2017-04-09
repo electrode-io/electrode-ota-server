@@ -1,7 +1,7 @@
 "use strict";
 
-const {wrap} = require('../util');
-const diregister = require('../diregister');
+import {wrap} from '../util';
+import diregister from '../diregister';
 const register = diregister({
     name: 'accessKeysRoute',
     dependencies: ['electrode:route', 'ota!account', 'ota!scheme']

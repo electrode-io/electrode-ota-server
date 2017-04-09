@@ -1,4 +1,4 @@
-const diregister = require('../../diregister');
+import diregister from '../../diregister';
 const register = diregister({
     name: "ota!fileservice",
     multiple: false,

@@ -1,6 +1,6 @@
-const initDao = require('./support/init-dao');
-const eql = require('./support/eql');
-const expect = require('chai').expect;
+import initDao from './support/init-dao';
+import eql from './support/eql';
+import { expect } from 'chai';
 
 
 describe('dao/cassandra', function () {

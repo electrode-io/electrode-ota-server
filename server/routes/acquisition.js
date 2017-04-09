@@ -1,6 +1,6 @@
 "use strict";
-const {wrap} = require('../util');
-const diregister = require('../diregister');
+import {wrap} from '../util';
+import diregister from '../diregister';
 const noContent = (reply)=>(e)=> {
     if (e) return reply(e);
     reply().code(204);

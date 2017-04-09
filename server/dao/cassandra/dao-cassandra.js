@@ -1,8 +1,8 @@
 "use strict";
 
-const BaseCassandra = require('./base-cassandra');
-const {promiseMap, reducer, remove} = require('../../util');
-const {alreadyExistsMsg} = require('../../service/errors');
+import BaseCassandra from './base-cassandra';
+import {promiseMap, reducer, remove} from '../../util';
+import {alreadyExistsMsg} from '../../service/errors';
 const historySort = history=> history && history.sort((a, b)=>b.created_.getTime() - a.created_.getTime());
 
 const removeCreated = v => {

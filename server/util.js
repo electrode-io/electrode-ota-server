@@ -1,6 +1,6 @@
-const randomstring = require("randomstring");
+import randomstring from "randomstring";
 
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 const genString = (length = 40)=>randomstring.generate({length, charset: 'alphabetic'});
 

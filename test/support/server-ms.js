@@ -1,6 +1,6 @@
-const agent = require('superagent');
-const path = require('path');
-const AccountManager = require('code-push/script/management-sdk');
+import agent from 'superagent';
+import path from 'path';
+import AccountManager from 'code-push/script/management-sdk';
 
 const removeApps = (am, collaborator)=>am.getApps().then(apps=>Promise.all(apps.filter(({collaborators})=>collaborators[collaborator] && collaborators[collaborator].permission === 'Owner' && collaborators[collaborator].isCurrentAccount)
     .map(app=>am.removeApp(app.name))));
@@ -10,7 +10,7 @@ const amRemove = (args)=> {
     return removeApps(new AccountManager(...rest), collaborator)
 };
 
-module.exports = ()=> {
+export default ()=> {
     console.warn(`
 (((+++  WARNING +++)))  (((+++  WARNING +++)))  (((+++  WARNING +++)))  
 

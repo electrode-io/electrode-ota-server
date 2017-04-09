@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+import { expect } from 'chai';
 const handle = (resolve) => r => {
     const contentType = r.headers['content-type'] || "";
     if (contentType.indexOf('application/json') > -1) {

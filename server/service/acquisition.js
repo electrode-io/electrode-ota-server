@@ -3,9 +3,9 @@
  downloadReportStatus,
  deployReportStatus*/
 
-const {missingParameter} = require('./errors');
+import {missingParameter} from './errors';
 const fixver = (ver)=>ver ? ('' + ver).replace(/^(\d+?)$/, '$1.0.0') : '0.0.0';
-const version = require('semver');
+import version from 'semver';
 
 module.exports = (dao, weighted, _download, manifest)=> {
     const api = {

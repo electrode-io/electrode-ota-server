@@ -1,14 +1,14 @@
-const manifest = require('../server/service/manifest');
-const expect = require('chai').expect;
-const path = require('path');
+import manifest from '../server/service/manifest';
+import { expect } from 'chai';
+import path from 'path';
 const join = path.join.bind(path, __dirname);
 const fixture = path.join.bind(path, __dirname, 'fixtures');
-const step0 = require('./fixtures/step.0.manifest.json');
-const step1 = require('./fixtures/step.1.manifest.json');
-const step2 = require('./fixtures/step.2.manifest.json');
-const history = require('./fixtures/history.json').history;
-const fs = require('fs');
-const {shasum} = require('../server/util');
+import step0 from './fixtures/step.0.manifest.json';
+import step1 from './fixtures/step.1.manifest.json';
+import step2 from './fixtures/step.2.manifest.json';
+import { history } from './fixtures/history.json';
+import fs from 'fs';
+import {shasum} from '../server/util';
 const eql = eql => resp => {
     expect(resp).to.eql(eql);
     return resp;

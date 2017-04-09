@@ -1,8 +1,8 @@
 "use strict";
 //fixes github email, when marked private.
 require('./github');
-const {map} = require('../util');
-const diregister = require('../diregister');
+import {map} from '../util';
+import diregister from '../diregister';
 
 module.exports.register = diregister({
     name: 'ota!scheme',

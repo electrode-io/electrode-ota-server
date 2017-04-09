@@ -1,8 +1,8 @@
 const dao = process.env.DAO || 'express-cassandra';
-const init = require(`../../server/dao/${dao}/init`);
-const Dao = require(`../../server/dao/${dao}/dao-${dao}`);
+const init = require(`../../server/dao/${dao}/init`).default;
+const Dao = require(`../../server/dao/${dao}/dao-${dao}`).default;
 
-module.exports = async () => {
+export default async () => {
     const client = await (init({
         contactPoints: ['localhost'],
         keyspace: `ota_server_test`

@@ -1,5 +1,5 @@
 "use strict";
-const expect = require('chai').expect;
+import { expect } from 'chai';
 
 const eql = (eq, pos) => {
     const isA = Array.isArray(eq);

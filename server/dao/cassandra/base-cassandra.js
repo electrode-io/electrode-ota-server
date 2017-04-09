@@ -1,5 +1,5 @@
 "use strict";
-const cassandra = require('cassandra-driver');
+import cassandra from 'cassandra-driver';
 
 class BaseCassandra {
     constructor(props) {

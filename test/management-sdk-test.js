@@ -1,14 +1,15 @@
+import uuid from 'uuid';
+import path from 'path';
+import AccountManager from 'code-push/script/management-sdk';
+import {expect} from 'chai';
+import {AcquisitionManager, AcquisitionStatus} from 'code-push/script/acquisition-sdk';
+
 const {env} = process;
-const uuid = require('uuid');
 //EVIL - But we need snoopage
 env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-const path = require('path');
 const join = path.join.bind(path, __dirname);
-const AccountManager = require('code-push/script/management-sdk');
-const {expect} = require('chai');
-const {AcquisitionManager, AcquisitionStatus} = require('code-push/script/acquisition-sdk');
-const server = process.env.MS_CONFIG ? require('./support/server-ms') : require('./support/server-init');
+const server = process.env.MS_CONFIG ? require('./support/server-ms').default : require('./support/server-init').default;
 
 const verbs = 'GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, CONNECT, PATCH'.toLowerCase().split(/,\s*/);
 const uploadFile = "./test/fixtures/upload.zip";

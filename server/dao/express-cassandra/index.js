@@ -1,5 +1,5 @@
-const models = require('express-cassandra');
-const udts = require('./models/UDTS');
+import models from 'express-cassandra';
+import udts from './models/UDTS';
 
 
 const CLIENT_OPTIONS = {
@@ -21,7 +21,7 @@ const ORM_OPTIONS = {
 };
 
 
-module.exports = async function ({clientOptions = {}, ormOptions = {}} = {}, drop) {
+export default async function ({clientOptions = {}, ormOptions = {}} = {}, drop) {
     const conf = {
         clientOptions: Object.assign({}, CLIENT_OPTIONS, clientOptions),
         ormOptions: Object.assign({}, ORM_OPTIONS, ormOptions)

@@ -1,10 +1,10 @@
-const path = require('path');
-const yauzl = require('yauzl');
-const yazl = require('yazl');
-const crypto = require('crypto');
+import path from 'path';
+import yauzl from 'yauzl';
+import yazl from 'yazl';
+import crypto from 'crypto';
 const MTIME = new Date(0);
 const all = (arr, fn)=>Promise.all(arr.map(fn));
-const fileType = require('file-type');
+import fileType from 'file-type';
 
 const isZip = (fileName, content)=> {
     if (typeof content === 'string') {

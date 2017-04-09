@@ -1,19 +1,19 @@
 "use strict";
 
-const path = require("path");
-process.env.NODE_ENV = 'test';
-process.env.PORT = 9999;
-process.env.OTA_CONFIG_DIR = path.join(__dirname, 'config');
-const otaServer = require("../index");
-const initDao = require('./support/init-dao');
-const expect = require("chai").expect;
-const {
+import path from "path";
+import initDao from './support/init-dao';
+import {expect} from "chai";
+import {
     auth,
     makeRequester,
     body,
     match,
     tokenRe
-} = require('./support/request');
+} from './support/request';
+process.env.NODE_ENV = 'test';
+process.env.PORT = 9999;
+process.env.OTA_CONFIG_DIR = path.join(__dirname, 'config');
+const otaServer = require("../index");
 
 /**
  *  **** IMPORTANT ***
@@ -30,7 +30,7 @@ const {
 describe('electrode-ota-server', function () {
     this.timeout(10000);
     let server;
-    before(() => initDao().then(()=>otaServer().then(r => server = r)));
+    before(() => initDao().then(() => otaServer().then(r => server = r)));
 
     after(() => server && server.stop());
 

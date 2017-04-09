@@ -1,4 +1,4 @@
-const Boom = require('boom');
+import Boom from 'boom';
 
 const notFound = (check, message = `Not Found`)=> {
     if (!check) throw Boom.notFound(message);

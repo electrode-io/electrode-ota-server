@@ -1,4 +1,4 @@
-const diregister = require('../diregister');
+import diregister from '../diregister';
 const weighted = (weight) => {
     return Math.random() < (weight / 100);
 };

@@ -1,6 +1,6 @@
 "use strict";
 
-const {wrap} = require('../util');
+import {wrap} from '../util';
 
 const register = require('../diregister')({
     name: 'authRoute',

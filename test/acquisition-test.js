@@ -1,7 +1,7 @@
-const initDao = require('./support/init-dao');
-const acquisition = require('../server/service/acquisition');
-const eql = require('./support/eql');
-const expect = require('chai').expect;
+import initDao from './support/init-dao';
+import acquisition from '../server/service/acquisition';
+import eql from './support/eql';
+import { expect } from 'chai';
 
 describe('model/acquisition', function () {
     let ac;

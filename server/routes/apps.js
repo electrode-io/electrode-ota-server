@@ -1,7 +1,7 @@
 "use strict";
-const Joi = require('joi');
-const {wrap} = require('../util');
-const diregister = require('../diregister');
+import Joi from 'joi';
+import {wrap} from '../util';
+import diregister from '../diregister';
 const toAppOut = (src)=> {
     const app = Object.assign({}, src);
     delete app.id;

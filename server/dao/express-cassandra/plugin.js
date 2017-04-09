@@ -1,7 +1,7 @@
 "use strict";
 
-const diregister = require('../../diregister');
-const Dao = require('./dao-express-cassandra');
+import diregister from '../../diregister';
+import Dao from './dao-express-cassandra';
 /** Can not use server.expose because object properties are merged by do not include
  the class properties.  This is legal, ugly and works **/
 

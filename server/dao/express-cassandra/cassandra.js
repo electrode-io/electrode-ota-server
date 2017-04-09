@@ -1,15 +1,15 @@
 "use strict";
 
-const cassandra = require('cassandra-driver');
-const diregister = require('../../diregister');
-const client = require('./index');
+import cassandra from 'cassandra-driver';
+import diregister from '../../diregister';
+import client from './index';
 
-module.exports.register = diregister({
+export const register = diregister({
     name: "ota!cassandra",
     multiple: false,
     connections: false,
     dependencies: []
-}, async (clientOptions, plugins, cassandra) =>{
-    console.log('clientOptions',clientOptions);
+}, async (clientOptions, plugins, cassandra) => {
+    console.log('clientOptions', clientOptions);
     return await client({clientOptions})
 });

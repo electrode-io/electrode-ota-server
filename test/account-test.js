@@ -1,6 +1,6 @@
-const initDao = require('./support/init-dao');
-const accountFactory = require('../server/service/account');
-const expect = require('chai').expect;
+import initDao from './support/init-dao';
+import accountFactory from '../server/service/account';
+import { expect } from 'chai';
 const TOKEN = {profile: {email: 'test@t.com', name: 'test'}, provider: 'GitHub', query: {hostname: 'TestHost'}};
 const newToken = (email = 'test@t.com') => {
     return {profile: {email, name: 'test'}, provider: 'GitHub', query: {hostname: 'TestHost'}}

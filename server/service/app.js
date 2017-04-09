@@ -1,9 +1,9 @@
 "use strict";
 
-const {id, key, remove} = require('../util');
+import {id, key, remove} from '../util';
 
-const {isZip, generate} = require('./manifest');
-const {alreadyExists, alreadyExistsMsg, notFound, missingParameter, notAuthorized, invalidRequest} = require('./errors');
+import {isZip, generate} from './manifest';
+import {alreadyExists, alreadyExistsMsg, notFound, missingParameter, notAuthorized, invalidRequest} from './errors';
 
 const excludeNull = obj => Object.keys(obj).reduce((ret, key) => {
     if (obj[key] == null) return ret;

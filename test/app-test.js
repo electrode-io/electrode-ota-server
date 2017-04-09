@@ -1,11 +1,11 @@
-const initDao = require('./support/init-dao');
-const eql = require('./support/eql');
-const appFactory = require('../server/service/app')
-const accountFactory = require('../server/service/account');
-const upload = require('../server/fileservice/dao/upload').fileservice;
-const download = require('../server/fileservice/dao/download').fileservice;
-const {diffPackageMap} = require('../server/service/manifest');
-const expect = require('chai').expect;
+import initDao from './support/init-dao';
+import eql from './support/eql';
+import appFactory from '../server/service/app';
+import accountFactory from '../server/service/account';
+import { fileservice as upload } from '../server/fileservice/dao/upload';
+import { fileservice as download } from '../server/fileservice/dao/download';
+import {diffPackageMap} from '../server/service/manifest';
+import { expect } from 'chai';
 
 const shouldError = () => {
     expect(false, 'Should have an error').to.be.true;

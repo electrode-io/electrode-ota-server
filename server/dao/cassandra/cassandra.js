@@ -1,8 +1,8 @@
 "use strict";
 
-const cassandra = require('cassandra-driver');
-const init = require('./init');
-const diregister = require('../../diregister');
+import cassandra from 'cassandra-driver';
+import init from './init';
+import diregister from '../../diregister';
 
 module.exports.register = diregister({
     name: "ota!cassandra",

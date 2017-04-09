@@ -1,6 +1,6 @@
 "use strict";
-const {id, values, genString} = require('../util');
-const {notFound, notAuthorized, alreadyExistsMsg} = require('./errors');
+import {id, values, genString} from '../util';
+import {notFound, notAuthorized, alreadyExistsMsg} from './errors';
 const TTL = 60 * 24 * 3600 * 1000;
 const asTrue = () => true;
 const genAccessKey = ({email, createdBy, friendlyName, description, ttl = TTL}) => {

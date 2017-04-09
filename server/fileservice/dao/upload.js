@@ -1,5 +1,5 @@
-const diregister = require('../../diregister');
-const {shasum} = require('../../util');
+import diregister from '../../diregister';
+import {shasum} from '../../util';
 /**
  * The fileservice is meant to be plugable.
  *

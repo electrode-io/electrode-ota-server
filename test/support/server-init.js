@@ -1,15 +1,14 @@
+import path from 'path';
+import init from './init-dao';
 
-const path = require('path');
-const init = require('./init-dao');
+import supertest from 'supertest';
+import {makeRequester, tokenRe, auth} from './request';
 process.env.OTA_CONFIG_DIR = path.join(__dirname, '..', 'config');
 process.env.NODE_ENV = 'test';
 process.env.PORT = 9999;
-
 const otaServer = require("../../index");
-const supertest = require('supertest');
-const {makeRequester, tokenRe, auth} = require('./request');
 
-module.exports = () => init().then(client => {
+export default () => init().then(client => {
 
     return otaServer().then((server) => {
         const request = makeRequester(server);

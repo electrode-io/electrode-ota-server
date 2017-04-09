@@ -1,17 +1,17 @@
-const child_process = require('child_process');
-const tmp = require('tmp');
+import child_process from 'child_process';
+import tmp from 'tmp';
 const cwd = process.cwd();
-const path = require('path');
+import path from 'path';
 
 const sample = path.join.bind(path, __dirname, 'sample');
 const rncp = path.join.bind(path, sample('react-native-code-push'));
 const demo = path.join.bind(path, rncp('Examples', 'CodePushDemoApp'));
-const rimraf = require('rimraf');
-const spawn = require('child_process').spawn;
-const plist = require('plist');
-const fs = require('fs-extra');
+import rimraf from 'rimraf';
+import { spawn } from 'child_process';
+import plist from 'plist';
+import fs from 'fs-extra';
 const server = process.env.MS_CONFIG ? require('./support/server-ms') : require('./support/server-init');
-const AccountManager = require('code-push/script/management-sdk');
+import AccountManager from 'code-push/script/management-sdk';
 
 function exists(path) {
     try {

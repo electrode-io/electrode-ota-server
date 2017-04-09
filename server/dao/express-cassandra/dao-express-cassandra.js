@@ -1,8 +1,8 @@
 "use strict";
-const {types} = require('dse-driver');
-const {promiseMap, reducer, remove} = require('../../util');
-const {alreadyExistsMsg} = require('../../service/errors');
-const UDTS = require('./models/UDTS');
+import {types} from 'dse-driver';
+import {promiseMap, reducer, remove} from '../../util';
+import {alreadyExistsMsg} from '../../service/errors';
+import UDTS from './models/UDTS';
 
 const historySort = history => history && history.sort((a, b) => b.created_.getTime() - a.created_.getTime());
 
@@ -88,7 +88,7 @@ const Mock = {
 const ifExists = (result) => result.first().get('[applied]') != false;
 
 
-class DaoExpressCassandra {
+export default class DaoExpressCassandra {
     //these are just here for autocomplete.
     App = Mock;
     ClientRatio = Mock;
@@ -480,4 +480,3 @@ class DaoExpressCassandra {
     }
 
 }
-module.exports = DaoExpressCassandra;

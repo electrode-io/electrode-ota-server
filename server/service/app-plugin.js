@@ -1,5 +1,5 @@
-const diregister = require('../diregister');
-const app = require('./app');
+import diregister from '../diregister';
+import app from './app';
 
 module.exports = {
     register: diregister({

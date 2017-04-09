@@ -1,4 +1,4 @@
-const account = require('./account');
+import account from './account';
 const register = require('../diregister')({
     name: 'ota!account',
     multiple: false,

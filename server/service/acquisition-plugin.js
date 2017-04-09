@@ -1,4 +1,4 @@
-const aquistion = require('./acquisition');
+import aquistion from './acquisition';
 const register = require('../diregister')({
     name: 'ota!acquisition',
     multiple: false,

@@ -1,5 +1,5 @@
-const diregister = require('../diregister');
-const {diffPackageMapCurrent} = require('./manifest');
+import diregister from '../diregister';
+import {diffPackageMapCurrent} from './manifest';
 
 const register = diregister({
     name: 'ota!manifest',

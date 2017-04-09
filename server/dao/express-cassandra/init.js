@@ -1,9 +1,6 @@
-const cassandra = require('cassandra-driver');
+import factory from './index';
 
-const factory = require('./index');
-
-
-module.exports = function init(clientOptions) {
+export default function init(clientOptions) {
     const connect = (opts) => factory({clientOptions}, opts.reset);
     return {
         connect
