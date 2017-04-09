@@ -5,8 +5,6 @@ process.env.NODE_ENV = 'test';
 process.env.PORT = 9999;
 process.env.OTA_CONFIG_DIR = path.join(__dirname, '..', 'config');
 
-const accountFactory = require('../../server/service/account')
-const Dao = require('../../server/dao/cassandra/dao-cassandra');
 const otaServer = require("../../index");
 const supertest = require('supertest');
 const {makeRequester, tokenRe, auth} = require('./request');

@@ -1,0 +1,12 @@
+module.exports =  ({
+    fields: {
+        app: "uuid",
+        name: "text",
+        key: "text"
+    },
+    key: [["app"], "name"],
+    clustering_order: {
+        name: "asc"
+    },
+    table_name: "deployments_app_name"
+})

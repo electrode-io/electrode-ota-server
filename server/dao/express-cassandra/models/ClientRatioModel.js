@@ -1,0 +1,20 @@
+module.exports = ({
+    "fields": {
+        clientUniqueId: "text",
+        inserted: {
+            type: "timestamp",
+            default: {
+                "$db_function": "toUnixTimestamp(now())"
+            }
+        },
+        packageHash: "text",
+        ratio: "float",
+        updated: "boolean"
+    },
+    key: [["clientUniqueId"], "inserted"],
+    indexes: ["packageHash"],
+    table_name: "client_ratio",
+    clustering_order: {
+        "inserted": "desc"
+    }
+});

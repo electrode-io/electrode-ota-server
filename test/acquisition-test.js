@@ -1,29 +1,26 @@
+const initDao = require('./support/init-dao');
 const acquisition = require('../server/service/acquisition');
-const init = require('../server/dao/cassandra/init');
 const eql = require('./support/eql');
-const Dao = require('../server/dao/cassandra/dao-cassandra');
 const expect = require('chai').expect;
 
 describe('model/acquisition', function () {
     let ac;
     this.timeout(50000);
+    let i = 0;
+    const genRatio = (ratio) => {
+        const ret = ratio % (i += 25) == 0;
+        return ret;
+    };
+    before(async () => ac = acquisition((await initDao()), genRatio));
 
-    before(()=> init({contactPoints: ['localhost'], keyspace: 'ota_test'}).connect({reset: true}).then((client)=> {
-        let i = 0;
-        ac = acquisition(new Dao({client}), (ratio)=> {
-            const ret = ratio % (i+=25) == 0;
-            return ret;
-        });
-    }));
-
-    it('should be 50% rollout', ()=> {
+    it('should be 50% rollout', () => {
         const result = [];
         const update = (uniqueClientId = 'uniqueClientId',
                         packageHash = 'packageHash',
-                        ratio = 50)=>()=>ac.isUpdateAble(uniqueClientId, packageHash, ratio).then(r=>result.push(r));
+                        ratio = 50) => () => ac.isUpdateAble(uniqueClientId, packageHash, ratio).then(r => result.push(r));
         const first = update();
-        return first().then(first).then(first).then(_=> {
-            const [r0,r1,r2] = result;
+        return first().then(first).then(first).then(_ => {
+            const [r0, r1, r2] = result;
             expect(r0).to.be.true;
             expect(r1).to.be.true;
             expect(r2).to.be.true;
@@ -31,8 +28,8 @@ describe('model/acquisition', function () {
         }).then(update('id1', 'hash', 3))
             .then(update('id1', 'hash', 3))
             .then(update('id1', 'hash', 99))
-            .then(_=> {
-                const [r0,r1,r2] = result;
+            .then(_ => {
+                const [r0, r1, r2] = result;
                 expect(r0).to.be.false;
                 expect(r1).to.be.false;
                 expect(r2).to.be.false;
