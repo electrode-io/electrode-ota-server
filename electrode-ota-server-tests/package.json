@@ -4,10 +4,14 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "test": "ern-mocha",
-    "build": "ern-babel",
-    "coverage":"ern-nyc"
+    "test": "ota-mocha",
+    "build": "ota-babel",
+    "coverage": "ota-nyc"
   },
-  "author": "",
-  "license": "ISC"
+  "dependencies": {
+    "electrode-ota-server-default-config": "1.0.0"
+  },
+  "devDependencies": {
+    "electrode-ota-server-util-dev": "1.0.0"
+  }
 }

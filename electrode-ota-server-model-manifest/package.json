@@ -4,10 +4,11 @@
   "description": "OTA Manifest Service",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ota-mocha",
+    "build": "ota-babel",
+    "coverage": "ota-nyc",
+    "prepublish": "npm run build"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "electrode-ota-server-util":"1.0.0"
   },

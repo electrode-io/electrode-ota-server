@@ -9,8 +9,6 @@
     "coverage": "ota-nyc",
     "prepublish": "npm run build"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "electrode-ota-server-diregister": "1.0.0"
   },
