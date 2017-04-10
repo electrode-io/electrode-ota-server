@@ -1,10 +1,10 @@
 {
-  "name": "ota-dao-express-cassandra",
+  "name": "electrode-ota-server-dao-express-cassandra",
   "version": "1.0.0",
   "description": "OTA Express-Cassandra DAO",
   "main": "index.js",
   "scripts": {
-    "test": "ota-mocha"
+    "test": "electrode-ota-server-mocha"
   },
   "keywords": [
     "ota",
@@ -14,9 +14,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ota-util":"1.0.0"
+    "electrode-ota-server-util":"1.0.0"
   },
   "devDependencies": {
-    "ota-util-dev":"1.0.0"
+    "electrode-ota-server-util-dev":"1.0.0"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "ota-util",
+  "name": "electrode-ota-server-util",
   "version": "1.0.0",
   "description": "OTA Utils",
   "main": "index.js",
@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "ota-util-dev":"1.0.0"
+    "electrode-ota-server-util-dev":"1.0.0"
   }
 }

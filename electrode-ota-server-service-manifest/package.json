@@ -1,5 +1,5 @@
 {
-  "name": "ota-service-manifest",
+  "name": "electrode-ota-server-service-manifest",
   "version": "1.0.0",
   "description": "OTA Manifest Service",
   "main": "index.js",
@@ -9,9 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ota-util":"1.0.0"
+    "electrode-ota-server-util":"1.0.0"
   },
   "devDependencies": {
-    "ota-util-dev":"1.0.0"
+    "electrode-ota-server-util-dev":"1.0.0"
   }
 }

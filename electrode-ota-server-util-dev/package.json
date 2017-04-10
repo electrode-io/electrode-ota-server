@@ -1,5 +1,5 @@
 {
-  "name": "ota-util-dev",
+  "name": "electrode-ota-server-util-dev",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

@@ -1,5 +1,5 @@
 {
-  "name": "ota-example-service",
+  "name": "electrode-ota-server-example-service",
   "version": "1.0.0",
   "description": "An Example of using OTA",
   "main": "index.js",
@@ -9,9 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ota-util": "1.0.0"
+    "electrode-ota-server-util": "1.0.0"
   },
   "devDependencies": {
-    "ota-util-dev": "1.0.0"
+    "electrode-ota-server-util-dev": "1.0.0"
   }
 }

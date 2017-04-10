@@ -1,5 +1,5 @@
 {
-  "name": "ota-service-static",
+  "name": "electrode-ota-server-service-static",
   "version": "1.0.0",
   "description": "OTA Static Web Resources",
   "main": "index.js",
@@ -8,9 +8,9 @@
   },
   "author": "",
   "license": "ISC","dependencies": {
-  "ota-util":"1.0.0"
+  "electrode-ota-server-util":"1.0.0"
 },
   "devDependencies": {
-    "ota-util-dev":"1.0.0"
+    "electrode-ota-server-util-dev":"1.0.0"
   }
 }
