@@ -11,7 +11,7 @@
   "dependencies": {
     "electrode-ota-server-dao-cassandra": "1.0.0",
     "electrode-ota-server-dao-legacy-cassandra": "1.0.0",
-    "electrode-ota-server-boot": "1.0.0",
+    "electrode-ota-server": "1.0.0",
     "electrode-ota-server-model-account": "1.0.0",
     "electrode-ota-server-model-app": "1.0.0",
     "electrode-ota-server-model-manifest": "1.0.0",

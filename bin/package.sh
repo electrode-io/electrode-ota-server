@@ -7,7 +7,7 @@ help(){
 
 valid_name() {
   [ -d "$1" ] && help "directory already exists $1"
-   echo $1 | grep -q '^electrode-ota-server-'
+   echo $1 | grep -q '^electrode-ota-server'
 }
 
 PKG=$1
@@ -39,7 +39,8 @@ cat <<EOF
 EOF
 )>package.json
 
-mkdirp src
-mkdirp test
+mkdir src
+mkdir test
+touch src/index.js
 
 git add ../$PKG

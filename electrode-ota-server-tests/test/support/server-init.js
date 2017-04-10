@@ -1,6 +1,6 @@
 import path from 'path';
 import init from './init-dao';
-import otaServer from 'electrode-ota-server-boot';
+import otaServer from 'electrode-ota-server';
 import supertest from 'supertest';
 import {makeRequester, tokenRe, auth} from './request';
 process.env.OTA_CONFIG_DIR = path.join(__dirname, '..', 'config');

@@ -10,7 +10,7 @@ import {
     match,
     tokenRe
 } from './support/request';
-import otaServer from 'electrode-ota-server-boot';
+import otaServer from 'electrode-ota-server';
 process.env.NODE_ENV = 'test';
 process.env.PORT = 9999;
 process.env.OTA_CONFIG_DIR = path.join(__dirname, 'config');
@@ -30,7 +30,9 @@ process.env.OTA_CONFIG_DIR = path.join(__dirname, 'config');
 describe('electrode-ota-server', function () {
     this.timeout(10000);
     let server;
-    before(() => initDao().then(() => otaServer().then(r => server = r)));
+    before(() => initDao().then(() =>{
+        return otaServer().then(r => server = r)
+    }));
 
     after(() => server && server.stop());
 

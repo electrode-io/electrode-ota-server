@@ -4,8 +4,11 @@ import {set} from "lodash";
 import fs from 'fs';
 import util from 'electrode-ota-server-util';
 
+export const DEFAULT_OTA_SERVER_DIRS = [
+    path.join(require.resolve('electrode-server'), '..', 'config')
+];
 
-export function boot() {
+export function boot(dirs = DEFAULT_OTA_SERVER_DIRS) {
     const makeRandomJson = (name) => {
         const randomFile = path.join(process.cwd(), '.random.json');
         let rndm = {};
@@ -25,10 +28,6 @@ set a cookie password for this path in your configuration.`);
         }
         return rndm[name];
     };
-    const dirs = [
-        path.join(require.resolve('electrode-server'), '..', 'config'),
-        path.join(require.resolve('electrode-ota-server-default-config'), '..'),
-        process.env.OTA_CONFIG_DIR || path.join(process.cwd(), 'config')];
 
     const options = {
         dirs,
@@ -65,10 +64,10 @@ set a cookie password for this path in your configuration.`);
     defaults._$.use(verify(defaults));
     return defaults;
 }
-export const bootServer = function () {
+export const bootServer = function (dirs) {
     const electrodeServer = require('electrode-server');
-    return electrodeServer(boot());
-}
+    return electrodeServer(boot(dirs));
+};
 export default bootServer;
 if (require.main === module) {
     bootServer();

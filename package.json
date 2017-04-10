@@ -1,7 +1,7 @@
 {
-  "name": "electrode-ota-server",
+  "name": "electrode-ota",
   "version": "1.0.0",
-  "description": "Electrode Over The Air Server",
+  "description": "Electrode Over The Air",
   "author": "Justin Spears <jspears@walmartlabs.com>",
   "license": "Apache-2.0",
   "bugs": {

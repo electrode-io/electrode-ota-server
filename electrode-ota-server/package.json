@@ -1,10 +1,7 @@
 {
-  "name": "electrode-ota-server-boot",
+  "name": "electrode-ota-server",
   "version": "1.0.0",
   "main": "lib/index.js",
-  "bin": {
-    "electrode-ota": "bin/boot.js"
-  },
   "scripts": {
     "test": "ota-mocha",
     "build": "ota-babel",
@@ -12,9 +9,10 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-server": "^1.2.2"
+    "electrode-ota-server-default-config":"1.0.0",
+    "electrode-ota-server-boot":"1.0.0"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "1.0.0"
+    "electrode-ota-server-util-dev":"1.0.0"
   }
 }

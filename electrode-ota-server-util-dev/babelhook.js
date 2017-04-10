@@ -19,9 +19,9 @@ if (process.env.COVERAGE) {
     ]);
 }
 const project = path.join(__dirname, '..');
-const otaRegex = /(@walmart\/)?electrode-ota-server-/;
+const otaRegex = /(@walmart\/)?electrode-ota-server/;
 //only look into ern- projects that have a src directory.
-conf.only = /electrode-ota-server-[^/]*\/(src|test|lib)/;
+conf.only = /electrode-ota-server[^/]*\/(src|test|lib)/;
 
 /**
  * Babelify all ern- projects.  And if they
@@ -36,7 +36,7 @@ function normalizePath(file, parent) {
         return file;
     }
     if (/^\//.test(file)) {
-        if (file.startsWith(project + '/electrode-ota-server-')) {
+        if (file.startsWith(project + '/electrode-ota-server')) {
             return file.replace(project + '/', '');
         }
         return file;
@@ -54,7 +54,7 @@ Module._load = function (file, parent) {
 
         let parts = absFile.split('/');
         let scope = parts[0], pkg = parts[1], rest = parts.slice(2).join(path.sep);
-        if (/electrode-ota-server-/.test(scope)) {
+        if (/electrode-ota-server/.test(scope)) {
             if (!pkg || pkg == 'lib') pkg = 'src';
             file = path.join(project, scope, pkg, rest || 'index');// `${project}/${pkg}/${rest ? '/' + rest : ''}`
         }
