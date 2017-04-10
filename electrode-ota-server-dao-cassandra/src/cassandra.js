@@ -6,8 +6,5 @@ export const register = diregister({
     multiple: false,
     connections: false,
     dependencies: []
-}, async (clientOptions, plugins, cassandra) => {
-    console.log('clientOptions', clientOptions);
-    return await client({clientOptions})
-});
+}, client);
 export default ({register});

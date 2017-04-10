@@ -11,7 +11,8 @@
   "main": "index.js",
   "scripts": {
     "rebuild": "lerna clean --yes && lerna bootstrap",
-    "test": "lerna run test",
+    "lerna": "npm run rebuild",
+    "test": "mocha --compilers js:./electrode-ota-server-util-dev/babelhook ./electrode-ota-server*/test/*-test.js",
     "coverage": "lerna run coverage && istanbul-combine -d coverage -p summary -r lcov -r html $(find ./ern-*/.nyc_output -type f -name '*.json' -maxdepth 3)"
   },
   "bin": {

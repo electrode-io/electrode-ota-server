@@ -1,6 +1,6 @@
-import initDao from './support/init-dao';
+import initDao, {shutdown} from 'electrode-ota-server-test-support/lib/init-dao';
 import acquisition from 'electrode-ota-server-model-acquisition/lib/acquisition';
-import { expect } from 'chai';
+import {expect} from 'chai';
 
 describe('model/acquisition', function () {
     let ac;
@@ -10,7 +10,11 @@ describe('model/acquisition', function () {
         const ret = ratio % (i += 25) == 0;
         return ret;
     };
-    before(async () => ac = acquisition((await initDao()), genRatio));
+    before(async () => {
+        const dao = await initDao();
+        ac = acquisition({}, dao, genRatio)
+    });
+    after(shutdown);
 
     it('should be 50% rollout', () => {
         const result = [];

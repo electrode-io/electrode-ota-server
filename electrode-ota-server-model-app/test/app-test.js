@@ -1,9 +1,11 @@
-import initDao from './support/init-dao';
-import eql from './support/eql';
+import initDao, {shutdown} from 'electrode-ota-server-test-support/lib/init-dao';
+import eql from 'electrode-ota-server-test-support/lib/eql';
+
 import appFactory from 'electrode-ota-server-model-app/lib/app';
 import accountFactory from 'electrode-ota-server-model-account/lib/account';
 import {fileservice as upload} from 'electrode-ota-server-fileservice-upload';
 import {fileservice as download} from 'electrode-ota-server-fileservice-download';
+
 import {expect} from 'chai';
 
 const shouldError = () => {
@@ -21,10 +23,13 @@ describe('model/app', function () {
     before(async () => {
         const dao = await initDao();
         let w = 0;
-        account = accountFactory(dao);
+        account = accountFactory({}, dao);
         const up = upload({}, dao), down = download({}, dao);
         ac = appFactory({}, dao, up, (history) => diffPackageMap(down, up, history));
     });
+    
+    after(shutdown);
+    
     it('should create/list/remove an app', () => {
         const email = 'test@p.com';
         return ac.createApp({email, name: 'super'})

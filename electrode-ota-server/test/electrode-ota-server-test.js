@@ -1,7 +1,7 @@
 "use strict";
 
 import path from "path";
-import initDao from './support/init-dao';
+import initDao from 'electrode-ota-server-test-support/lib/init-dao';
 import {expect} from "chai";
 import {
     auth,
@@ -9,8 +9,8 @@ import {
     body,
     match,
     tokenRe
-} from './support/request';
-import otaServer from 'electrode-ota-server';
+} from 'electrode-ota-server-test-support/lib/request';
+import otaServer from '../src';
 process.env.NODE_ENV = 'test';
 process.env.PORT = 9999;
 process.env.OTA_CONFIG_DIR = path.join(__dirname, 'config');
@@ -28,11 +28,11 @@ process.env.OTA_CONFIG_DIR = path.join(__dirname, 'config');
  *
  */
 describe('electrode-ota-server', function () {
-    this.timeout(10000);
+    this.timeout(500000);
     let server;
-    before(() => initDao().then(() =>{
+    before(()=>{
         return otaServer().then(r => server = r)
-    }));
+    });
 
     after(() => server && server.stop());
 

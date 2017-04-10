@@ -2,7 +2,7 @@ import {missingParameter} from 'electrode-ota-server-errors';
 import version from 'semver';
 const fixver = (ver) => ver ? ('' + ver).replace(/^(\d+?)$/, '$1.0.0') : '0.0.0';
 
-export default (dao, weighted, _download, manifest) => {
+export default (options, dao, weighted, _download, manifest) => {
     const api = {
         download(hash){
             return _download(hash);

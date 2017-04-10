@@ -5,4 +5,4 @@ export const register = diregister({
     multiple: false,
     connections: false,
     dependencies: ['ota!dao', 'ota!weighted', 'ota!fileservice-download', 'ota!manifest']
-}, (options, dao, weighted, download, manifest) => aquistion(dao, weighted, download, manifest, options));
+}, aquistion);

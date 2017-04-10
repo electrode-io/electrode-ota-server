@@ -6,4 +6,4 @@ export const register = diregister({
     multiple: false,
     connections: false,
     dependencies: ['ota!dao']
-}, (options, dao) => account(dao, options));
+}, account);

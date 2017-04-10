@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "lib/index.js",
-  "scripts": {
-  },
   "license": "ISC",
   "dependencies": {
     "babel-preset-env": "^1.3.3"
+  },
+  "scripts": {
+    "test": "exit 0"
   },
   "bin": {
     "ota-babel": "bin/ota-babel.js",

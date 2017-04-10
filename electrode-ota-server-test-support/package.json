@@ -1,5 +1,5 @@
 {
-  "name": "electrode-ota-server-model-app",
+  "name": "electrode-ota-server-test-support",
   "version": "1.0.0",
   "main": "lib/index.js",
   "scripts": {
@@ -9,13 +9,14 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-diregister":"1.0.0",
     "electrode-ota-server-util":"1.0.0"
   },
-  "devDependencies": {
-    "electrode-ota-server-util-dev":"1.0.0",
-    "electrode-ota-server-test-support":"1.0.0",
+  "peerDependencies": {
+    "electrode-ota-server":"1.0.0",
     "electrode-ota-server-dao-cassandra":"1.0.0",
-    "electrode-ota-server-dao-legacy-cassandra":"1.0.0"
+    "electrode-ota-server-dao-cassandra-legacy":"1.0.0"
+  },
+  "devDependencies": {
+    "electrode-ota-server-util-dev":"1.0.0"
   }
 }

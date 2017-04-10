@@ -1,12 +1,14 @@
-import initDao from './support/init-dao';
-import eql from './support/eql';
-import { expect } from 'chai';
+import initDao, {shutdown} from 'electrode-ota-server-test-support/lib/init-dao';
+import eql from 'electrode-ota-server-test-support/lib/eql';
+import {expect} from 'chai';
 
 
 describe('dao/cassandra', function () {
-    this.timeout(8000);
+    this.timeout(20000)
     let dao;
     before(async () => dao = await initDao());
+    after(shutdown);
+
     it('should insert user', () => dao.createUser({email: 'joe@b.com', name: 'Joe'}).then((user) => {
         expect(user.email).to.eql('joe@b.com');
         expect(user.linkedProviders).to.eql(['GitHub']);

@@ -4,17 +4,19 @@ import AccountManager from 'code-push/script/management-sdk';
 import {expect} from 'chai';
 import {AcquisitionManager, AcquisitionStatus} from 'code-push/script/acquisition-sdk';
 
+const dir = path.join.bind(path, __dirname);
+
 const {env} = process;
 //EVIL - But we need snoopage
 env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 const join = path.join.bind(path, __dirname);
-const server = process.env.MS_CONFIG ? require('./support/server-ms').default : require('./support/server-init').default;
+const server = process.env.MS_CONFIG ? require('electrode-ota-server-test-support/lib/server-ms').default : require('electrode-ota-server-test-support/lib/server-init').default;
 
 const verbs = 'GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, CONNECT, PATCH'.toLowerCase().split(/,\s*/);
-const uploadFile = "./test/fixtures/upload.zip";
-const uploadFile2 = "./test/fixtures/upload2.zip";
-const uploadFile3 = "./test/fixtures/upload3.zip";
+const uploadFile = dir("./fixtures/upload.zip");
+const uploadFile2 = dir("./fixtures/upload2.zip");
+const uploadFile3 = dir("./fixtures/upload3.zip");
 
 const step1 = join('./fixtures/step.1.blob.zip');
 const step2 = join('./fixtures/step.2.blob.zip');

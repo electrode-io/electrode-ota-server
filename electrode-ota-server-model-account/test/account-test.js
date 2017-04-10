@@ -1,6 +1,6 @@
-import initDao from './support/init-dao';
+import initDao, {shutdown} from 'electrode-ota-server-test-support/lib/init-dao';
 import accountFactory from 'electrode-ota-server-model-account/lib/account';
-import { expect } from 'chai';
+import {expect} from 'chai';
 const TOKEN = {profile: {email: 'test@t.com', name: 'test'}, provider: 'GitHub', query: {hostname: 'TestHost'}};
 const newToken = (email = 'test@t.com') => {
     return {profile: {email, name: 'test'}, provider: 'GitHub', query: {hostname: 'TestHost'}}
@@ -9,16 +9,18 @@ const newToken = (email = 'test@t.com') => {
 describe('model/account', function () {
     this.timeout(10000);
     let account;
-    before(async () =>{
+    before(async () => {
         try {
             const dao = await initDao();
-            account = accountFactory(dao);
-        }catch(e){
-            console.log(`errorr people`);
+            account = accountFactory({}, dao);
+        } catch (e) {
+            console.log('model/account error');
             console.trace(e);
+            throw e;
         }
     });
 
+    after(shutdown);
 
     it('should createToken', () => account.createToken(newToken('createToken@t.com')).then((t) => {
         expect(t).to.exist;

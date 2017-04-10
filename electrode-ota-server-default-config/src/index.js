@@ -43,7 +43,7 @@ export default function () {
         },
         "routes": {
             "files": {
-                "relativeTo": root('server')
+                "relativeTo": _resolve("electrode-ota-server-public", '..')
             }
         },
         "plugins": {
@@ -148,7 +148,7 @@ export default function () {
                         "auth": false,
                         "handler": {
                             "directory": {
-                                "path": root("server", "public")
+                                "path": _resolve("electrode-ota-server-public", "public")
                             }
                         }
                     }
