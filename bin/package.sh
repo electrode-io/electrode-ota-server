@@ -38,6 +38,8 @@ cat <<EOF
 }
 EOF
 )>package.json
-mkdir src
-mkdir test
+
+mkdirp src
+mkdirp test
+
 git add ../$PKG

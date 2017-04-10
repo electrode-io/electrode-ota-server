@@ -12,3 +12,8 @@ config/development.json
 .random.json
 example
 test/sample/react-native-code-push
+lerna-debug.log
+npm-debug.log
+*/npm-debug.log
+.nyc_output
+*/.nyc_output

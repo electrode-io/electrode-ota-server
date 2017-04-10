@@ -52,6 +52,7 @@
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-core": "^6.24.1",
+    "babel-plugin-istanbul": "^4.1.1",
     "babel-plugin-syntax-async-functions": "^6.13.0",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
@@ -61,11 +62,12 @@
     "babel-register": "^6.24.1",
     "chai": "^3.5.0",
     "code-push": "^1.10.2-beta",
+    "istanbul-combine": "^0.3.0",
     "lerna": "2.0.0-beta.37",
     "mocha": "^2.5.3",
+    "nyc": "^10.2.0",
     "rimraf": "^2.5.4",
     "supertest": "^2.0.0",
-    "tmp": "0.0.29",
-    "nyc": "^10.1.2"
+    "tmp": "0.0.29"
   }
 }
