@@ -1,6 +1,8 @@
 */.DS_Store
 **/dist
 dist
+lib
+**/lib
 .DS_Store
 .idea
 node_modules

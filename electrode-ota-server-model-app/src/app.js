@@ -1,5 +1,5 @@
 import {id, key, toJSON} from 'electrode-ota-server-util';
-import {isZip, generate} from 'electrode-ota-server-model-manifest/dist/manifest';
+import {isZip, generate} from 'electrode-ota-server-model-manifest/lib/manifest';
 
 import {
     alreadyExists,

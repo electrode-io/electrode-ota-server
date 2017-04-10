@@ -8,7 +8,7 @@ process.argv.push(babelRc.plugins.join(','));
 // src --out-dir distrib
 process.argv.push('src');
 process.argv.push('--out-dir');
-process.argv.push('dist');
+process.argv.push('lib');
 
 console.log('running babel with', process.argv.slice(2));
 require('babel-cli/lib/babel');

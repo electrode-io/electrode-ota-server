@@ -1,5 +1,5 @@
 import initDao from './support/init-dao';
-import accountFactory from 'electrode-ota-server-model-account/dist/account';
+import accountFactory from 'electrode-ota-server-model-account/lib/account';
 import { expect } from 'chai';
 const TOKEN = {profile: {email: 'test@t.com', name: 'test'}, provider: 'GitHub', query: {hostname: 'TestHost'}};
 const newToken = (email = 'test@t.com') => {

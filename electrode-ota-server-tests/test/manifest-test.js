@@ -1,4 +1,4 @@
-import manifest from 'electrode-ota-server-model-manifest/dist/manifest';
+import manifest from 'electrode-ota-server-model-manifest/lib/manifest';
 import {expect} from 'chai';
 import path from 'path';
 import {shasum} from 'electrode-ota-server-util';

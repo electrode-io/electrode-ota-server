@@ -1,6 +1,6 @@
 const dao = process.env.DAO || 'cassandra';
-const init = require(`electrode-ota-server-dao-${dao}/dist/init`).default;
-const Dao = require(`electrode-ota-server-dao-${dao}/dist/dao-${dao}`).default;
+const init = require(`electrode-ota-server-dao-${dao}/lib/init`).default;
+const Dao = require(`electrode-ota-server-dao-${dao}/lib/dao-cassandra`).default;
 
 export default async () => {
     try {

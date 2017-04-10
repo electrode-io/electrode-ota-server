@@ -1,7 +1,7 @@
 import initDao from './support/init-dao';
 import eql from './support/eql';
-import appFactory from 'electrode-ota-server-model-app/dist/app';
-import accountFactory from 'electrode-ota-server-model-account/dist/account';
+import appFactory from 'electrode-ota-server-model-app/lib/app';
+import accountFactory from 'electrode-ota-server-model-account/lib/account';
 import {fileservice as upload} from 'electrode-ota-server-fileservice-upload';
 import {fileservice as download} from 'electrode-ota-server-fileservice-download';
 import {expect} from 'chai';

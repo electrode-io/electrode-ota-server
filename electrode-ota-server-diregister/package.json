@@ -2,7 +2,7 @@
   "name": "electrode-ota-server-diregister",
   "version": "1.0.0",
   "description": "Additional Dependency for Electrode OTA",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "author": "",
   "license": "ISC",
   "scripts": {

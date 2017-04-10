@@ -2,7 +2,7 @@
   "name": "electrode-ota-server-dao-cassandra",
   "version": "1.0.0",
   "description": "OTA Express-Cassandra DAO",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
     "build": "ota-babel",

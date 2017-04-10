@@ -21,7 +21,7 @@ cat <<EOF
 {
   "name": "${PKG}",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
     "build": "ota-babel",

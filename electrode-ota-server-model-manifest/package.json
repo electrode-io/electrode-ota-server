@@ -2,7 +2,7 @@
   "name": "electrode-ota-server-model-manifest",
   "version": "1.0.0",
   "description": "OTA Manifest Service",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
     "build": "ota-babel",

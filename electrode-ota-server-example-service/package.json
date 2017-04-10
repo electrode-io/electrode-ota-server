@@ -2,7 +2,7 @@
   "name": "electrode-ota-server-example-service",
   "version": "1.0.0",
   "description": "An Example of using OTA",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
     "build": "ota-babel",

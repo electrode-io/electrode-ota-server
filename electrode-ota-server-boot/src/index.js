@@ -1,7 +1,6 @@
 import Confippet from "electrode-confippet";
 import path from 'path';
 import {set} from "lodash";
-import {default as defaultConfig} from 'electrode-ota-server-default-config';
 import fs from 'fs';
 import util from 'electrode-ota-server-util';
 

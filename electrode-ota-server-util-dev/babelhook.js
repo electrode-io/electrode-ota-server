@@ -55,7 +55,7 @@ Module._load = function (file, parent) {
         let parts = absFile.split('/');
         let scope = parts[0], pkg = parts[1], rest = parts.slice(2).join(path.sep);
         if (/electrode-ota-server-/.test(scope)) {
-            if (!pkg || pkg == 'dist') pkg = 'src';
+            if (!pkg || pkg == 'lib') pkg = 'src';
             file = path.join(project, scope, pkg, rest || 'index');// `${project}/${pkg}/${rest ? '/' + rest : ''}`
         }
     }
