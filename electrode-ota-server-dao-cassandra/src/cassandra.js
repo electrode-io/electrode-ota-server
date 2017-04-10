@@ -1,4 +1,4 @@
-import diregister from '../../diregister';
+import diregister from 'electrode-ota-server-diregister';
 import client from './index';
 
 export const register = diregister({

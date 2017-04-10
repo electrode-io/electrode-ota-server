@@ -4,15 +4,13 @@
   "description": "OTA Github Authentication Provider",
   "main": "dist/index.js",
   "scripts": {
-    "test": "electrode-ota-server-mocha"
+    "test": "ota-mocha",
+    "build": "ota-babel",
+    "coverage": "ota-nyc",
+    "prepublish": "npm run build"
   },
-  "keywords": [
-    "ota",
-    "github"
-  ],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
+    "electrode-ota-server-diregister":"1.0.0",
     "electrode-ota-server-util":"1.0.0"
   },
   "devDependencies": {

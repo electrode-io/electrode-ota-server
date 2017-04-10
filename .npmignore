@@ -11,3 +11,5 @@ test
 server/public/movie.mpg
 docs/img
 test/support/server-ms.js
+test/*
+*/test/*

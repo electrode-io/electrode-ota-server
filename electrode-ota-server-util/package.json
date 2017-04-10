@@ -4,14 +4,17 @@
   "description": "OTA Utils",
   "main": "dist/index.js",
   "scripts": {
-    "test": "ern-mocha",
-    "build": "ern-babel",
-    "coverage":"ern-nyc",
+    "test": "ota-mocha",
+    "build": "ota-babel",
+    "coverage": "ota-nyc",
     "prepublish": "npm run build"
   },
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "electrode-ota-server-diregister": "1.0.0"
+  },
   "devDependencies": {
-    "electrode-ota-server-util-dev":"1.0.0"
+    "electrode-ota-server-util-dev": "1.0.0"
   }
 }

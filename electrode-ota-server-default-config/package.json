@@ -4,18 +4,18 @@
   "description": "OTA Default Configuration",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ota-mocha",
+    "build": "ota-babel",
+    "coverage": "ota-nyc",
+    "prepublish": "npm run build"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "electrode-ota-server-util": "1.0.0",
     "electrode-ota-server-auth-configuration": "1.0.0",
     "electrode-ota-server-auth-github": "1.0.0",
     "electrode-ota-server-auth-validate": "1.0.0",
-    "electrode-ota-server-dao-express-cassandra": "1.0.0",
+    "electrode-ota-server-dao-cassandra": "1.0.0",
     "electrode-ota-server-dao-legacy-cassandra": "1.0.0",
-    "electrode-ota-server-example-service": "1.0.0",
+    "electrode-ota-server-diregister": "1.0.0",
     "electrode-ota-server-service-account": "1.0.0",
     "electrode-ota-server-service-acquisition": "1.0.0",
     "electrode-ota-server-service-auth": "1.0.0",

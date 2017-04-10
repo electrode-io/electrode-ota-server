@@ -1,8 +1,8 @@
-var path = require('path');
-var root = path.join.bind(path, __dirname, '..');
-var dao = process.env.DAO || 'express-cassandra';
+import path from 'path';
+const root = path.join.bind(path, __dirname, '..');
+const dao = process.env.DAO || 'express-cassandra';
 
-module.exports = {
+export default {
     "app": {
         "electrode": true
     },

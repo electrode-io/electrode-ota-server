@@ -1,19 +1,16 @@
 {
-  "name": "electrode-ota-server-dao-express-cassandra",
+  "name": "electrode-ota-server-dao-cassandra",
   "version": "1.0.0",
   "description": "OTA Express-Cassandra DAO",
   "main": "dist/index.js",
   "scripts": {
-    "test": "electrode-ota-server-mocha"
+    "test": "ota-mocha",
+    "build": "ota-babel",
+    "coverage": "ota-nyc",
+    "prepublish": "npm run build"
   },
-  "keywords": [
-    "ota",
-    "express-cassandra",
-    "dao"
-  ],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
+    "electrode-ota-server-diregister":"1.0.0",
     "electrode-ota-server-util":"1.0.0"
   },
   "devDependencies": {

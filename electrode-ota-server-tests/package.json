@@ -1,0 +1,13 @@
+{
+  "name": "electrode-ota-server-tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "ern-mocha",
+    "build": "ern-babel",
+    "coverage":"ern-nyc"
+  },
+  "author": "",
+  "license": "ISC"
+}
