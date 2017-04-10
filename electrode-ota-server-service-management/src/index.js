@@ -1,4 +1,4 @@
-import diregister from '../diregister';
+import diregister from "electrode-ota-server-diregister";
 
 export const register = diregister({
     name: 'ota!model',

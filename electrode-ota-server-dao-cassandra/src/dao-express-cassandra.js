@@ -1,6 +1,6 @@
 import {types} from 'dse-driver';
-import {promiseMap, reducer, remove, toJSON} from '../../util';
-import {alreadyExistsMsg} from '../../service/errors';
+import {promiseMap, reducer, remove, toJSON} from 'electrode-ota-server-util';
+import {alreadyExistsMsg} from 'electrode-ota-server-errors';
 import UDTS from './models/UDTS';
 
 const historySort = history => history && history.sort((a, b) => b.created_.getTime() - a.created_.getTime());

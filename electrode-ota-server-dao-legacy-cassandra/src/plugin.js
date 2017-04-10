@@ -1,6 +1,4 @@
-"use strict";
-
-import diregister from '../../diregister';
+import diregister from "electrode-ota-server-diregister";
 
 import Dao from './dao-cassandra';
 /** Can not use server.expose because object properties are merged by do not include

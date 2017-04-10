@@ -1,8 +1,7 @@
-"use strict";
 
 import BaseCassandra from './base-cassandra';
-import {promiseMap, reducer, remove} from '../../util';
-import {alreadyExistsMsg} from '../../service/errors';
+import {promiseMap, reducer, remove} from 'electrode-ota-server-util';
+import {alreadyExistsMsg} from 'electrode-ota-server-errors';
 const historySort = history=> history && history.sort((a, b)=>b.created_.getTime() - a.created_.getTime());
 
 const removeCreated = v => {

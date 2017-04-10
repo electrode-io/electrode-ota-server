@@ -1,4 +1,4 @@
-module.exports = function loadCassandra(keyspace) {
+export default function loadCassandra(keyspace) {
     return [
 
         `CREATE KEYSPACE ${keyspace} WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}  AND durable_writes = true;`,

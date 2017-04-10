@@ -1,5 +1,5 @@
-import diregister from '../../diregister';
-import {shasum} from '../../util';
+import diregister from "electrode-ota-server-diregister";
+import {shasum} from 'electrode-ota-server-util';
 /**
  * The fileservice is meant to be plugable.
  *

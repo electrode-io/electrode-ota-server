@@ -1,4 +1,4 @@
-import diregister from '../../diregister';
+import diregister from "electrode-ota-server-diregister";
 /**
  * The fileservice is meant to be plugable.
  *

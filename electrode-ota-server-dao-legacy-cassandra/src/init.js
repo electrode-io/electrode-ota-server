@@ -1,7 +1,7 @@
 import cassandra from 'cassandra-driver';
 
 
-import loadCassandraFactory from '.././cassandra/load-cassandra';
+import loadCassandraFactory from './load-cassandra';
 
 
 export default function (conf = {contactPoints: ['localhost'], keyspace: 'ota'}) {

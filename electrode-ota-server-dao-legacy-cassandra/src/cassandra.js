@@ -1,8 +1,5 @@
-"use strict";
-
-import cassandra from 'cassandra-driver';
 import init from './init';
-import diregister from '../../diregister';
+import diregister from "electrode-ota-server-diregister";
 
 module.exports.register = diregister({
     name: "ota!cassandra",
