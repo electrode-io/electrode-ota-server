@@ -11,11 +11,9 @@
   "main": "index.js",
   "scripts": {
     "test-legacy": "DAO=cassandra PORT=9999 NODE_TLS_REJECT_UNAUTHORIZED=0 mocha --compilers js:babel-register test/*-test.js",
-
     "test": "PORT=9999 NODE_TLS_REJECT_UNAUTHORIZED=0 mocha --compilers js:babel-register test/*-test.js",
     "start": "node ./index.js",
-    "prepublish":"babel ./server/ ./index.js --out-dir dist/server && babel index.js --out-dir dist/"
-
+    "prepublish": "babel ./server/ ./index.js --out-dir dist/server && babel index.js --out-dir dist/"
   },
   "bin": {
     "electrode-ota-server": "./index.js"
@@ -64,6 +62,7 @@
     "babel-register": "^6.24.1",
     "chai": "^3.5.0",
     "code-push": "^1.10.2-beta",
+    "lerna": "2.0.0-beta.37",
     "mocha": "^2.5.3",
     "rimraf": "^2.5.4",
     "supertest": "^2.0.0",

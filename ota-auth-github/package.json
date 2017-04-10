@@ -1,0 +1,21 @@
+{
+  "name": "ota-auth-github",
+  "version": "1.0.0",
+  "description": "OTA Github Authentication Provider",
+  "main": "index.js",
+  "scripts": {
+    "test": "ota-mocha"
+  },
+  "keywords": [
+    "ota",
+    "github"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ota-util":"1.0.0"
+  },
+  "devDependencies": {
+    "ota-util-dev":"1.0.0"
+  }
+}

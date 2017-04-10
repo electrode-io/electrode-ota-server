@@ -1,0 +1,14 @@
+{
+  "name": "ota-util",
+  "version": "1.0.0",
+  "description": "OTA Utils",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "ota-util-dev":"1.0.0"
+  }
+}

@@ -1,8 +1,6 @@
-"use strict";
+import diregister from 'electode-ota-util/diregister';
 
-import diregister from '../diregister';
-
-module.exports.register = diregister({
+export const register = diregister({
     name: 'ota!validate',
     dependencies: ['ota!account'],
     multiple: false,
@@ -10,12 +8,12 @@ module.exports.register = diregister({
 }, (options, {validateFunc}) => {
 
 
-    const token = (name, callback)=>validateFunc(name).then(profile=> callback(null, true, {
+    const token = (name, callback) => validateFunc(name).then(profile => callback(null, true, {
         email: profile.email,
         name
-    }), ()=>callback(null, false));
+    }), () => callback(null, false));
 
-    const session = (request, session, callback)=> {
+    const session = (request, session, callback) => {
         return token(session.token, callback);
     };
 

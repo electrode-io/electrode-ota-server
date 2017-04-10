@@ -1,0 +1,16 @@
+{
+  "name": "ota-service-static",
+  "version": "1.0.0",
+  "description": "OTA Static Web Resources",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC","dependencies": {
+  "ota-util":"1.0.0"
+},
+  "devDependencies": {
+    "ota-util-dev":"1.0.0"
+  }
+}

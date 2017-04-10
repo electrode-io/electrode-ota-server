@@ -1,6 +1,4 @@
-"use strict";
-//fixes github email, when marked private.
-require('./github');
+
 import {map} from '../util';
 import diregister from '../diregister';
 
