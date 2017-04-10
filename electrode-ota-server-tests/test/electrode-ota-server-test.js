@@ -10,10 +10,10 @@ import {
     match,
     tokenRe
 } from './support/request';
+import otaServer from 'electrode-ota-server-boot';
 process.env.NODE_ENV = 'test';
 process.env.PORT = 9999;
 process.env.OTA_CONFIG_DIR = path.join(__dirname, 'config');
-const otaServer = require("electrode-ota-server-boot");
 
 /**
  *  **** IMPORTANT ***

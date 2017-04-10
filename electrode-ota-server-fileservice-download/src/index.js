@@ -8,14 +8,14 @@ import diregister from "electrode-ota-server-diregister";
  *
  */
 
-export const fileservice = (options, dao)=> {
+export const fileservice = (options, dao) => {
     return (packageHash, url, type) => {
         const hash = packageHash
             || url.split('/').pop();
         const p = dao.download(hash);
 
         if (type == 'application/json') {
-            p.then((resp)=>{
+            p.then((resp) => {
                 return JSON.parse(resp + '')
             });
         }
@@ -29,7 +29,3 @@ export const register = diregister({
     dependencies: ['ota!dao']
 }, fileservice);
 
-export default({
-    register,
-    fileservice
-})

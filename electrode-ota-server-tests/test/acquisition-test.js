@@ -1,6 +1,5 @@
 import initDao from './support/init-dao';
-import acquisition from 'electrode-ota-server-model-acquisition';
-import eql from './support/eql';
+import acquisition from 'electrode-ota-server-model-acquisition/dist/acquisition';
 import { expect } from 'chai';
 
 describe('model/acquisition', function () {

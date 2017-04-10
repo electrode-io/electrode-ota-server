@@ -1,25 +1,5 @@
-#!/usr/bin/env bash
-help(){
-  [ -n "$1" ] && echo "ERROR: $*"
-  echo "package.sh <packagename>"
-  exit 1;
-}
-
-valid_name() {
-  [ -d "$1" ] && help "directory already exists $1"
-   echo $1 | grep -q '^electrode-ota-server-'
-}
-
-PKG=$1
-valid_name $PKG
-
-mkdir $PKG
-cd $PKG
-
-(
-cat <<EOF
 {
-  "name": "${PKG}",
+  "name": "electrode-ota-server-fileservice-upload",
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
@@ -36,8 +16,3 @@ cat <<EOF
     "electrode-ota-server-util-dev":"1.0.0"
   }
 }
-EOF
-)>package.json
-mkdir src
-mkdir test
-git add ../$PKG

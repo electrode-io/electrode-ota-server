@@ -9,8 +9,17 @@
     "coverage": "ota-nyc"
   },
   "dependencies": {
+    "electrode-ota-server-dao-cassandra": "1.0.0",
+    "electrode-ota-server-dao-legacy-cassandra": "1.0.0",
     "electrode-ota-server-boot": "1.0.0",
-    "electrode-ota-server-default-config": "1.0.0"
+    "electrode-ota-server-model-account": "1.0.0",
+    "electrode-ota-server-model-app": "1.0.0",
+    "electrode-ota-server-model-manifest": "1.0.0",
+    "electrode-ota-server-model-weighted": "1.0.0",
+    "electrode-ota-server-default-config": "1.0.0",
+    "electrode-ota-server-util": "1.0.0",
+    "electrode-ota-server-service-fileservice": "1.0.0",
+    "electrode-ota-server-errors": "1.0.0"
   },
   "devDependencies": {
     "electrode-ota-server-util-dev": "1.0.0"

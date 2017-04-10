@@ -1,12 +1,11 @@
 import path from 'path';
 import init from './init-dao';
-
+import otaServer from 'electrode-ota-server-boot';
 import supertest from 'supertest';
 import {makeRequester, tokenRe, auth} from './request';
 process.env.OTA_CONFIG_DIR = path.join(__dirname, '..', 'config');
 process.env.NODE_ENV = 'test';
 process.env.PORT = 9999;
-const otaServer = require("electrode-ota-server-boot");
 
 export default () => init().then(client => {
 

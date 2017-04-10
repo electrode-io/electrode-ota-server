@@ -1,5 +1,6 @@
 import models from 'express-cassandra';
 import udts from './models/UDTS';
+import path from 'path';
 
 export const CLIENT_OPTIONS = {
     contactPoints: ['127.0.0.1'],
@@ -20,12 +21,13 @@ export const ORM_OPTIONS = {
 };
 
 
-export default async function ({clientOptions = {}, ormOptions = {}} = {}, drop) {
+export default async function indexObject({clientOptions = {}, ormOptions = {}} = {}, drop) {
     const conf = {
         clientOptions: Object.assign({}, CLIENT_OPTIONS, clientOptions),
         ormOptions: Object.assign({}, ORM_OPTIONS, ormOptions)
     };
-    console.log(`[expresss-cassandra] using keyspace ${conf.clientOptions.keyspace}`);
+    const modelPath = 
+    console.log(`[expresss-cassandra] using keyspace ${conf.clientOptions.keyspace} ${__dirname}/models`);
     if (drop === true) {
         console.log(`dropping keyspace ${conf.clientOptions.keyspace}`);
         const client = await models.createClient(conf);

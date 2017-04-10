@@ -10,3 +10,4 @@ export const register = diregister({
     console.log('clientOptions', clientOptions);
     return await client({clientOptions})
 });
+export default ({register});

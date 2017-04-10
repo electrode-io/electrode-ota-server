@@ -1,14 +1,16 @@
-import manifest from 'electrode-ota-server-model-manifest';
+import manifest from 'electrode-ota-server-model-manifest/dist/manifest';
 import {expect} from 'chai';
 import path from 'path';
-const join = path.join.bind(path, __dirname);
-const fixture = path.join.bind(path, __dirname, 'fixtures');
+import {shasum} from 'electrode-ota-server-util';
 import step0 from './fixtures/step.0.manifest.json';
 import step1 from './fixtures/step.1.manifest.json';
 import step2 from './fixtures/step.2.manifest.json';
 import {history} from './fixtures/history.json';
 import fs from 'fs';
-import {shasum} from '../server/util';
+
+const join = path.join.bind(path, __dirname);
+const fixture = path.join.bind(path, __dirname, 'fixtures');
+
 const eql = eql => resp => {
     expect(resp).to.eql(eql);
     return resp;

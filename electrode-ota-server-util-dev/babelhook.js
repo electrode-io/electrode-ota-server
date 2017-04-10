@@ -19,7 +19,7 @@ if (process.env.COVERAGE) {
     ]);
 }
 const project = path.join(__dirname, '..');
-
+const otaRegex = /(@walmart\/)?electrode-ota-server-/;
 //only look into ern- projects that have a src directory.
 conf.only = /electrode-ota-server-[^/]*\/(src|test|lib)/;
 
@@ -35,17 +35,13 @@ function normalizePath(file, parent) {
     if (/^\./.test(file)) {
         return file;
     }
-    //fixes issue with globa-cli calling local-cli.
-    if (/\/ern-local-cli$/.test(file)) {
-        return 'ern-local-cli'
-    }
     if (/^\//.test(file)) {
         if (file.startsWith(project + '/electrode-ota-server-')) {
             return file.replace(project + '/', '');
         }
         return file;
     }
-    if (/(@walmart\/)?ern-/.test(file)) {
+    if (otaRegex.test(file)) {
         return file.replace('@walmart/', '');
     }
     return;
@@ -58,7 +54,7 @@ Module._load = function (file, parent) {
 
         let parts = absFile.split('/');
         let scope = parts[0], pkg = parts[1], rest = parts.slice(2).join(path.sep);
-        if (/ern-/.test(scope)) {
+        if (/electrode-ota-server-/.test(scope)) {
             if (!pkg || pkg == 'dist') pkg = 'src';
             file = path.join(project, scope, pkg, rest || 'index');// `${project}/${pkg}/${rest ? '/' + rest : ''}`
         }

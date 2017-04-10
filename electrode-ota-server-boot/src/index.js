@@ -1,14 +1,14 @@
-const Confippet = require("electrode-confippet");
-const path = require('path');
-const dirs = [path.join(__dirname, "config"), path.join(process.cwd(), 'config')];
-const {set} = require("lodash");
-const defaultConfig = rquire('electrode-ota-server-defuault-config').default;
-const electrodeServer = require("electrode-server");
+import Confippet from "electrode-confippet";
+import path from 'path';
+import {set} from "lodash";
+import {default as defaultConfig} from 'electrode-ota-server-default-config';
+import fs from 'fs';
+import util from 'electrode-ota-server-util';
+
+
 export function boot() {
     const makeRandomJson = (name) => {
         const randomFile = path.join(process.cwd(), '.random.json');
-        const fs = require('fs');
-        const util = require('./server/util')
         let rndm = {};
 
         try {
@@ -26,10 +26,10 @@ set a cookie password for this path in your configuration.`);
         }
         return rndm[name];
     };
-
-    if (process.env.OTA_CONFIG_DIR) {
-        dirs.push(process.env.OTA_CONFIG_DIR)
-    }
+    const dirs = [
+        path.join(require.resolve('electrode-server'), '..', 'config'),
+        path.join(require.resolve('electrode-ota-server-default-config'), '..'),
+        process.env.OTA_CONFIG_DIR || path.join(process.cwd(), 'config')];
 
     const options = {
         dirs,
@@ -63,14 +63,14 @@ set a cookie password for this path in your configuration.`);
 
     const defaults = Confippet.store();
     defaults._$.compose(options);
-    defaults._$.compose(defaultConfig);
     defaults._$.use(verify(defaults));
     return defaults;
 }
-export default function () {
+export const bootServer = function () {
+    const electrodeServer = require('electrode-server');
     return electrodeServer(boot());
 }
-
+export default bootServer;
 if (require.main === module) {
-    electrodeServer(boot());
+    bootServer();
 }

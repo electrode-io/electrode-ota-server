@@ -1,10 +1,10 @@
 import initDao from './support/init-dao';
 import eql from './support/eql';
-import appFactory from 'electrode-ota-server-model-app';
-import accountFactory from 'electrode-ota-server-model-account';
-import { download, upload } from 'electrode-ota-server-service-fileservice';
-import {diffPackageMap} from 'electrode-ota-server-model-manifest';
-import { expect } from 'chai';
+import appFactory from 'electrode-ota-server-model-app/dist/app';
+import accountFactory from 'electrode-ota-server-model-account/dist/account';
+import {fileservice as upload} from 'electrode-ota-server-fileservice-upload';
+import {fileservice as download} from 'electrode-ota-server-fileservice-download';
+import {expect} from 'chai';
 
 const shouldError = () => {
     expect(false, 'Should have an error').to.be.true;
@@ -23,7 +23,7 @@ describe('model/app', function () {
         let w = 0;
         account = accountFactory(dao);
         const up = upload({}, dao), down = download({}, dao);
-        ac = appFactory(dao, up, (history) => diffPackageMap(down, up, history));
+        ac = appFactory({}, dao, up, (history) => diffPackageMap(down, up, history));
     });
     it('should create/list/remove an app', () => {
         const email = 'test@p.com';
@@ -105,8 +105,8 @@ describe('model/app', function () {
                     }
                 })
             })
-            .then(_ =>{
-               return ac.historyDeployment({app: 'superd', deployment: 'Staging', email})
+            .then(_ => {
+                return ac.historyDeployment({app: 'superd', deployment: 'Staging', email})
             })
             .then(v => {
                 expect(v.length, 'should be 2').to.eql(2);

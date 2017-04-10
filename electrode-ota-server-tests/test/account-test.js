@@ -1,5 +1,5 @@
 import initDao from './support/init-dao';
-import accountFactory from 'electrode-ota-server-model-account';
+import accountFactory from 'electrode-ota-server-model-account/dist/account';
 import { expect } from 'chai';
 const TOKEN = {profile: {email: 'test@t.com', name: 'test'}, provider: 'GitHub', query: {hostname: 'TestHost'}};
 const newToken = (email = 'test@t.com') => {
@@ -10,8 +10,13 @@ describe('model/account', function () {
     this.timeout(10000);
     let account;
     before(async () =>{
-        const dao = await initDao();
-        account = accountFactory(dao);
+        try {
+            const dao = await initDao();
+            account = accountFactory(dao);
+        }catch(e){
+            console.log(`errorr people`);
+            console.trace(e);
+        }
     });
 
 

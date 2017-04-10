@@ -1,4 +1,5 @@
-import {id, key, toJSON} from 'electode-ota-server-util';
+import {id, key, toJSON} from 'electrode-ota-server-util';
+import {isZip, generate} from 'electrode-ota-server-model-manifest/dist/manifest';
 
 import {
     alreadyExists,
@@ -62,8 +63,7 @@ const notAuthorizedPerm = (app, email, perm, message) => {
 };
 
 
-export default (dao, upload, manifest) => {
-    const {isZip, generate} = manifest;
+export default (options, dao, upload, download) => {
     const api = {};
     return Object.assign(api, {
         findApp({email, app}){

@@ -1,7 +1,7 @@
 "use strict";
 
 import diregister from "electrode-ota-server-diregister";
-import Dao from './dao-express-cassandra';
+import Dao from './dao-cassandra';
 
 export const register = diregister({
     name: "ota!dao",

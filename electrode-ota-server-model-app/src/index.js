@@ -5,6 +5,6 @@ export const register = diregister({
     name: 'ota!app',
     multiple: false,
     connections: false,
-    dependencies: ['ota!dao', 'ota!fileservice-upload', 'ota!manifest']
-}, (options, dao, upload) => app(dao, upload, options));
+    dependencies: ['ota!dao', 'ota!fileservice-upload', 'ota!fileservice-download']
+}, app);
 

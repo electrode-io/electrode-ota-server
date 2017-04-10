@@ -8,7 +8,7 @@ import {shasum} from 'electrode-ota-server-util';
  * use a storage provider for this stuff.
  *
  */
-const fileservice = ({downloadUrl}, dao) => {
+export const fileservice = ({downloadUrl}, dao) => {
     downloadUrl = downloadUrl && downloadUrl.replace(/\/+?$/, '');
     return (file) => {
         const packageHash = shasum(file);
@@ -22,6 +22,7 @@ const fileservice = ({downloadUrl}, dao) => {
         });
     };
 };
+
 export const register = diregister({
     name: "ota!fileservice-upload",
     multiple: false,
@@ -29,7 +30,3 @@ export const register = diregister({
     dependencies: ['ota!dao']
 }, fileservice);
 
-module.exports = {
-    register,
-    fileservice
-};

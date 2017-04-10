@@ -1,6 +1,6 @@
 import Boom from 'boom';
 
-const register = (plugin, options, next) => {
+export const register = (plugin, options, next) => {
 
     plugin.auth.scheme('basic', authentication);
     next();
@@ -8,11 +8,11 @@ const register = (plugin, options, next) => {
 };
 
 //Do not use this in production.
-const validate = (users)=> {
+const validate = (users) => {
     if (process.env.NODE_ENV === 'production') {
         throw new Error('Do not use this method for verification in production')
     }
-    return (request, email, password, callback)=> {
+    return (request, email, password, callback) => {
         if (password != users[email]) {
             return callback(null, false);
         }
@@ -28,7 +28,7 @@ const authentication = function (server, {unauthorizedAttributes, realm, allowEm
         authenticate(request, reply) {
 
             const {authorization} = request.headers;
-            if (realm &! authorization) {
+            if (realm & !authorization) {
                 reply.setHeader('WWW-Authenticate', `Basic realm="${realm}"`);
                 return reply.code(402);
             }
@@ -47,7 +47,7 @@ const authentication = function (server, {unauthorizedAttributes, realm, allowEm
                 return reply(Boom.badRequest('Bad HTTP authentication header format', 'Basic'));
             }
 
-            const [username,password] = new Buffer(authValue, 'base64').toString().split(':', 2);
+            const [username, password] = new Buffer(authValue, 'base64').toString().split(':', 2);
 
             if (!username && !allowEmptyUsername) {
                 return reply(Boom.unauthorized('HTTP authentication header missing username', 'Basic', unauthorizedAttributes));
@@ -84,4 +84,3 @@ register.attributes = {
     description: 'super basic auth mechanism'
 };
 
-module.exports = {register};
