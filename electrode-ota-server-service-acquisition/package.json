@@ -2,7 +2,7 @@
   "name": "electrode-ota-server-service-acquisition",
   "version": "1.0.0",
   "description": "OTA Acquistion Service",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

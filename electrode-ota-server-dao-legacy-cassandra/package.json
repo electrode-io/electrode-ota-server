@@ -2,7 +2,7 @@
   "name": "electrode-ota-server-dao-legacy-cassandra",
   "version": "1.0.0",
   "description": "OTA Legacy Cassandra DAO",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
