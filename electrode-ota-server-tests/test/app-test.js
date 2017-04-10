@@ -1,10 +1,9 @@
 import initDao from './support/init-dao';
 import eql from './support/eql';
-import appFactory from '../server/service/app';
-import accountFactory from '../server/service/account';
-import { fileservice as upload } from '../server/fileservice/dao/upload';
-import { fileservice as download } from '../server/fileservice/dao/download';
-import {diffPackageMap} from '../server/service/manifest';
+import appFactory from 'electrode-ota-server-model-app';
+import accountFactory from 'electrode-ota-server-model-account';
+import { download, upload } from 'electrode-ota-server-service-fileservice';
+import {diffPackageMap} from 'electrode-ota-server-model-manifest';
 import { expect } from 'chai';
 
 const shouldError = () => {

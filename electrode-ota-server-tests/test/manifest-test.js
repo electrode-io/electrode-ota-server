@@ -1,61 +1,61 @@
-import manifest from '../server/service/manifest';
-import { expect } from 'chai';
+import manifest from 'electrode-ota-server-model-manifest';
+import {expect} from 'chai';
 import path from 'path';
 const join = path.join.bind(path, __dirname);
 const fixture = path.join.bind(path, __dirname, 'fixtures');
 import step0 from './fixtures/step.0.manifest.json';
 import step1 from './fixtures/step.1.manifest.json';
 import step2 from './fixtures/step.2.manifest.json';
-import { history } from './fixtures/history.json';
+import {history} from './fixtures/history.json';
 import fs from 'fs';
 import {shasum} from '../server/util';
 const eql = eql => resp => {
     expect(resp).to.eql(eql);
     return resp;
 };
-const debug = (resp)=> {
+const debug = (resp) => {
     console.log(JSON.stringify(resp, null, 2));
     return resp;
 };
 
 const readFile = (file, options = {}) => {
-    return new Promise((resolve, reject)=> {
+    return new Promise((resolve, reject) => {
         fs.readFile(file, options, function (err, buffer) {
             if (err) return reject(err);
             resolve(buffer);
         });
     })
 };
-const readFixture = (file, options)=> readFile(fixture(file), options);
+const readFixture = (file, options) => readFile(fixture(file), options);
 
-const readJSON = (file)=> {
+const readJSON = (file) => {
     return JSON.parse(fs.readFileSync(file, 'utf8'));
 };
 
 describe('manifest', function () {
     this.timeout(50000);
-    it('should generate manifest step0', ()=> readFixture('step.0.blob.zip').then(manifest.generate).then(eql(step0)));
-    it('should generate manifest step1', ()=> Promise.resolve(fixture('step.1.blob.zip')).then(manifest.generate).then(eql(step1)));
-    it('should generate manifest step2', ()=> readFixture('step.2.blob.zip').then(manifest.generate).then(eql(step2)));
+    it('should generate manifest step0', () => readFixture('step.0.blob.zip').then(manifest.generate).then(eql(step0)));
+    it('should generate manifest step1', () => Promise.resolve(fixture('step.1.blob.zip')).then(manifest.generate).then(eql(step1)));
+    it('should generate manifest step2', () => readFixture('step.2.blob.zip').then(manifest.generate).then(eql(step2)));
 
     it('should generate a delta file from a file and a manifest', function () {
 
         return readFixture('step.2.blob.zip')
-            .then(buffer=>manifest.delta(step1, buffer))
+            .then(buffer => manifest.delta(step1, buffer))
             .then(manifest.zipToBuf)
             .then(manifest.generate)
             .then(eql)
-            .then(check=> manifest.generate(fixture('step.2.map.c7b8f2545224a4d180f8deeebf3fbdc267600ffe1f76914236cd186be45c6229.zip'))
+            .then(check => manifest.generate(fixture('step.2.map.c7b8f2545224a4d180f8deeebf3fbdc267600ffe1f76914236cd186be45c6229.zip'))
                 .then(check));
 
     });
 
     it('should generate diffPackageMap', function () {
         const blobs = {}, hashes = {}, manifests = {};
-        const test = history.map((obj, i)=> {
+        const test = history.map((obj, i) => {
             const ret = Object.assign({}, obj);
             delete ret.diffPackageMap;
-            if (i % 2 == 0){
+            if (i % 2 == 0) {
                 delete ret.manifestBlobUrl;
             }
             return ret;
@@ -65,7 +65,7 @@ describe('manifest', function () {
             hashes[history.packageHash] = join('fixtures', `step.${idx}.blob.zip`);
             manifests[history.manifestBlobUrl] = join('fixtures', `step.${idx}.manifest.json`);
         });
-        const download = (packageHash, url)=> {
+        const download = (packageHash, url) => {
             if (packageHash) {
                 return Promise.resolve(hashes[packageHash]);
             }
@@ -76,7 +76,7 @@ describe('manifest', function () {
                 return Promise.resolve(readJSON(manifests[url]));
             }
         };
-        const upload = (blob)=> {
+        const upload = (blob) => {
             const blobUrl = shasum(blob);
             return Promise.resolve({
                 size: blob.length,

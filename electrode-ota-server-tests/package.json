@@ -9,6 +9,7 @@
     "coverage": "ota-nyc"
   },
   "dependencies": {
+    "electrode-ota-server-boot": "1.0.0",
     "electrode-ota-server-default-config": "1.0.0"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 import diregister from "electrode-ota-server-diregister";
 
-import Dao from './dao-cassandra';
+import Dao from './dao-legacy-cassandra';
 /** Can not use server.expose because object properties are merged by do not include
  the class properties.  This is legal, ugly and works **/
 
@@ -9,6 +9,6 @@ module.exports.register = diregister({
     multiple: false,
     connections: false,
     dependencies: ['ota!cassandra']
-}, (options,  client)=> {
+}, (options, client) => {
     return new Dao(Object.assign({}, options, {client}))
 });

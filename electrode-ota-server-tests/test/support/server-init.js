@@ -6,7 +6,7 @@ import {makeRequester, tokenRe, auth} from './request';
 process.env.OTA_CONFIG_DIR = path.join(__dirname, '..', 'config');
 process.env.NODE_ENV = 'test';
 process.env.PORT = 9999;
-const otaServer = require("../../index");
+const otaServer = require("electrode-ota-server-boot");
 
 export default () => init().then(client => {
 

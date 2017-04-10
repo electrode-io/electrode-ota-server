@@ -1,5 +1,4 @@
-"use strict";
-import { expect } from 'chai';
+import {expect} from 'chai';
 
 const eql = (eq, pos) => {
     const isA = Array.isArray(eq);
@@ -7,10 +6,10 @@ const eql = (eq, pos) => {
         eq = eq.map(eql);
     }
 
-    return (v, i)=> {
+    return (v, i) => {
         if (isA) {
             expect(Array.isArray(v), 'should be an array').to.be.true;
-            eq.forEach((c, i)=>c(v[i]));
+            eq.forEach((c, i) => c(v[i]));
             return v;
         }
         const p = JSON.parse(JSON.stringify(v));
@@ -21,4 +20,4 @@ const eql = (eq, pos) => {
 
     };
 };
-module.exports = eql;
+export default eql;

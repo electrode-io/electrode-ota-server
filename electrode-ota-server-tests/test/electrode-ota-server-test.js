@@ -13,7 +13,7 @@ import {
 process.env.NODE_ENV = 'test';
 process.env.PORT = 9999;
 process.env.OTA_CONFIG_DIR = path.join(__dirname, 'config');
-const otaServer = require("../index");
+const otaServer = require("electrode-ota-server-boot");
 
 /**
  *  **** IMPORTANT ***
