@@ -46,7 +46,7 @@ module.exports = {
             "module": "vision"
         },
         "electrode-ota-server-dao-cassandra": {
-            "module": root(`server/dao/${dao}/cassandra`),
+            "module": `${dao}/dist/cassandra`,
             "options": {
                 "contactPoints": [
                     "localhost"

@@ -1,0 +1,34 @@
+{
+  "name": "ota-default-config",
+  "version": "1.0.0",
+  "description": "OTA Default Configuration",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ota-util": "1.0.0",
+    "ota-auth-configuration": "1.0.0",
+    "ota-auth-github": "1.0.0",
+    "ota-auth-validate": "1.0.0",
+    "ota-dao-express-cassandra": "1.0.0",
+    "ota-dao-legacy-cassandra": "1.0.0",
+    "ota-example-service": "1.0.0",
+    "ota-service-account": "1.0.0",
+    "ota-service-acquisition": "1.0.0",
+    "ota-service-auth": "1.0.0",
+    "ota-service-error": "1.0.0",
+    "ota-service-fileservice": "1.0.0",
+    "ota-service-management": "1.0.0",
+    "ota-service-manifest": "1.0.0",
+    "ota-service-static": "1.0.0",
+    "ota-service-weighting": "1.0.0",
+    "ota-util": "1.0.0",
+    "ota-web-auth": "1.0.0"
+  },
+  "devDependencies": {
+    "ota-util-dev": "1.0.0"
+  }
+}

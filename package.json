@@ -10,10 +10,9 @@
   "homepage": "https://github.com/electrode-io/electrode-ota-server",
   "main": "index.js",
   "scripts": {
-    "test-legacy": "DAO=cassandra PORT=9999 NODE_TLS_REJECT_UNAUTHORIZED=0 mocha --compilers js:babel-register test/*-test.js",
-    "test": "PORT=9999 NODE_TLS_REJECT_UNAUTHORIZED=0 mocha --compilers js:babel-register test/*-test.js",
-    "start": "node ./index.js",
-    "prepublish": "babel ./server/ ./index.js --out-dir dist/server && babel index.js --out-dir dist/"
+    "rebuild": "lerna clean --yes && lerna bootstrap",
+    "test": "lerna run test",
+    "coverage": "lerna run coverage && istanbul-combine -d coverage -p summary -r lcov -r html $(find ./ern-*/.nyc_output -type f -name '*.json' -maxdepth 3)"
   },
   "bin": {
     "electrode-ota-server": "./index.js"
