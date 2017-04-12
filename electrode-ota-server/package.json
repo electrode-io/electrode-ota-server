@@ -16,7 +16,9 @@
     "hapi": "^15.1.1"
   },
   "devDependencies": {
+    "electrode-ota-server-test-support": "1.0.0",
     "electrode-ota-server-util-dev": "1.0.0",
-    "electrode-ota-server-test-support": "1.0.0"
+    "supertest": "^3.0.0",
+    "code-push":"^1.10.2-beta"
   }
 }

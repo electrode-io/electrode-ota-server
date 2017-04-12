@@ -14,7 +14,7 @@
     "electrode-ota-server-auth-github": "1.0.0",
     "electrode-ota-server-auth-validate": "1.0.0",
     "electrode-ota-server-dao-cassandra": "1.0.0",
-    "electrode-ota-server-dao-legacy-cassandra": "1.0.0",
+    "electrode-ota-server-dao-plugin": "1.0.0",
     "electrode-ota-server-diregister": "1.0.0",
     "electrode-ota-server-errors": "1.0.0",
     "electrode-ota-server-model-account": "1.0.0",

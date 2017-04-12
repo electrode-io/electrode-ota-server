@@ -1,6 +1,5 @@
-const dao = process.env.DAO || 'cassandra';
-const init = require(`electrode-ota-server-dao-${dao}`).default;
-const Dao = require(`electrode-ota-server-dao-${dao}/lib/dao-cassandra`).default;
+import {daoFactory} from 'electrode-ota-server-dao-plugin';
+import {clientFactory} from 'electrode-ota-server-dao-cassandra';
 
 let client;
 export const shutdown = async () => {
@@ -11,16 +10,17 @@ export const shutdown = async () => {
 };
 export default async (options = {}) => {
     try {
-        if (client != null){
-           throw new Error(`shutdown was not called`);
+        if (client != null) {
+            throw new Error(`shutdown was not called`);
         }
-        client = await init({
+        client = await clientFactory({
             contactPoints: ['localhost'],
             keyspace: `ota_server_test`,
             dangerouslyDropKeyspaceBeforeUse: true,
             ...options
         });
-        return new Dao({client});
+        const dao = await daoFactory({}, client);
+        return dao;
     } catch (e) {
         console.trace(e);
         throw e;

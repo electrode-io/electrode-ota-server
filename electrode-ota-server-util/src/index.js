@@ -62,8 +62,20 @@ export const toJSON = (v, exclude) => {
     return v;
 };
 export const key = genString;
+export const waitFor = function (fn, scope, ...args) {
+    if (typeof fn == 'string') {
+        fn = scope[fn];
+    }
+    return new Promise((resolve, reject) => fn.apply(scope, args.concat((e, o) => e ? reject(e) : resolve(o))));
+
+};
+export const promisify = (fn, scope) => function (...args) {
+    return waitFor(fn, scope || this, ...args);
+};
 export default({
     toJSON,
+    promisify,
+    waitFor,
     genString,
     id,
     key,

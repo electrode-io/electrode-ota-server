@@ -1,4 +1,3 @@
-import {types} from 'dse-driver';
 import {promiseMap, reducer, remove, toJSON} from 'electrode-ota-server-util';
 import {alreadyExistsMsg} from 'electrode-ota-server-errors';
 import UDTS from './models/UDTS.json';
@@ -133,7 +132,7 @@ export default class DaoExpressCassandra {
         pkg.id_ = this._models.timeuuid();
         pkg.created_ = Date.now();
         if (pkg.size)
-            pkg.size = types.Integer.fromNumber(pkg.size);
+            pkg.size = this._models.driver.types.Integer.fromNumber(pkg.size);
 
         return new this.Package(pkg);
     }

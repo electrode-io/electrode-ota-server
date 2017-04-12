@@ -15,7 +15,6 @@
   "devDependencies": {
     "electrode-ota-server-util-dev":"1.0.0",
     "electrode-ota-server-test-support":"1.0.0",
-    "electrode-ota-server-dao-cassandra":"1.0.0",
-    "electrode-ota-server-dao-legacy-cassandra":"1.0.0"
+    "electrode-ota-server-dao-cassandra":"1.0.0"
   }
 }

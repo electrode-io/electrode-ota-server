@@ -1,7 +1,7 @@
 {
-  "name": "electrode-ota-server-model-acquisition",
+  "name": "electrode-ota-server-dao-plugin",
   "version": "1.0.0",
-  "description": "OTA Acquistion Service",
+  "description": "OTA Express-Cassandra DAO",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -10,13 +10,13 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "semver": "^5.3.0",
+    "express-cassandra": "^1.7.5",
     "electrode-ota-server-diregister": "1.0.0",
-    "electrode-ota-server-util": "1.0.0"
+    "electrode-ota-server-util": "1.0.0",
+    "electrode-ota-server-errors":"1.0.0"
   },
   "devDependencies": {
     "electrode-ota-server-util-dev": "1.0.0",
-    "electrode-ota-server-test-support":"1.0.0",
-    "electrode-ota-server-dao-cassandra":"1.0.0"
+    "electrode-ota-server-test-support": "1.0.0"
   }
 }

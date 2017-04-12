@@ -49,7 +49,6 @@ export default function () {
         "plugins": {
             "electrode-ota-server-view": {},
             "electrode-ota-server-dao-cassandra": {
-                "module": _resolve(`electrode-ota-server-dao-${dao}`, 'cassandra'),
                 "options": {
                     "contactPoints": [
                         "localhost"
@@ -58,7 +57,6 @@ export default function () {
                 }
             },
             "electrode-ota-server-dao-plugin": {
-                "module": _resolve(`electrode-ota-server-dao-${dao}`, 'plugin')
             },
             "electrode-ota-server-fileservice-upload": {},
             "electrode-ota-server-fileservice-download": {},

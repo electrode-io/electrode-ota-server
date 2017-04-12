@@ -9,14 +9,15 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-util":"1.0.0"
+    "boom": "^4.3.1",
+    "electrode-ota-server-util": "1.0.0",
+    "supertest": "^3.0.0"
   },
   "peerDependencies": {
-    "electrode-ota-server":"1.0.0",
-    "electrode-ota-server-dao-cassandra":"1.0.0",
-    "electrode-ota-server-dao-cassandra-legacy":"1.0.0"
+    "electrode-ota-server": "1.0.0",
+    "electrode-ota-server-dao-cassandra": "1.0.0"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev":"1.0.0"
+    "electrode-ota-server-util-dev": "1.0.0"
   }
 }

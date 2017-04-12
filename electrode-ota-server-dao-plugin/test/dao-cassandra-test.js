@@ -2,9 +2,11 @@ import initDao, {shutdown} from 'electrode-ota-server-test-support/lib/init-dao'
 import eql from 'electrode-ota-server-test-support/lib/eql';
 import {expect} from 'chai';
 
-
+function alwaysFail() {
+    throw new Error(`should have failed`);
+}
 describe('dao/cassandra', function () {
-    this.timeout(20000)
+    this.timeout(200000);
     let dao;
     before(async () => dao = await initDao());
     after(shutdown);
@@ -16,11 +18,10 @@ describe('dao/cassandra', function () {
         expect(user.id).to.exist;
     }));
 
-    it('should fail insert user', (done) => dao.createUser({email: 'joe@b.com', name: 'Joe'})
+    it('should fail insert user', () => dao.createUser({email: 'joe@b.com', name: 'Joe'})
         .then(_ => dao.createUser({email: 'joe@b.com', name: 'Joe'}))
-        .then(() => done(new Error(`should have failed`)), (e) => {
+        .then(alwaysFail, (e) => {
             expect(e.message).eql('User already exists joe@b.com');
-            done();
         }));
 
     it('should insert and update keys', () => dao.createUser({
