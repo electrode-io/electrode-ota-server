@@ -1,7 +1,7 @@
 {
     "fields": {
     "id_": {
-        "type": "uuid"
+        "type": "timeuuid"
     },
     "appVersion": "text",
         "blobUrl": "text",

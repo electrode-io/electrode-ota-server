@@ -130,7 +130,7 @@ export default class DaoExpressCassandra {
     }
 
     newPackage(pkg) {
-        pkg.id_ = this._models.uuid();
+        pkg.id_ = this._models.timeuuid();
         pkg.created_ = Date.now();
         if (pkg.size)
             pkg.size = types.Integer.fromNumber(pkg.size);

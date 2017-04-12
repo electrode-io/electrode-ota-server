@@ -13,7 +13,11 @@
   "license": "ISC",
   "dependencies": {
     "electrode-ota-server-diregister":"1.0.0",
-    "electrode-ota-server-util":"1.0.0"
+    "electrode-ota-server-util":"1.0.0",
+    "hapi-auth-cookie": "^6.1.1",
+    "hapi-server-session": "^3.0.0",
+    "hapi-auth-bearer-token": "^4.1.1",
+    "bell": "^8.0.1"
   },
   "devDependencies": {
     "electrode-ota-server-util-dev":"1.0.0"

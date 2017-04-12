@@ -10,6 +10,8 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
+    "semver": "^5.3.0",
+    "electrode-ota-server-diregister": "1.0.0",
     "electrode-ota-server-util": "1.0.0"
   },
   "devDependencies": {

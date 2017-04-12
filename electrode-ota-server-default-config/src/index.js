@@ -10,7 +10,7 @@ const _resolve = function (mod, lib) {
 
 export default function () {
 
-    return {
+    const conf = {
         "app": {
             "electrode": true
         },
@@ -43,16 +43,11 @@ export default function () {
         },
         "routes": {
             "files": {
-                "relativeTo": _resolve("electrode-ota-server-public", '..')
+                "relativeTo": _resolve("electrode-ota-server-public", '..', 'public')
             }
         },
         "plugins": {
-            "inert": {
-                "enable": true
-            },
-            "electrode-ota-view": {
-                "module": "vision"
-            },
+            "electrode-ota-server-view": {},
             "electrode-ota-server-dao-cassandra": {
                 "module": _resolve(`electrode-ota-server-dao-${dao}`, 'cassandra'),
                 "options": {
@@ -143,18 +138,18 @@ export default function () {
             "electrode-ota-server-public": {
                 "options": {
                     "method": "GET",
-                    "path": "/assets/{param*}",
-                    "config": {
-                        "auth": false,
-                        "handler": {
-                            "directory": {
-                                "path": _resolve("electrode-ota-server-public", "public")
-                            }
-                        }
-                    }
+                    "path": "/assets/{param*}"
                 }
             },
             "electrode-ota-server-service-errors": {}
         }
     };
+
+    Object.keys(conf.plugins).forEach(key => {
+
+        conf.plugins[key].module = require.resolve(conf.plugins[key].module || key);
+
+    });
+
+    return conf;
 };

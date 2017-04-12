@@ -10,10 +10,14 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-util":"1.0.0"
+    "electrode-ota-server-diregister": "1.0.0",
+    "file-type": "^3.9.0",
+    "electrode-ota-server-util": "1.0.0",
+    "yauzl": "^2.7.0",
+    "yazl": "^2.4.1"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev":"1.0.0",
-    "electrode-ota-server-test-support":"1.0.0"
+    "electrode-ota-server-util-dev": "1.0.0",
+    "electrode-ota-server-test-support": "1.0.0"
   }
 }

@@ -6,6 +6,17 @@ const Module = require('module');
 const path = require('path');
 const babelRegister = require('babel-register');
 const oload = Module._load;
+const modname = path.join.bind(path, __dirname, 'node_modules');
+
+function fix(prefix) {
+    return function (v) {
+        if (Array.isArray(v)) {
+            v[0] = modname(`${prefix}-${v[0]}`);
+            return v;
+        }
+        return modname(`${prefix}-${v}`);
+    }
+}
 
 if (process.env.COVERAGE) {
     console.log('Has Coverage');
@@ -18,6 +29,9 @@ if (process.env.COVERAGE) {
         }
     ]);
 }
+conf.plugins = conf.plugins.map(fix(`babel-plugin`));
+conf.presets = conf.presets.map(fix(`babel-preset`));
+
 const project = path.join(__dirname, '..');
 const otaRegex = /(@walmart\/)?electrode-ota-server/;
 //only look into ern- projects that have a src directory.

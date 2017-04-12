@@ -29,8 +29,11 @@
     "electrode-ota-server-routes-auth": "1.0.0",
     "electrode-ota-server-service-errors": "1.0.0",
     "electrode-ota-server-service-fileservice": "1.0.0",
+    "electrode-ota-server-fileservice-upload": "1.0.0",
+    "electrode-ota-server-fileservice-download": "1.0.0",
     "electrode-ota-server-service-management": "1.0.0",
-    "electrode-ota-server-util": "1.0.0"
+    "electrode-ota-server-util": "1.0.0",
+    "electrode-ota-server-view":"1.0.0"
   },
   "devDependencies": {
     "electrode-ota-server-util-dev": "1.0.0"

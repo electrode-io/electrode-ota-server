@@ -2,7 +2,7 @@
   "name": "electrode-ota-server-dao-legacy-cassandra",
   "version": "1.0.0",
   "description": "OTA Legacy Cassandra DAO",
-  "main":"dist/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "ota-mocha",
     "build": "ota-babel",
@@ -10,10 +10,12 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-diregister":"1.0.0",
-    "electrode-ota-server-util":"1.0.0"
+    "dse-driver": "^1.2.0",
+    "electrode-ota-server-diregister": "1.0.0",
+    "electrode-ota-server-errors": "1.0.0",
+    "electrode-ota-server-util": "1.0.0"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev":"1.0.0"
+    "electrode-ota-server-util-dev": "1.0.0"
   }
 }

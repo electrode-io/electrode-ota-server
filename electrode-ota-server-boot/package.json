@@ -12,7 +12,8 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-server": "^1.2.2"
+    "electrode-server": "^1.2.2",
+    "electrode-ota-server-util": "1.0.0"
   },
   "devDependencies": {
     "electrode-ota-server-util-dev": "1.0.0"

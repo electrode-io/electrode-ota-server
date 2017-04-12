@@ -10,6 +10,7 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
+    "randomstring": "^1.1.5",
     "electrode-ota-server-diregister": "1.0.0"
   },
   "devDependencies": {

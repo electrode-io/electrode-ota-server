@@ -9,6 +9,7 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
+
   },
   "devDependencies": {
     "electrode-ota-server-util-dev":"1.0.0"

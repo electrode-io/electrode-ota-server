@@ -9,6 +9,8 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
+    "vision": "^4.1.0",
+    "ejs": "^2.5.2",
     "electrode-ota-server-diregister":"1.0.0",
     "electrode-ota-server-util":"1.0.0"
   },
