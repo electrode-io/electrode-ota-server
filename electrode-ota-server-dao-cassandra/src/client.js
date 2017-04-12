@@ -29,7 +29,7 @@ export const requireRelative = (directory, file) => {
 };
 
 export default async function indexObject(options = {}) {
-    let {clientOptions, ormOptions = {}, dangerouslyDropKeyspaceBeforeUse, ..._options} = options;
+    let {clientOptions, ormOptions = {}, dangerouslyDropKeyspaceBeforeUse, directories, ..._options} = options;
     if (!clientOptions) {
         clientOptions = _options;
     } else if (dangerouslyDropKeyspaceBeforeUse == null) {
@@ -90,6 +90,7 @@ export default async function indexObject(options = {}) {
                 }
             }
         }
+        //if udts we'll do them now.
         if (udts && Object.keys(udts).length) {
             client.orm._options.udts = udts;
             await waitFor(client.orm._assert_user_defined_types, client.orm);
@@ -105,6 +106,13 @@ export default async function indexObject(options = {}) {
             }
         }
     };
+
+    if (directories) {
+        directories = typeof directories == 'string' ? directories.split(/,\s*/) : directories;
+        for (const dir of directories) {
+            await client.registerDirectoryAsync(dir);
+        }
+    }
 
     return client;
 };
