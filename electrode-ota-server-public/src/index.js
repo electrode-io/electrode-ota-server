@@ -1,15 +1,14 @@
 import _inert from 'inert';
 import path from 'path';
 
-function register(server, _options, next) {
-    const {inert = {}, config = {}, ...options} = _options;
+function register(server, {inert = {}, config = {}, ...options}, next) {
     server.register(_inert, inert, function (e, o) {
 
         options.config = config;
         if (!config.handler) {
             config.handler = {};
         }
-        if (config.handler.directory) {
+        if (!config.handler.directory) {
             config.handler.directory = {};
         }
         if (!config.handler.directory.path) {
