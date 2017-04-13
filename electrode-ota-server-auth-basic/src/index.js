@@ -16,7 +16,7 @@ const authentication = function (server, options) {
 
             const authorization = request.headers && request.headers.authorization;
             if (realm && authorization == null) {
-                return reply(notAuthorized('No Credentials Given', 'Basic', unauthorizedAttributes));
+                return reply(notAuthorized(false, 'No Credentials Given', 'Basic', unauthorizedAttributes));
             }
 
             const [authType, authValue] = authorization.split(/\s+/, 2);
@@ -44,7 +44,7 @@ const authentication = function (server, options) {
                 }
 
                 if (!isValid) {
-                    return reply(notAuthorized('Bad username or password', 'Basic', unauthorizedAttributes), null, {credentials: credentials});
+                    return reply(notAuthorized(false, 'Bad username or password', 'Basic', unauthorizedAttributes), null, {credentials: credentials});
                 }
 
                 if (!credentials || typeof credentials !== 'object') {

@@ -10,7 +10,7 @@ It is not meant to be used standalone, use at your own risk.
 
 ## Install
 ```
-$ npm install electrode-ota-server-auth-ldap
+$ npm install electrode-ota-server-auth-ldap --save
 ```
 
 ## Usage

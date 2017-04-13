@@ -5,7 +5,8 @@ const boot = (configDir) => {
     return serverBoot(dirs.concat(
         path.join(require.resolve('electrode-ota-server-default-config'), '..'),
         configDir || process.env.OTA_CONFIG_DIR || path.join(process.cwd(), 'config')));
-}
+};
+
 export default boot;
 
 if (require.main === module) {

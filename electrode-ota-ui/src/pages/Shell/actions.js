@@ -1,4 +1,4 @@
-import history from '../../history';
+import {replace} from '../../history';
 
 export const DISMISS_ERROR = 'DISMISS_ERROR';
 export const NAVIGATE = 'NAVIGATE';
@@ -13,7 +13,7 @@ export const navigate = (to)=> {
             type: NAVIGATE,
             to
         });
-        return history.replace(to);
+        return replace(to);
     }
 
 };

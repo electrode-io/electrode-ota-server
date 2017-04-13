@@ -3,7 +3,12 @@ import path from 'path';
 import {set} from "lodash";
 import fs from 'fs';
 import util from 'electrode-ota-server-util';
+import Module from 'module';
 
+let _module = module;
+while (_module.parent) {
+    _module = _module.parent;
+}
 export const DEFAULT_OTA_SERVER_DIRS = [
     path.join(require.resolve('electrode-server'), '..', 'config')
 ];
@@ -62,6 +67,8 @@ set a cookie password for this path in your configuration.`);
     const defaults = Confippet.store();
     defaults._$.compose(options);
     defaults._$.use(verify(defaults));
+
+
     return defaults;
 }
 export const bootServer = function (dirs) {

@@ -1,5 +1,5 @@
 import manage from '../util/manage';
-import history from '../history';
+import {replace} from '../history';
 
 export default function sdkAction({dispatch, getState}) {
 	return next => action => {
@@ -34,14 +34,14 @@ export default function sdkAction({dispatch, getState}) {
 			})),
 			reject => dispatch(({
 				...payload,
-				error: reject || {message:'An Error Occurred'},
+				error: reject || {message: 'An Error Occurred'},
 				isError: true,
 				type: receiveType
 			}))
 		);
 		if (navigateTo) {
-			resp.then(resp=> {
-				if (!(resp && resp.isError)) history.replace(navigateTo);
+			resp.then(resp => {
+				if (!(resp && resp.isError)) replace(navigateTo);
 				return resp;
 			})
 		}

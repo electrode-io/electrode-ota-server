@@ -1,4 +1,5 @@
 {
   "name": "mocha",
-  "main": "./index"
+  "main": "./index",
+  "version":"2.5.3"
 }

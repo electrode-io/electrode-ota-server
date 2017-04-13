@@ -2,4 +2,7 @@
 import React from 'react';
 import {Provider} from 'react-redux';
 import Routes from './routes';
-export default ({store})=><Provider store={store}><Routes store={store}/></Provider>;
+
+export default function App(props) {
+	return (<Provider {...props}><Routes {...props}/></Provider>);
+}
