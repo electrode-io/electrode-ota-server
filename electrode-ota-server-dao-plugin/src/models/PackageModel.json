@@ -1,38 +1,38 @@
 {
-    "fields": {
+  "fields": {
     "id_": {
-        "type": "uuid"
+      "type": "uuid"
     },
     "appVersion": "text",
-        "blobUrl": "text",
-        "created_": {
-        "type": "timestamp"
+    "blobUrl": "text",
+    "created_": {
+      "type": "timestamp"
     },
     "description": "text",
-        "diffPackageMap": {
-        "type": "map",
-            "typeDef": "<text, frozen<packagemap>>"
+    "diffPackageMap": {
+      "type": "map",
+      "typeDef": "<text, frozen<packagemap>>"
     },
     "isDisabled": "boolean",
-        "isMandatory": "boolean",
-        "label": "text",
-        "manifestBlobUrl": "text",
-        "originalDeployment": "text",
-        "originalLabel": "text",
-        "packageHash": "text",
-        "releaseMethod": "text",
-        "releasedBy": "text",
-        "rollout": "tinyint",
-        "size": "varint",
-        "uploadTime": "timestamp"
-},
-    "key": [
+    "isMandatory": "boolean",
+    "label": "text",
+    "manifestBlobUrl": "text",
+    "originalDeployment": "text",
+    "originalLabel": "text",
+    "packageHash": "text",
+    "releaseMethod": "text",
+    "releasedBy": "text",
+    "rollout": "tinyint",
+    "size": "varint",
+    "uploadTime": "timestamp"
+  },
+  "key": [
     [
-        "id_"
+      "id_"
     ]
-],
-    "indexes": [
+  ],
+  "indexes": [
     "label"
-],
-    "table_name": "packages"
+  ],
+  "table_name": "packages"
 }

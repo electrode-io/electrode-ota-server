@@ -29,7 +29,7 @@ export const requireRelative = (directory, file) => {
 };
 
 export default async function indexObject(options = {}) {
-    let {clientOptions, ormOptions = {}, dangerouslyDropKeyspaceBeforeUse, directories, ..._options} = options;
+    let {clientOptions, ormOptions = {}, dangerouslyDropKeyspaceBeforeUse, username, password, directories, ..._options} = options;
     if (!clientOptions) {
         clientOptions = _options;
     } else if (dangerouslyDropKeyspaceBeforeUse == null) {
@@ -37,42 +37,55 @@ export default async function indexObject(options = {}) {
         dangerouslyDropKeyspaceBeforeUse = clientOptions.dangerouslyDropKeyspaceBeforeUse;
 
     }
+    if ((username || password) && !clientOptions.authProvider) {
+        clientOptions = {
+            ...clientOptions,
+            authProvider: {
+                provider: 'DsePlainTextAuthProvider',
+                auth: [username, password]
+            }
+        }
+    }
     const conf = {
         clientOptions: Object.assign({}, CLIENT_OPTIONS, clientOptions, {dangerouslyDropKeyspaceBeforeUse: void(0)}),
         ormOptions: Object.assign({udts: {}}, ORM_OPTIONS, ormOptions)
     };
+    clientOptions = conf.clientOptions;
 
-    if (conf.authProvider && models.driver.auth[conf.authProvider.provider]) {
-        if (conf.authProvider.provider) {
-            if (Array.isArray(conf.authProvider.auth)) {
-                conf.authProvider = new models.driver.auth[conf.authProvider.provider](...conf.authProvider.auth);
+    if (clientOptions.authProvider && models.driver.auth[clientOptions.authProvider.provider]) {
+        if (clientOptions.authProvider.provider) {
+            if (Array.isArray(clientOptions.authProvider.auth)) {
+                clientOptions.authProvider = new models.driver.auth[clientOptions.authProvider.provider](...clientOptions.authProvider.auth);
             } else {
-                conf.authProvider = new models.driver.auth[conf.authProvider.provider](conf.authProvider.auth);
+                clientOptions.authProvider = new models.driver.auth[clientOptions.authProvider.provider](clientOptions.authProvider.auth);
             }
         }
     }
 
     console.log(`[expresss-cassandra] using keyspace ${conf.clientOptions.keyspace} ${__dirname}/models`);
     let client = await models.createClient(conf);
-    const connection = await client.connectAsync();
+
+    let connection = await client.connectAsync();
 
     if (dangerouslyDropKeyspaceBeforeUse === true) {
-        console.log(`dropping keyspace ${conf.clientOptions.keyspace}`);
+        console.log(`dropping keyspace ${conf.clientOptions.keyspace} [if it exists]`);
         try {
-            const raw = connection._get_system_client();
-            await  raw.executeAsync(`DROP KEYSPACE ${conf.clientOptions.keyspace}`);
+            await connection._get_system_client().executeAsync(`DROP KEYSPACE IF EXISTS ${conf.clientOptions.keyspace}`);
         } catch (e) {
+            console.log(`Error droping ${conf.clientOptions.keyspace}`)
             console.trace(e);
         } finally {
             try {
                 await client.close();
             } finally {
                 client = await models.createClient(conf);
-                await client.connectAsync();
+                connection = await client.connectAsync();
             }
         }
     }
-
+    client.executeAsync = function (...params) {
+        return connection._get_system_client().executeAsync(...params);
+    };
     client.registerDirectoryAsync = async function (directory) {
         //first udts.
         let udts = client.orm._options.udts;

@@ -1,0 +1,14 @@
+{
+  "fields": {
+    "name": "text",
+    "users": {
+      "type": "map",
+      "typeDef": "<text, frozen<\"Permission\">>"
+    }
+  },
+  "key": [
+    [
+      "name"
+    ]
+  ]
+}
