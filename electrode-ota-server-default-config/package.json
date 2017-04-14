@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-default-config",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "OTA Default Configuration",
   "main": "lib/index.js",
   "scripts": {
@@ -10,32 +10,32 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-auth": "^1.6.1",
-    "electrode-ota-server-auth-github": "^1.6.1",
-    "electrode-ota-server-auth-validate": "^1.6.1",
-    "electrode-ota-server-dao-cassandra": "^1.6.1",
-    "electrode-ota-server-dao-plugin": "^1.6.1",
-    "electrode-ota-server-diregister": "^1.6.1",
-    "electrode-ota-server-errors": "^1.6.1",
-    "electrode-ota-server-model-account": "^1.6.1",
-    "electrode-ota-server-model-acquisition": "^1.6.1",
-    "electrode-ota-server-model-app": "^1.6.1",
-    "electrode-ota-server-model-manifest": "^1.6.1",
-    "electrode-ota-server-model-weighted": "^1.6.1",
-    "electrode-ota-server-public": "^1.6.1",
-    "electrode-ota-server-routes-accesskeys": "^1.6.1",
-    "electrode-ota-server-routes-acquisition": "^1.6.1",
-    "electrode-ota-server-routes-apps": "^1.6.1",
-    "electrode-ota-server-routes-auth": "^1.6.1",
-    "electrode-ota-server-service-errors": "^1.6.1",
-    "electrode-ota-server-service-fileservice": "^1.6.1",
-    "electrode-ota-server-fileservice-upload": "^1.6.1",
-    "electrode-ota-server-fileservice-download": "^1.6.1",
-    "electrode-ota-server-service-management": "^1.6.1",
-    "electrode-ota-server-util": "^1.6.1",
-    "electrode-ota-server-view": "^1.6.1"
+    "electrode-ota-server-auth": "^1.6.2",
+    "electrode-ota-server-auth-github": "^1.6.2",
+    "electrode-ota-server-auth-validate": "^1.6.2",
+    "electrode-ota-server-dao-cassandra": "^1.6.2",
+    "electrode-ota-server-dao-plugin": "^1.6.2",
+    "electrode-ota-server-diregister": "^1.6.2",
+    "electrode-ota-server-errors": "^1.6.2",
+    "electrode-ota-server-model-account": "^1.6.2",
+    "electrode-ota-server-model-acquisition": "^1.6.2",
+    "electrode-ota-server-model-app": "^1.6.2",
+    "electrode-ota-server-model-manifest": "^1.6.2",
+    "electrode-ota-server-model-weighted": "^1.6.2",
+    "electrode-ota-server-public": "^1.6.2",
+    "electrode-ota-server-routes-accesskeys": "^1.6.2",
+    "electrode-ota-server-routes-acquisition": "^1.6.2",
+    "electrode-ota-server-routes-apps": "^1.6.2",
+    "electrode-ota-server-routes-auth": "^1.6.2",
+    "electrode-ota-server-service-errors": "^1.6.2",
+    "electrode-ota-server-service-fileservice": "^1.6.2",
+    "electrode-ota-server-fileservice-upload": "^1.6.2",
+    "electrode-ota-server-fileservice-download": "^1.6.2",
+    "electrode-ota-server-service-management": "^1.6.2",
+    "electrode-ota-server-util": "^1.6.2",
+    "electrode-ota-server-view": "^1.6.2"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^1.6.1"
+    "electrode-ota-server-util-dev": "^1.6.2"
   }
 }

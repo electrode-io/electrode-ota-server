@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-demo",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "electrode-ota-server": "^1.6.1"
+    "electrode-ota-server": "^1.6.2"
   }
 }
