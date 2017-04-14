@@ -3,7 +3,6 @@
   "version": "2.0.0-beta",
   "description": "",
   "main": "lib/index.js",
-  "license": "ISC",
   "dependencies": {
     "babel-cli": "^6.24.1",
     "babel-core": "^6.24.1",

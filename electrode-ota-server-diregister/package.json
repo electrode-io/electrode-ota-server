@@ -4,7 +4,6 @@
   "description": "Additional Dependency for Electrode OTA",
   "main": "lib/index.js",
   "author": "",
-  "license": "ISC",
   "scripts": {
     "test": "ota-mocha",
     "build": "ota-babel",

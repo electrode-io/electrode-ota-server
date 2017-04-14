@@ -7,7 +7,6 @@
   "dependencies": {},
   "repository": "https://github.com/electrode-io/electrode-ota-ui",
   "author": "Justin Spears <speajus@gmail.com>",
-  "license": "Apache-2.0",
   "devDependencies": {
     "autoprefixer": "^6.7.7",
     "babel-core": "^6.24.1",

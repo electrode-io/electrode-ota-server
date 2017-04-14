@@ -10,7 +10,6 @@
     "prepublish": "npm run build"
   },
   "author": "",
-  "license": "ISC",
   "dependencies": {
     "electrode-ota-server-diregister": "^2.0.0-beta",
     "electrode-ota-server-util": "^2.0.0-beta",
