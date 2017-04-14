@@ -1,0 +1,38 @@
+{
+  "plugins": {
+    "electrode-ota-server-dao-cassandra": {
+      "options": {
+        "contactPoints": [
+          "localhost"
+        ],
+        "keyspace": "ota_db_2"
+      }
+    },
+    "electrode-ota-server-fileservice":{
+      "options": {
+        "downloadUrl": "http://localhost.<yourhost>.com:9001/storagev2/"
+      }
+    },
+    "electrode-ota-server-auth": {
+      "options": {
+        "strategy": {
+          "github-oauth": {
+            "options": {
+              "isSecure": false,
+              "location":"http://<yourhost>.walmart.com:9001",
+              "password": "<password>",
+              "clientId": "<clientId>",
+              "clientSecret": "<clientSecret>"
+            }
+          },
+          "session": {
+            "options": {
+              "isSecure": false
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
