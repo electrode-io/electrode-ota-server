@@ -2,6 +2,8 @@
 **/dist
 converage
 **/coverage
+**/.private.json
+.private.json
 dist
 lib
 **/lib
@@ -12,7 +14,6 @@ publish
 users.out
 config/development.json
 .random.json
-example
 test/sample/react-native-code-push
 lerna-debug.log
 npm-debug.log

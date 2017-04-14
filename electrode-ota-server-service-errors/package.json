@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-service-errors",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -9,10 +9,10 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-diregister":"1.0.0",
-    "electrode-ota-server-util":"1.0.0"
+    "electrode-ota-server-diregister": "^1.5.0",
+    "electrode-ota-server-util": "^1.5.0"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev":"1.0.0"
+    "electrode-ota-server-util-dev": "^1.5.0"
   }
 }

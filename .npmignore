@@ -1,4 +1,6 @@
 */.DS_Store
+*/.private.json
+.private.json
 .DS_Store
 .random.json
 .idea

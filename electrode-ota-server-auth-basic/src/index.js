@@ -1,4 +1,5 @@
 import {notAuthorized, Boom} from 'electrode-ota-server-errors';
+
 const {badRequest, badImplementation} = Boom;
 
 export const register = (plugin, options, next) => {
