@@ -1,0 +1,15 @@
+{
+  "name": "electrode-ota-server-demo-with-ui",
+  "version": "1.7.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "NODE_ENV=development node $NODE_DEBUG_OPTION ./node_modules/electrode-ota-server/index"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electrode-ota-server": "^1.7.1",
+    "electrode-ota-server-manager": "^1.7.1"
+  }
+}

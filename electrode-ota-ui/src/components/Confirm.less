@@ -1,0 +1,51 @@
+.container {
+//  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.show .blockout {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  display: block;
+  -webkit-filter: blur(3px);
+  background-color: silver;
+  opacity: .6;
+  z-index: 99;
+}
+.hide {
+
+}
+.show .message {
+  opacity: .99;
+  top: 50%;
+  transition: opacity 0.3s ease-in, top 0.3s ease-in, background 0.3s ease-in;
+  z-index: 100;
+  pointer-events: all;
+
+}
+
+.message {
+  position: absolute;
+  background: rgba(255, 255, 255, .9);
+  border: 2px solid rgba(128, 128, 128, .5);
+  top: 0%;
+  display: inline-block;
+  z-index: -100;
+  white-space: nowrap;
+  vertical-align: middle;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  opacity: .01;
+  transition: opacity 0.3s ease-in, top 0.3s ease-in, background 0.3s ease-in;
+  font-weight: 600;
+  margin: 0 auto;
+  left: 50%;
+  padding: 5px;
+  border-radius: 5px;
+  padding:1% 10%;
+  // width: 100%;
+}

@@ -1,0 +1,15 @@
+{
+  "fields": {
+    "id_": "uuid",
+    "name": "text",
+    "props": {
+      "type": "list",
+      "typeDef": "<frozen <keyval>>"
+    }
+  },
+  "key": [
+    [
+      "id_"
+    ]
+  ]
+}

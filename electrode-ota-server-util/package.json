@@ -1,0 +1,19 @@
+{
+  "name": "electrode-ota-server-util",
+  "version": "1.7.1",
+  "description": "OTA Utils",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "ota-mocha",
+    "build": "ota-babel",
+    "coverage": "ota-nyc",
+    "prepublish": "npm run build"
+  },
+  "dependencies": {
+    "randomstring": "^1.1.5",
+    "electrode-ota-server-diregister": "^1.7.1"
+  },
+  "devDependencies": {
+    "electrode-ota-server-util-dev": "^1.7.1"
+  }
+}
