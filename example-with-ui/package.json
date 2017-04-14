@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-demo-with-ui",
-  "version": "1.7.1",
+  "version": "2.0.0-beta",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "electrode-ota-server": "^1.7.1",
-    "electrode-ota-server-manager": "^1.7.1"
+    "electrode-ota-server": "^2.0.0-beta",
+    "electrode-ota-server-manager": "^2.0.0-beta"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-util-dev",
-  "version": "1.7.1",
+  "version": "2.0.0-beta",
   "description": "",
   "main": "lib/index.js",
   "license": "ISC",
