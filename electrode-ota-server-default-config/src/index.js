@@ -1,4 +1,5 @@
 import path from 'path';
+import TTY from 'tty';
 const root = path.join.bind(path, __dirname, '..');
 const dao = process.env.DAO || 'cassandra';
 const _resolve = function (mod, lib) {
@@ -56,7 +57,8 @@ export default function () {
                     "contactPoints": [
                         "localhost"
                     ],
-                    "keyspace": "wm_ota"
+                    "keyspace": "wm_ota",
+                    "disableTTYConfirmation": !TTY.isatty()
                 }
             },
             "electrode-ota-server-dao-plugin": {},
