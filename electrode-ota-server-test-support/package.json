@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-test-support",
-  "version": "1.6.2",
+  "version": "1.7.0",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "boom": "^4.3.1",
-    "electrode-ota-server-util": "^1.6.2",
+    "electrode-ota-server-util": "^1.7.0",
     "supertest": "^3.0.0"
   },
   "peerDependencies": {
@@ -18,6 +18,6 @@
     "electrode-ota-server-dao-cassandra": "1.0.0"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^1.6.2"
+    "electrode-ota-server-util-dev": "^1.7.0"
   }
 }

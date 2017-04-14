@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-manager",
-  "version": "1.6.2",
+  "version": "1.7.0",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -9,12 +9,12 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-diregister": "^1.6.2",
-    "electrode-ota-server-util": "^1.6.2",
-    "electrode-ota-ui": "^1.6.2",
+    "electrode-ota-server-diregister": "^1.7.0",
+    "electrode-ota-server-util": "^1.7.0",
+    "electrode-ota-ui": "^1.7.0",
     "inert": "^4.0.1"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^1.6.2"
+    "electrode-ota-server-util-dev": "^1.7.0"
   }
 }
