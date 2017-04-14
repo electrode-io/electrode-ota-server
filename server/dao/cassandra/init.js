@@ -19,7 +19,9 @@ module.exports = function (conf = {contactPoints: ['localhost'], keyspace: 'ota'
         ret = ret.then(()=>cp(`use ${keyspace};`));
         return ret;
     };
-    const drop = ()=>new Promise((resolve, reject)=>client.execute(`drop KEYSPACE ${keyspace} ;`, (e)=>e ? resolve() : resolve()));
+    const drop = ()=>new Promise((resolve, reject)=>client.execute(`drop KEYSPACE ${keyspace} ;`, (e,o)=>{
+        e ? resolve() : resolve()
+    }));
 
     const reset = ()=>new Promise((resolve, reject)=> {
         client.connect((e)=> {

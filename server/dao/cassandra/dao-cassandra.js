@@ -3,17 +3,17 @@
 const BaseCassandra = require('./base-cassandra');
 const {promiseMap, reducer, remove} = require('../../util');
 const {alreadyExistsMsg} = require('../../model/errors');
-const historySort = history=> history && history.sort((a, b)=>b.created_.getTime() - a.created_.getTime());
+const historySort = history => history && history.sort((a, b) => b.created_.getTime() - a.created_.getTime());
 
 const removeCreated = v => {
-    v && v.forEach(b=>delete b.created_);
+    v && v.forEach(b => delete b.created_);
     return v;
 };
-const asKey = v=>v && v.key;
+const asKey = v => v && v.key;
 
-const asKeyAll = (v, arr)=> v.key && arr.push(v.key);
+const asKeyAll = (v, arr) => v.key && arr.push(v.key);
 
-const historyAll = (v, arr)=> v.history_ && arr.push(...v.history_);
+const historyAll = (v, arr) => v.history_ && arr.push(...v.history_);
 
 const PACKAGE_FIELDS = [
     "appVersion",
@@ -56,9 +56,9 @@ class DaoCassandra extends BaseCassandra {
 
     createUser({email, name, accessKeys = {}, linkedProviders = ['GitHub']}) {
         const id = uuid() + '';
-        return this._first(`INSERT INTO users (email, name, "accessKeys", "linkedProviders", id, "createdTime") VALUES ( ?, ?,?, ?, ?, toUnixTimestamp(now())) IF NOT EXISTS`,
-            [email, name, accessKeys, linkedProviders, id], insertError)
-            .then(dne=> alreadyExistsMsg(dne, `User already exists ${email}`))
+        return this._first(`INSERT INTO users (email, name, "accessKeys", "linkedProviders", id, "createdTime") VALUES ( ?, ?,?, ?, ?, ?) IF NOT EXISTS`,
+            [email, name, accessKeys, linkedProviders, id, Date.now()], insertError)
+            .then(dne => alreadyExistsMsg(dne, `User already exists ${email}`))
             .then(ret => this.userById(id));
 
     }
@@ -66,18 +66,18 @@ class DaoCassandra extends BaseCassandra {
     createApp({name, deployments = {}, collaborators}) {
         const id = uuid();
         return this._first(`INSERT INTO apps (name, collaborators, id, deployments) values (?,?,?,?)`, [name, collaborators, id, Object.keys(deployments)])
-            .then(_=>Promise.all(Object.keys(deployments).map(d=>this.addDeployment(id, d, deployments[d]))))
-            .then(_=>this.appById(id));
+            .then(_ => Promise.all(Object.keys(deployments).map(d => this.addDeployment(id, d, deployments[d]))))
+            .then(_ => this.appById(id));
     }
 
     updateApp(id, {name, collaborators}) {
 
         return this._first(`UPDATE apps SET name=?,  collaborators=? WHERE id = ?`, [name, collaborators, id])
-            .then(_ =>this.appById(id));
+            .then(_ => this.appById(id));
     }
 
     _deploymentsByAppId(appId) {
-        return this._first(`SELECT deployments FROM apps WHERE id = ?`, [appId], r=>r.deployments);
+        return this._first(`SELECT deployments FROM apps WHERE id = ?`, [appId], r => r.deployments);
     }
 
     _deploymentKeyByAppAndName(appId, deploymentName) {
@@ -86,13 +86,13 @@ class DaoCassandra extends BaseCassandra {
 
     _deploymentByAppAndName(appId, deploymentName) {
         return this._deploymentKeyByAppAndName(appId, deploymentName)
-            .then(key=>this._first(`SELECT * FROM deployments WHERE key = ?`, [key]));
+            .then(key => this._first(`SELECT * FROM deployments WHERE key = ?`, [key]));
     }
 
     addDeployment(appId, name, {key}) {
         return this._deploymentsByAppId(appId)
             .then(deployments => this._batch([
-                q(`INSERT INTO deployments ("createdTime", id, name, key) VALUES ( toUnixTimestamp(now()),  now(), ?, ?)`, name, key),
+                q(`INSERT INTO deployments ("createdTime", id, name, key) VALUES (?,  now(), ?, ?)`, Date.now(), name, key),
                 q(`INSERT INTO deployments_app_name (key, app, name) VALUES (?, ? , ?)`, key, appId, name),
                 q(`UPDATE apps SET deployments = ? WHERE id = ?`, deployments ? deployments.concat(name) : [name], appId)
             ]));
@@ -102,8 +102,8 @@ class DaoCassandra extends BaseCassandra {
 
     removeDeployment(appId, deploymentName) {
         return this._deploymentsByAppId(appId)
-            .then((dep)=>this._deploymentKeyByAppAndName(appId, deploymentName)
-                .then(key=>this._first(`SELECT key, history_ FROM deployments WHERE key = ?`, [key]))
+            .then((dep) => this._deploymentKeyByAppAndName(appId, deploymentName)
+                .then(key => this._first(`SELECT key, history_ FROM deployments WHERE key = ?`, [key]))
                 .then(({key, history_}) => {
                     const batch = [
                         q(`DELETE FROM deployments_app_name WHERE app = ? AND name = ?`, appId, deploymentName),
@@ -131,8 +131,8 @@ class DaoCassandra extends BaseCassandra {
 
     addPackage(deploymentKey, pkg) {
         const {params, update} = updater(PACKAGE_FIELDS, pkg);
-        return this._first(`SELECT history_ FROM deployments WHERE key = ?`, [deploymentKey], v=>v ? v.history_ : [])
-            .then(history=> {
+        return this._first(`SELECT history_ FROM deployments WHERE key = ?`, [deploymentKey], v => v ? v.history_ : [])
+            .then(history => {
                 const pkgId = tuuid();
 
                 //add pkgId first.
@@ -143,23 +143,23 @@ class DaoCassandra extends BaseCassandra {
                 }
                 return this._batch([
                     q(`UPDATE deployments SET history_ = ?  WHERE key = ?`, history, deploymentKey),
-                    q(`UPDATE packages SET created_ = toUnixTimestamp(now()), ${update} WHERE "id_" = ?`, ...params, pkgId)
-                ]).then(_=>this._first(`SELECT * FROM packages WHERE id_ = ?`, [pkgId]));
+                    q(`UPDATE packages SET created_ = ?, ${update} WHERE "id_" = ?`, Date.now(), ...params, pkgId)
+                ]).then(_ => this._first(`SELECT * FROM packages WHERE id_ = ?`, [pkgId]));
             });
     }
 
     updatePackage(deploymentKey, pkg, label) {
         const {params, update} = updater(PACKAGE_UPDATE_FIELDS, pkg);
-        return this._first(`SELECT history_ FROM deployments WHERE key = ? `, [deploymentKey], v=>v.history_ || []).then((ids)=> {
+        return this._first(`SELECT history_ FROM deployments WHERE key = ? `, [deploymentKey], v => v.history_ || []).then((ids) => {
 
             if (label) {
                 const qp = [...params, ids, label];
                 return this._first(`UPDATE packages SET ${update} WHERE "id_" in ? AND label = ?`, qp)
-                    .then(_=>this._first(`SELECT * FROM packages WHERE id_ in ? AND label = ?`, qp));
+                    .then(_ => this._first(`SELECT * FROM packages WHERE id_ in ? AND label = ?`, qp));
             } else {
                 const qp = [...params, ids[0]];
                 return this._first(`UPDATE packages SET  ${update} WHERE "id_" = ?`, qp)
-                    .then(_=>this._first(`SELECT * FROM packages WHERE id_ = ?`, [ids[0]]));
+                    .then(_ => this._first(`SELECT * FROM packages WHERE id_ = ?`, [ids[0]]));
             }
         });
     }
@@ -167,12 +167,12 @@ class DaoCassandra extends BaseCassandra {
 
     updateUser(currentEmail, {name, email, accessKeys, linkedProviders}) {
         return this._first(`UPDATE users SET name=?, "accessKeys"=?, "linkedProviders"=? WHERE email= ?`, [name, accessKeys, linkedProviders, currentEmail])
-            .then(_=>this.userByEmail(email));
+            .then(_ => this.userByEmail(email));
     }
 
     history(appId, deploymentName) {
         return this._deploymentByAppAndName(appId, deploymentName)
-            .then(deployment=>deployment.history_ ? this._all(`SELECT * FROM packages WHERE id_ IN ?`, [deployment.history_]).then(historySort).then(removeCreated) : []);
+            .then(deployment => deployment.history_ ? this._all(`SELECT * FROM packages WHERE id_ IN ?`, [deployment.history_]).then(historySort).then(removeCreated) : []);
     }
     historyByIds(historyIds){
         if (historyIds == null || historyIds.length == 0){
@@ -188,7 +188,7 @@ class DaoCassandra extends BaseCassandra {
      */
     clearHistory(appId, deploymentName) {
         return this._deploymentByAppAndName(appId, deploymentName)
-            .then(deployment=>deployment.history_ ? this._first(`DELETE FROM packages WHERE id_ in ?`, [deployment.history_]) : []);
+            .then(deployment => deployment.history_ ? this._first(`DELETE FROM packages WHERE id_ in ?`, [deployment.history_]) : []);
 
     }
 
@@ -197,7 +197,7 @@ class DaoCassandra extends BaseCassandra {
          * Because we can' use in query....
          */
         return this._deploymentByAppAndName(appId, deploymentName)
-            .then(deployment=>deployment.history_ && this._all(`SELECT * FROM packages WHERE id_ IN ?`, [deployment.history_]).then(pkgs=>pkgs && pkgs.find(v=>v.label == label)));
+            .then(deployment => deployment.history_ && this._all(`SELECT * FROM packages WHERE id_ IN ?`, [deployment.history_]).then(pkgs => pkgs && pkgs.find(v => v.label == label)));
     }
 
     packageById(pkg) {
@@ -208,9 +208,9 @@ class DaoCassandra extends BaseCassandra {
     removeApp(appId) {
 
         return this._all(`SELECT key FROM deployments_app_name  WHERE app = ?`, [appId], asKeyAll)
-            .then(keys=> {
+            .then(keys => {
                 return this._all(`SELECT history_ FROM deployments WHERE key IN  ?`, [keys], historyAll)
-                    .then(packages=> {
+                    .then(packages => {
                         const batch = [
                             q(`DELETE FROM deployments_app_name WHERE app = ?`, appId),
                             q(`DELETE FROM apps WHERE id = ?`, appId)
@@ -253,7 +253,7 @@ class DaoCassandra extends BaseCassandra {
     }
 
     download(packageHash) {
-        return this._first(`SELECT content FROM packages_content WHERE "packageHash" = ? `, [packageHash]).then(v=>v.content);
+        return this._first(`SELECT content FROM packages_content WHERE "packageHash" = ? `, [packageHash]).then(v => v.content);
     }
 
     deploymentForKey(deploymentKey) {
@@ -268,12 +268,12 @@ class DaoCassandra extends BaseCassandra {
 
     deploymentsByApp(appId, deployments) {
         return this._all(`select key,name FROM deployments_app_name WHERE app = ? AND name IN ?`, [appId, deployments])
-            .then(deps=>promiseMap(reducer(deps, (ret, d)=> (ret[d.name] = this.deploymentForKey(d.key)))));
+            .then(deps => promiseMap(reducer(deps, (ret, d) => (ret[d.name] = this.deploymentForKey(d.key)))));
     }
 
     deploymentByApp(appId, deployment) {
         return this._first(`select key,name FROM deployments_app_name WHERE app = ? AND name = ?`, [appId, deployment])
-            .then(d=>d && this.deploymentForKey(d.key));
+            .then(d => d && this.deploymentForKey(d.key));
 
     }
 
@@ -287,7 +287,7 @@ class DaoCassandra extends BaseCassandra {
 
     appForDeploymentKey(deploymentKey) {
         return this._first(`select app FROM deployments_app_name WHERE key = ?`, [deploymentKey])
-            .then(({app})=>this.appById(app));
+            .then(({app}) => this.appById(app));
     }
 
     /*  appVersion text,
@@ -329,7 +329,7 @@ class DaoCassandra extends BaseCassandra {
        "clientUniqueId",
        "packageHash",
        ratio,
-       updated) values (toUnixTimestamp(now()), ?,?,?,?)`, [clientUniqueId, packageHash, ratio, updated]);
+       updated) values (?, ?,?,?,?)`, [Date.now(), clientUniqueId, packageHash, ratio, updated]);
     }
 
 }

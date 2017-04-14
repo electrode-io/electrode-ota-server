@@ -24,8 +24,11 @@
             "enable": false
           },
           "session": {
-            "isSecure": false,
-            "password": "aasd123123mnl1kj31lk2312l3n1l2312l3kn12l3n12n312kj3n12kj3n12k3jn12k3n12k3n"
+            "options": {
+              "isSecure": false,
+              "isHttpOnly": false,
+              "password": "aasd123123mnl1kj31lk2312l3n1l2312l3kn12l3n12n312kj3n12kj3n12k3jn12k3n12k3n"
+            }
           },
           "basic": {
             "module": "../../test/support/basic.js",
