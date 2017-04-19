@@ -5,6 +5,25 @@ is API compatible with [code-push-cli](https://microsoft.github.io/code-push/doc
 [Code Push React Native SDK](https://microsoft.github.io/code-push/docs/react-native.html) and the [Code Push Cordova SDK](https://microsoft.github.io/code-push/docs/cordova.html).
 
 
+##Upgrade
+Version 2 adds partial update support.  To do this it requires some alterations to the cassandra database.  This
+will happen automatically, unless the configuration to the electrode-ota-dao-cassandra is configured as
+```json
+
+ "electrode-ota-server-dao-cassandra": {
+                "options": {
+                    ...
+                    "disableTTYConfirmation": false,
+                    //this is alter by default.
+                    "migration: 'safe',
+                }
+            }
+ }
+
+```
+Make sure to backup your data, while not known to cause data loss, it is possible.
+
+
 ![OTA: Overview](./docs/img/OV1.png)
 
 ##Installation
