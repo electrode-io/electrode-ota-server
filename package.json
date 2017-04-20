@@ -13,7 +13,7 @@
     "rebuild": "lerna clean --yes && lerna bootstrap  --include-filtered-dependencies && npm run relink ",
     "relink": "lr-link && lr-idea",
     "lerna": "npm run rebuild",
-    "test": "mocha --compilers js:./electrode-ota-server-util-dev/babelhook ./electrode-ota-server*/test/*-test.js",
+    "test": "npm run lerna && mocha --compilers js:./electrode-ota-server-util-dev/babelhook ./electrode-ota-server*/test/*-test.js",
     "coverage": "./node_modules/.bin/nyc --sourceMap=false --reportDir=./coverage --instrument=false --all --include=./electrode-ota-server*/src/**/*.js mocha --compilers js:./electrode-ota-server-util-dev/babelhook-coverage  ./electrode-ota-server*/test/*-test.js  && nyc report --reporter=html"
   },
   "bin": {
