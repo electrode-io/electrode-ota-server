@@ -1,5 +1,7 @@
 */.DS_Store
 */.private.json
+.npmrc
+*/.npmrc
 .private.json
 .DS_Store
 .random.json
