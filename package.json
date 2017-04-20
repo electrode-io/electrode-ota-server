@@ -10,10 +10,10 @@
   "homepage": "https://github.com/electrode-io/electrode-ota-server",
   "main": "index.js",
   "scripts": {
-    "rebuild": "lerna clean --yes && lerna bootstrap  --include-filtered-dependencies && npm run relink ",
+    "rebuild": "lerna clean --yes && lerna bootstrap  --include-filtered-dependencies && yarn run relink ",
     "relink": "lr-link && lr-idea",
-    "lerna": "npm run rebuild",
-    "test": "npm run lerna && mocha --compilers js:./electrode-ota-server-util-dev/babelhook ./electrode-ota-server*/test/*-test.js",
+    "lerna": "yarn run rebuild",
+    "test": "yarn run lerna && mocha --compilers js:./electrode-ota-server-util-dev/babelhook ./electrode-ota-server*/test/*-test.js",
     "coverage": "./node_modules/.bin/nyc --sourceMap=false --reportDir=./coverage --instrument=false --all --include=./electrode-ota-server*/src/**/*.js mocha --compilers js:./electrode-ota-server-util-dev/babelhook-coverage  ./electrode-ota-server*/test/*-test.js  && nyc report --reporter=html"
   },
   "bin": {
@@ -42,9 +42,8 @@
     "babel-preset-node6": "^11.0.0",
     "babel-register": "^6.24.1",
     "chai": "^3.5.0",
-    "code-push": "^1.10.2-beta",
     "lerna": "^2.0.0-rc.2",
-    "lerna-relinker": "^1.1.1",
+    "lerna-relinker": "latest",
     "mocha": "^2.5.3",
     "nyc": "^10.2.0",
     "rimraf": "^2.5.4",
