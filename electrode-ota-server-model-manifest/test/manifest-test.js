@@ -52,7 +52,7 @@ describe('manifest', function () {
 
     });
 
-    it('should generate diffPackageMap', function () {
+    it.skip('should generate diffPackageMap', function () {
         const blobs = {}, hashes = {}, manifests = {};
         const test = history.map((obj, i) => {
             const ret = Object.assign({}, obj);
