@@ -18,15 +18,9 @@ boom@3.x.x:
   dependencies:
     hoek "4.x.x"
 
-boom@4.2.x:
+boom@4.2.x, boom@4.x.x, "boom@>=2.8 <5", boom@^4.1.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/boom/-/boom-4.2.0.tgz#c1a74174b11fbba223f6162d4fd8851a1b82a536"
-  dependencies:
-    hoek "4.x.x"
-
-boom@4.x.x, "boom@>=2.8 <5", boom@^4.1.0:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/boom/-/boom-4.3.1.tgz#4f8a3005cb4a7e3889f749030fd25b96e01d2e31"
   dependencies:
     hoek "4.x.x"
 

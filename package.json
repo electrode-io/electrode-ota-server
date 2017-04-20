@@ -29,7 +29,10 @@
     "react-native",
     "cordova"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "lerna": "^2.0.0-rc.2",
+    "lerna-relinker": "^1.2.2"
+   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-core": "^6.24.1",
@@ -42,8 +45,6 @@
     "babel-preset-node6": "^11.0.0",
     "babel-register": "^6.24.1",
     "chai": "^3.5.0",
-    "lerna": "^2.0.0-rc.2",
-    "lerna-relinker": "latest",
     "mocha": "^2.5.3",
     "nyc": "^10.2.0",
     "rimraf": "^2.5.4",
