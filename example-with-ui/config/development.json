@@ -1,0 +1,69 @@
+{
+  "plugins": {
+    "electrode-ota-server-dao-cassandra": {
+      "options": {
+        "contactPoints": [
+          "localhost"
+        ],
+        "keyspace": "ota_db_2"
+      }
+    },
+    "electrode-ota-server-fileservice": {
+      "options": {
+        "downloadUrl": "http://localhost.walmart.com:9001/storagev2/"
+      }
+    },
+    "electrode-ota-server-auth": {
+      "options": {
+        "strategy": {
+          "github-oauth": {
+            "options": {
+              "isSecure": false,
+              "location": "http://localhost.walmart.com:9001",
+              "password": "LUaqMX6btxqKQ6fWiwt9PY7uCjVVpkKxfx0t2tSV",
+              "clientId": "4e71c4709e55261bd612",
+              "clientSecret": "f3d4ab9be03e0921ebd661980464c91785963e5c"
+            }
+          },
+          "session": {
+            "options": {
+              "isSecure": false
+            }
+          }
+        }
+      }
+    },
+    "electrode-ota-server-routes-auth": {
+      "options": {
+        "providers": [
+          {
+            "name": "github",
+            "auth": "github-oauth",
+            "label": "GitHub",
+            "icon": {
+              "src": "https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png",
+              "height": 50,
+              "width": 50
+            }
+          },
+          {
+            "name": "manager/login",
+            "auth": "github-oauth",
+            "label": "Management",
+            "redirectTo": "/manager",
+            "canRegister":false,
+            "icon": {
+              "src":"/manager/assets/electrode-logo.png",
+              "height": 50,
+              "width": 50
+            }
+          }
+        ]
+      }
+    },
+    "electrode-ota-server-manager": {
+      "module":"./node_modules/electrode-ota-server-manager"
+    }
+  }
+}
+

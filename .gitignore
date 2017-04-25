@@ -1,4 +1,12 @@
 */.DS_Store
+**/dist
+converage
+**/coverage
+**/.private.json
+.private.json
+dist
+lib
+**/lib
 .DS_Store
 .idea
 node_modules
@@ -6,5 +14,10 @@ publish
 users.out
 config/development.json
 .random.json
-example
 test/sample/react-native-code-push
+lerna-debug.log
+npm-debug.log
+*/npm-debug.log
+.nyc_output
+*/.nyc_output
+.npmrc

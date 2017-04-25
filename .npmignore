@@ -1,4 +1,8 @@
 */.DS_Store
+*/.private.json
+.npmrc
+*/.npmrc
+.private.json
 .DS_Store
 .random.json
 .idea
@@ -11,3 +15,5 @@ test
 server/public/movie.mpg
 docs/img
 test/support/server-ms.js
+test/*
+*/test/*
