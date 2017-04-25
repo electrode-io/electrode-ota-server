@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-auth",
-  "version": "2.0.0-beta",
+  "version": "2.0.0-beta.0",
   "description": "OTA Authentication Configuration",
   "main": "lib/index.js",
   "scripts": {
@@ -11,14 +11,14 @@
   },
   "author": "",
   "dependencies": {
-    "electrode-ota-server-diregister": "^2.0.0-beta",
-    "electrode-ota-server-util": "^2.0.0-beta",
-    "hapi-auth-cookie": "^6.1.1",
-    "hapi-server-session": "^3.0.0",
+    "bell": "^8.0.1",
+    "electrode-ota-server-diregister": "^2.0.0-beta.0",
+    "electrode-ota-server-util": "^2.0.0-beta.0",
     "hapi-auth-bearer-token": "^4.1.1",
-    "bell": "^8.0.1"
+    "hapi-auth-cookie": "^6.1.1",
+    "hapi-server-session": "^3.0.0"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^2.0.0-beta"
+    "electrode-ota-server-util-dev": "^2.0.0-beta.0"
   }
 }

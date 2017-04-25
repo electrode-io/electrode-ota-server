@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-routes-accesskeys",
-  "version": "2.0.0-beta",
+  "version": "2.0.0-beta.0",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -9,10 +9,10 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-diregister": "^2.0.0-beta",
-    "electrode-ota-server-util": "^2.0.0-beta"
+    "electrode-ota-server-diregister": "^2.0.0-beta.0",
+    "electrode-ota-server-util": "^2.0.0-beta.0"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^2.0.0-beta"
+    "electrode-ota-server-util-dev": "^2.0.0-beta.0"
   }
 }
