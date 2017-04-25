@@ -9,9 +9,9 @@ module.exports.register = diregister({
     dependencies: ['electrode:register', 'electrode:auth', 'ota!validate']
 }, (options, register, auth, validators) => {
 
-   return Promise.all(map(options.strategy, (obj, key) => obj !== false && new Promise((resolve, reject)=> {
+   return Promise.all(map(options.strategy, (obj, key) => obj && new Promise((resolve, reject)=> {
         //register plugins
-        if (obj == null || obj.enable === false || obj === false) {
+        if (obj == null || obj === false || obj.enable === false ) {
             return resolve();
         }
         const plugin = typeof obj.module != 'string' ? obj.module : require(obj.module);
