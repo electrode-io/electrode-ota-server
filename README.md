@@ -35,12 +35,13 @@ For configuration instructions visit the [electrode.io](http://www.electrode.io/
 ```
 
 ## Upload Size
-To increase the max upload size, add this to your configuration:
+To override the max upload size (currenlty 90MB), add this to your configuration:
 ```JavaScript
 
 "electrode-ota-server-routes-apps" : {
             options : {
                 payload : {
+                    // update this value to your desired max
                     maxBytes : 94371840
                 }                
             }
