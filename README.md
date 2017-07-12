@@ -34,7 +34,19 @@ For configuration instructions visit the [electrode.io](http://www.electrode.io/
  npm i electrode-ota-server
 ```
 
+## Upload Size
+To increase the max upload size, add this to your configuration:
+```JavaScript
 
+"electrode-ota-server-routes-apps" : {
+            options : {
+                payload : {
+                    maxBytes : 94371840
+                }                
+            }
+        }
+
+```
 
 
 Apache-2.0 © WalmartLabs

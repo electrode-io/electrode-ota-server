@@ -101,7 +101,7 @@ describe('model/app', function () {
                 return ac.upload({
                     app: 'superd',
                     email,
-                    package: `This is a string`,
+                    package: `This is another string`,
                     packageInfo: {
                         appVersion: '1.0.2',
                         rollout: 50,
@@ -120,7 +120,7 @@ describe('model/app', function () {
             }).then(eql([
                 {
                     "appVersion": "1.0.2",
-                    "blobUrl": "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
+                    "blobUrl": "8d7573816249dc6f9f34bd04dc07d4bb62c5deb6c3b1b5e574e0f26c0d2f25c9",
                     "description": "Not Super Cool",
                     "diffPackageMap": null,
                     "isDisabled": false,
@@ -129,11 +129,11 @@ describe('model/app', function () {
                     "originalDeployment": null,
                     "originalLabel": null,
                     "manifestBlobUrl": null,
-                    "packageHash": "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
+                    "packageHash": "8d7573816249dc6f9f34bd04dc07d4bb62c5deb6c3b1b5e574e0f26c0d2f25c9",
                     "releaseMethod": "Upload",
                     "releasedBy": "test@p.com",
                     "rollout": 50,
-                    "size": "16",
+                    "size": "22",
                 }, {
                     "appVersion": "1.0.0",
                     "blobUrl": "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
@@ -173,7 +173,7 @@ describe('model/app', function () {
                     "releasedBy": "test@p.com",
                     "rollout": 50,
                     "size": null,
-                    "packageHash": "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35"
+                    "packageHash": "8d7573816249dc6f9f34bd04dc07d4bb62c5deb6c3b1b5e574e0f26c0d2f25c9"
 
                 }
             ))
@@ -204,7 +204,7 @@ describe('model/app', function () {
                 "label": null,
                 "originalDeployment": "Staging",
                 "originalLabel": "v2",
-                "packageHash": "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
+                "packageHash": "8d7573816249dc6f9f34bd04dc07d4bb62c5deb6c3b1b5e574e0f26c0d2f25c9",
                 "releaseMethod": "Promote",
                 "releasedBy": "test@p.com",
                 "rollout": 50,

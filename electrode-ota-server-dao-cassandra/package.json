@@ -9,7 +9,7 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "express-cassandra": "^1.7.5",
+    "express-cassandra": "^1.8.2",
     "electrode-ota-server-diregister": "^2.0.0-beta",
     "electrode-ota-server-util": "^2.0.0-beta"
   },

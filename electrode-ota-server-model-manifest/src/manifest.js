@@ -32,11 +32,12 @@ export const zipToBuf = zip=> toBuf(zip.outputStream);
 export const streamHash = (stream, hashType = 'sha256', digestType = 'hex')=> {
     return new Promise(function (resolve, reject) {
         const hash = crypto.createHash(hashType);
-
         stream.on('data', function (data) {
             hash.update(data)
         });
-        stream.on('error', reject);
+        stream.on('error', (err) => {
+            reject(err);
+        });
         stream.on('end', function () {
             resolve(hash.digest(digestType)); // 34f7a3113803f8ed3b8fd7ce5656ebec
         });
@@ -79,16 +80,20 @@ export const generate = (buffer)=> new Promise(function (resolve, reject) {
 });
 
 export const delta = (manifest, buffer)=> {
+    if (manifest instanceof Buffer) {
+        manifest = JSON.parse(manifest.toString());
+    }
+
     if (buffer instanceof Uint8Array) {
         buffer = Buffer.from(buffer);
     }
+
     const method = typeof buffer === 'string' ? 'open' : buffer instanceof Buffer ? 'fromBuffer' : null;
     if (!method) {
         return Promise.reject(new Error('Unhandled type ' + buffer));
     }
 
     return new Promise((resolve, reject)=> {
-
         yauzl[method](buffer, {lazyEntries: true}, function (err, zipfile) {
             const seen = [];
             if (err) return reject(err);
@@ -114,6 +119,7 @@ export const delta = (manifest, buffer)=> {
                         zipfile.readEntry();
                     });
                 });
+
             });
 
             zipfile.once("end", function () {

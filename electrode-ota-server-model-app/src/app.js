@@ -1,5 +1,6 @@
 import {id, key, toJSON} from 'electrode-ota-server-util';
 import {isZip, generate} from 'electrode-ota-server-model-manifest/lib/manifest';
+import {shasum} from 'electrode-ota-server-util';
 
 import {
     alreadyExists,
@@ -30,6 +31,14 @@ const hasDeploymentName = ({deployments}, deployment) => {
         return deployments.indexOf(deployment) > -1;
     }
     return deployment in deployments;
+};
+
+const packageContainsChanges = (deploymentInDb, uploadedContent) => {
+    if (deploymentInDb && deploymentInDb.package && deploymentInDb.package.packageHash) {
+        let uploadedContentPackageHash = shasum(uploadedContent);
+        return uploadedContentPackageHash !== deploymentInDb.package.packageHash;
+    }
+    return true;
 };
 
 const hasPerm = (app, email, perms = Perms.Any) => {
@@ -310,6 +319,9 @@ export default (options, dao, upload, download) => {
                 const zip = isZip('', vals.package);
 
                 return dao.deploymentByApp(_app.id, deployment).then(deployments => {
+
+                    alreadyExistsMsg(packageContainsChanges(deployments, vals.package), 'No changes detected in uploaded content for this deployment.');
+
                     //noinspection JSUnresolvedVariable
                     const pkg = {
                         description, isDisabled, isMandatory, rollout, appVersion,
@@ -318,6 +330,7 @@ export default (options, dao, upload, download) => {
                         label: label || "v" + (deployments.history_ ? deployments.history_.length + 1 : 1),
                         releasedBy: email
                     };
+
                     return upload(vals.package)
                         .then((resp) => {
                             if (zip) {
