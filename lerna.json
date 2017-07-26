@@ -1,5 +1,5 @@
 {
-  "lerna": "2.0.0-beta.37",
+  "lerna": "2.0.0-rc.3",
   "packages": [
     "electrode-ota-server*",
     "example*",
@@ -10,6 +10,6 @@
       "example-*"
     ]
   },
-  "version": "2.0.0-beta",
+  "version": "2.0.0-beta-5",
   "npmClient": "yarn"
 }

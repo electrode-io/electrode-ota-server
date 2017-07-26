@@ -119,7 +119,14 @@ export default function () {
                 }
             },
             "electrode-ota-server-routes-accesskeys": {},
-            "electrode-ota-server-routes-apps": {},
+            "electrode-ota-server-routes-apps": {
+                options : {
+                    payload : {
+                        // ~90MB
+                        maxBytes : 94371840
+                    }
+                }
+            },
             "electrode-ota-server-routes-acquisition": {},
             "electrode-ota-server-routes-auth": {
                 "options": {

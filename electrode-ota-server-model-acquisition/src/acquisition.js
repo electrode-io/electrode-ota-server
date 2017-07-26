@@ -83,7 +83,7 @@ export default (options, dao, weighted, _download, manifest) => {
                     return ret;
                 }
 
-                return isNotAvailable ? makeReturn(isNotAvailable) : api.isUpdateAble(params.clientUniqueId, pkg.packageHash, pkg.rollout).then(makeReturn);
+                return isNotAvailable ? makeReturn(!isNotAvailable) : api.isUpdateAble(params.clientUniqueId, pkg.packageHash, pkg.rollout).then(makeReturn);
 
             });
         },
@@ -123,7 +123,7 @@ export default (options, dao, weighted, _download, manifest) => {
         /**
          * So this keeps track of what the client got last time.
          * Any time a ratio or a packageHash changes we roll the dice,
-         * as to weather they will be updated.  If the ratio has not
+         * as to whether they will be updated.  If the ratio has not
          * changed nor the packageHash or the uniqueClientId then return
          * the last roll of the die.
          * Otherwise roll the die and save the results so if we get asked again...

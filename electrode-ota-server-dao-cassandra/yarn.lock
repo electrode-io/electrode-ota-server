@@ -10,9 +10,26 @@ async@^1.0.0:
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/async/-/async-1.5.2.tgz#ec6a61ae56480c0c3cb241c95618e20892f9672a"
 
+balanced-match@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
+
 bluebird@^3.4.6:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.0.tgz#791420d7f551eea2897453a8a77653f96606d67c"
+
+brace-expansion@^1.1.7:
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-1.1.8.tgz#c07b211c7c952ec1f8efd51a77ef0d1d3990a292"
+  dependencies:
+    balanced-match "^1.0.0"
+    concat-map "0.0.1"
+
+cassandra-driver@^3.2.0:
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/cassandra-driver/-/cassandra-driver-3.2.2.tgz#bcbae15169141df08b4e32d477fa58b99eac5040"
+  dependencies:
+    long "^2.2.0"
 
 chai@^3.5.0:
   version "3.5.0"
@@ -25,6 +42,14 @@ chai@^3.5.0:
 check-types@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/check-types/-/check-types-1.4.0.tgz#eed63bbac9ea49a0e26a096314058b03b08dd62b"
+
+concat-map@0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
+
+core-util-is@~1.0.0:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
 
 debug@^2.2.0:
   version "2.6.4"
@@ -42,15 +67,15 @@ deep-eql@^0.1.3:
   dependencies:
     type-detect "0.1.1"
 
-dse-driver@^1.1.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/dse-driver/-/dse-driver-1.3.0.tgz#2c7fd3e9ac456d13a5d088484201c63b342dcaf6"
+dse-driver@~1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/dse-driver/-/dse-driver-1.2.0.tgz#a9c5d2957371e2691aac3e535d4a8c75ff8a1be3"
   dependencies:
-    long "^2.2.0"
+    cassandra-driver "^3.2.0"
 
-express-cassandra@^1.7.5:
-  version "1.8.1"
-  resolved "https://registry.yarnpkg.com/express-cassandra/-/express-cassandra-1.8.1.tgz#64cdd3364e3418a03134866e88cc7f4b424066f3"
+express-cassandra@^1.8.2:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/express-cassandra/-/express-cassandra-1.9.0.tgz#1a159304c9f666b6ba141c9306847b24a9cbda14"
   dependencies:
     async "^1.0.0"
     bluebird "^3.4.6"
@@ -58,10 +83,23 @@ express-cassandra@^1.7.5:
     check-types "^1.4.0"
     debug "^2.2.0"
     deep-diff "^0.3.4"
-    dse-driver "^1.1.0"
+    dse-driver "~1.2.0"
     lodash "^4.14.2"
     object-hash "1.1.4"
+    readdirp "^2.1.0"
     readline-sync "^1.4.4"
+
+graceful-fs@^4.1.2:
+  version "4.1.11"
+  resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
+
+inherits@~2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.3.tgz#633c2c83e3da42a502f52466022480f4208261de"
+
+isarray@~1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/isarray/-/isarray-1.0.0.tgz#bb935d48582cba168c06834957a54a3e07124f11"
 
 lodash@^4.14.2:
   version "4.17.4"
@@ -71,6 +109,12 @@ long@^2.2.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/long/-/long-2.4.0.tgz#9fa180bb1d9500cdc29c4156766a1995e1f4524f"
 
+minimatch@^3.0.2:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
+  dependencies:
+    brace-expansion "^1.1.7"
+
 ms@0.7.3:
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/ms/-/ms-0.7.3.tgz#708155a5e44e33f5fd0fc53e81d0d40a91be1fff"
@@ -79,9 +123,48 @@ object-hash@1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/object-hash/-/object-hash-1.1.4.tgz#136f07f1a48af5f6b906812451ae4e43978c94aa"
 
+process-nextick-args@~1.0.6:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-1.0.7.tgz#150e20b756590ad3f91093f25a4f2ad8bff30ba3"
+
+readable-stream@^2.0.2:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-2.3.3.tgz#368f2512d79f9d46fdfc71349ae7878bbc1eb95c"
+  dependencies:
+    core-util-is "~1.0.0"
+    inherits "~2.0.3"
+    isarray "~1.0.0"
+    process-nextick-args "~1.0.6"
+    safe-buffer "~5.1.1"
+    string_decoder "~1.0.3"
+    util-deprecate "~1.0.1"
+
+readdirp@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/readdirp/-/readdirp-2.1.0.tgz#4ed0ad060df3073300c48440373f72d1cc642d78"
+  dependencies:
+    graceful-fs "^4.1.2"
+    minimatch "^3.0.2"
+    readable-stream "^2.0.2"
+    set-immediate-shim "^1.0.1"
+
 readline-sync@^1.4.4:
   version "1.4.7"
   resolved "https://registry.yarnpkg.com/readline-sync/-/readline-sync-1.4.7.tgz#001bfdd4c06110c3c084c63bf7c6a56022213f30"
+
+safe-buffer@~5.1.0, safe-buffer@~5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.1.tgz#893312af69b2123def71f57889001671eeb2c853"
+
+set-immediate-shim@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/set-immediate-shim/-/set-immediate-shim-1.0.1.tgz#4b2b1b27eb808a9f8dcc481a58e5e56f599f3f61"
+
+string_decoder@~1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/string_decoder/-/string_decoder-1.0.3.tgz#0fc67d7c141825de94282dd536bec6b9bce860ab"
+  dependencies:
+    safe-buffer "~5.1.0"
 
 type-detect@0.1.1:
   version "0.1.1"
@@ -90,3 +173,7 @@ type-detect@0.1.1:
 type-detect@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/type-detect/-/type-detect-1.0.0.tgz#762217cc06db258ec48908a1298e8b95121e8ea2"
+
+util-deprecate@~1.0.1:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
