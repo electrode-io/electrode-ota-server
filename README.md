@@ -5,7 +5,7 @@ is API compatible with [code-push-cli](https://microsoft.github.io/code-push/doc
 [Code Push React Native SDK](https://microsoft.github.io/code-push/docs/react-native.html) and the [Code Push Cordova SDK](https://microsoft.github.io/code-push/docs/cordova.html).
 
 
-##Upgrade
+## Upgrade
 Version 2 adds partial update support.  To do this it requires some alterations to the cassandra database.  This
 will happen automatically, unless the configuration to the electrode-ota-dao-cassandra is configured as
 ```json
@@ -35,13 +35,12 @@ For configuration instructions visit the [electrode.io](http://www.electrode.io/
 ```
 
 ## Upload Size
-To override the max upload size (currenlty 90MB), add this to your configuration:
-```JavaScript
+To increase the max upload size, add this to your configuration:
+```json
 
 "electrode-ota-server-routes-apps" : {
             options : {
                 payload : {
-                    // update this value to your desired max
                     maxBytes : 94371840
                 }                
             }
