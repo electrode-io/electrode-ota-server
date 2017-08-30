@@ -1,6 +1,7 @@
 import {promiseMap, reducer, remove, toJSON} from 'electrode-ota-server-util';
 import {alreadyExistsMsg} from 'electrode-ota-server-errors';
 import UDTS from './models/UDTS.json';
+import {find} from "lodash";
 
 const historySort = history => history && history.sort((a, b) => b.created_.getTime() - a.created_.getTime());
 
@@ -272,12 +273,27 @@ export default class DaoExpressCassandra {
         if (isEmpty(history_)) {
             throw new Error(`Can not update a package without history, probably means things have gone awry.`);
         }
+
         let rpkg;
 
         if (label) {
-            rpkg = await this.Package.findOneAsync({id_: within(history_), label});
+            rpkg = await this.Package.findAsync({id_: within(history_)}).then(results => {
+              // Ideally await this.Package.findOneAsync({id_: within(history_), label})
+              // would find a single record with the proper label but this doesn't work
+              // Instead of relying on cassandra fall back to what I know (lodash), to
+              // filter array of results for proper label.
+              // Alternatively could search for label, and filter matching labels for matching history,
+              // With only 1 or 2 apps there won't ever be many labels found but with tons of deployments
+              // there may be a lot of deployment versions out there.
+              const result = find(results, (o) => o.label === label);
+              if (!result) {
+                throw new Error('Label "' + label + '" not found');
+              }
+              return result;
+            });
         } else {
-            rpkg = await this.Package.findOneAsync({id_: within(history_)});
+            // Assumes first item in history array is most recent version
+            rpkg = await this.Package.findOneAsync({id_: history_[0]});
         }
         apply(rpkg, pkg);
         await rpkg.saveAsync();

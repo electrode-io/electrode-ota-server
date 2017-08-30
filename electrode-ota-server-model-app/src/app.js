@@ -227,7 +227,7 @@ export default (options, dao, upload, download) => {
                     description
                 };
 
-                return dao.updatePackage(deployment.key, npkg);
+                return dao.updatePackage(deployment.key, npkg, params.label);
             })).then(toJSON);
         },
 
