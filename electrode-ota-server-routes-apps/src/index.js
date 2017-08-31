@@ -337,9 +337,6 @@ export const register = diregister({
             method: 'POST',
             path: '/apps/{app}/deployments/{deployment}/rollback/{label?}',
             config: {
-                validate: {
-                    params: Object.assign({label: Joi.string()}, PARAMS.deployment)
-                },
                 payload: Object.assign({}, options.payload),
                 handler(request, reply)
                 {
