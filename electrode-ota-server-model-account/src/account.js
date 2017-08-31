@@ -36,7 +36,6 @@ export default function (options, dao) {
         },
 
         async addAccessKey(email, createdBy, friendlyName, ttl) {
-            email = email || username;
             const ak = genAccessKey({email, createdBy, friendlyName, ttl});
             const user = await  dao.userByEmail(email);
 
