@@ -47,7 +47,7 @@ export default function (options, dao) {
 
         createToken({profile = {}, provider, query = {}}) {
 
-            const email = profile.email;
+            const email = profile.email || profile.username;
             const ak = genAccessKey({email, createdBy: query.hostname});
             const accessKeys = {[ak.name]: ak};
             const account = {

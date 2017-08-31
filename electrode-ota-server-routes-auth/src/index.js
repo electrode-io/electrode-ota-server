@@ -143,7 +143,7 @@ export const register = diregister({
                             const {email, displayName, username} = credentials.profile;
                             const {hostname} = credentials.query || {};
                             //(email, createdBy, friendlyName, ttl
-                            addAccessKey(email, hostname, displayName || username, void(0), (e, token) => {
+                            addAccessKey(email || username, hostname, displayName, void(0), (e, token) => {
                                 if (e) {
                                     console.error('Error adding key', e);
                                     return reply.view('error', {
