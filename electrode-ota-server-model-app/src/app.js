@@ -425,7 +425,7 @@ export default (options, dao, upload, download) => {
                     rollout: 100,
                     releasedBy: params.email,
                     releaseMethod: "Rollback",
-                    originalLabel: rollback.label,
+                    originalLabel: rollto.label,
                     label: `v${history_.length + 1}`
                 });
                 return dao.addPackage(deployment.key, pkg).then(v => pkg);
