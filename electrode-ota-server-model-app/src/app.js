@@ -159,19 +159,44 @@ export default (options, dao, upload, download) => {
         {
             return api.findApp(params).then(app => {
 
-                return dao.deploymentsByApp(app.id, [params.deployment, params.to]).then(deployments => {
+                return dao.deploymentsByApp(app.id, [params.deployment, params.to]).then(async (deployments) => {
                     const f = deployments[params.deployment];
 
                     notFound(f && f.package, `Deployment "${params.deployment}" does not exist.`);
 
                     const t = notFound(deployments[params.to], `Deployment "${params.to}" does not exist.`);
 
-                    const pkg = f.package;
+                    let pkg = f.package;
 
+                    if (params.label) {
+                        const packages = await dao.history(app.id, [params.deployment]);
+                        pkg = packages.find((packag) => {
+                            return packag.label === params.label;
+                        });
+
+                        notFound(pkg, `Deployment "${params.deployment}" has no package with label "${params.label}"`);
+                    }
+
+                    const existingPackage = t.package;
+                    
+                    // check to make sure that it is not already promoted
+                    if (existingPackage) {
+                        console.log("from packageHash", pkg.packageHash);
+                        console.log("to packageHash", existingPackage.packageHash);
+                        alreadyExistsMsg((existingPackage.packageHash !== pkg.packageHash), 
+                            `Deployment ${params.from}:${pkg.label} has already been promoted to ${params.to}:${existingPackage.label}.`);
+                    }
+
+                    // rollout property should not be carried forward on promotion
                     const {
-                        isDisabled = pkg.isDisabled, isMandatory = pkg.isMandatory, rollout = pkg.rollout, appVersion = pkg.appVersion, description = pkg.description
-                    } = params;
+                        isDisabled = pkg.isDisabled,
+                        isMandatory = pkg.isMandatory,
+                        rollout, // = pkg.rollout,
+                        appVersion = pkg.appVersion,
+                        description = pkg.description,
+                    } = excludeNull(params);
 
+                    console.log("adding package");
                     return dao.addPackage(t.key, {
                         packageHash: pkg.packageHash,
                         isDisabled,
@@ -183,7 +208,11 @@ export default (options, dao, upload, download) => {
                         releasedBy: params.email,
                         releaseMethod: "Promote",
                         originalLabel: pkg.label,
-                        originalDeployment: params.deployment
+                        originalDeployment: params.deployment,
+                        blobUrl : pkg.blobUrl,
+                        manifestBlobUrl : pkg.manifestBlobUrl,
+                        size : pkg.size,
+                        label : "v" + (t.history_ ? t.history_.length + 1 : 1)
                     });
                 })
             });
@@ -425,7 +454,7 @@ export default (options, dao, upload, download) => {
                     rollout: 100,
                     releasedBy: params.email,
                     releaseMethod: "Rollback",
-                    originalLabel: dpkg.label,
+                    originalLabel: rollto.label,
                     label: `v${history_.length + 1}`
                 });
                 return dao.addPackage(deployment.key, pkg).then(v => pkg);

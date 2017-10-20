@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "electrode-ota-server-diregister": "^2.0.0-beta.7",
-    "electrode-ota-server-util": "^2.0.0-beta.7"
+    "electrode-ota-server-util": "^2.0.0-beta.7",
+    "electrode-ota-server-model-manifest": "^2.0.0-beta.7",
+    "electrode-ota-server-errors": "^2.0.0-beta.7"
   },
   "devDependencies": {
     "electrode-ota-server-dao-cassandra": "^2.0.0-beta.7",

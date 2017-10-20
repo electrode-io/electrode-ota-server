@@ -252,7 +252,7 @@ describe('model/app', function () {
                     "label": "v3",
                     "originalDeployment": null,
                     "manifestBlobUrl": null,
-                    "originalLabel": "v2",
+                    "originalLabel": "v1",
                     "packageHash": "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
                     "blobUrl": "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
 
@@ -340,7 +340,7 @@ describe('model/app', function () {
                     "isMandatory": true,
                     "label": "v3",
                     "originalDeployment": null,
-                    "originalLabel": "v2",
+                    "originalLabel": "v1",
                     "packageHash": "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
                     "releaseMethod": "Rollback",
                     "releasedBy": "test@p.com",
