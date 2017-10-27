@@ -3,8 +3,8 @@ import diregister from "electrode-ota-server-diregister";
 
 export const register = diregister({
     name: 'authRoute',
-    dependencies: ['electrode:route', 'ota!account', 'electrode:views', 'ota!scheme'],
-}, (options, route, acf, views) => {
+    dependencies: ['electrode:route', 'ota!account', 'electrode:views', 'ota!scheme', 'ota!logger'],
+}, (options, route, acf, views, scheme, logger) => {
 
     views({
         engines: options.engines || {ejs: require('ejs')},
@@ -27,6 +27,7 @@ export const register = diregister({
             config: {
                 auth: false,
                 handler(req, reply){
+                    logger.info({ req }, "auth request");
                     reply.view('login', {
                         title: 'Login',
                         providers: options.providers,
@@ -49,6 +50,7 @@ export const register = diregister({
                                 credentials: {}
                             }
                         }, reply) {
+
                     if (!isAuthenticated) {
                         return reply.redirect('/auth/login').code(302);
                     }
@@ -132,7 +134,7 @@ export const register = diregister({
                 path: loginPath,
                 config: {
                     auth: {
-                        mode: "try",
+                        mode: "required",
                         strategy
                     },
                     handler ({auth: {isAuthenticated, credentials}, cookieAuth}, reply) {
@@ -161,7 +163,6 @@ export const register = diregister({
                 }
             });
             if (registerPath !== false) {
-
                 registerPath = registerPath || `/auth/register/${name}`;
                 ret.push({
                     method: 'GET',
@@ -173,26 +174,24 @@ export const register = diregister({
                                 console.error('request was not authenticated');
                                 return reply('Not logged in...').code(401);
                             }
-                            createToken(credentials, (e, token) => {
-                                if (e) {
-                                    if (e.output && e.output.payload && e.output.payload.error === 'Conflict') {
-                                        return reply.view('error', {
-                                            title: 'Error adding account',
-                                            message: 'This account is already registered, try logging in instead.',
-                                            href: `/auth/login?hostname=${credentials.query && credentials.query.hostname}`
-                                        })
-                                    }
-                                    console.error('Error creating token', e);
+
+                            createToken(credentials).then((token) => {
+                                cookieAuth.set({ token : token.name });
+                                reply.redirect(redirectTo).code(302);
+                            }).catch((e) => {
+                                if (e.output && e.output.payload && e.output.payload.error === 'Conflict') {
                                     return reply.view('error', {
                                         title: 'Error adding account',
-                                        message: e.message
-                                    });
-
+                                        message: 'This account is already registered, try logging in instead.',
+                                        href: `/auth/login?hostname=${credentials.query && credentials.query.hostname}`
+                                    })
                                 }
-                                cookieAuth.set({token: token.name});
-                                reply.redirect(redirectTo).code(302);
+                                console.error('Error creating token', e);
+                                return reply.view('error', {
+                                    title: 'Error adding account',
+                                    message: e.message
+                                });
                             });
-
                         }
                     }
                 });

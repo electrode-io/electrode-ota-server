@@ -11,8 +11,8 @@ const ok = (reply) => (e) => {
 
 export const register = diregister({
     name: 'acquisitionRoute',
-    dependencies: ['electrode:route', 'ota!acquisition']
-}, (options, route, acquisition) => {
+    dependencies: ['electrode:route', 'ota!acquisition', 'ota!logger']
+}, (options, route, acquisition, logger) => {
     const {
         download,
         updateCheck,
@@ -30,6 +30,7 @@ export const register = diregister({
                 auth: false,
                 handler(request, reply)
                 {
+                    logger.info({ req: request }, "updateCheck request");
                     updateCheck(request.query, (e, updateInfo) => {
                         if (e) {
                             console.log('error making update check ', request.query, e.message);
@@ -46,6 +47,7 @@ export const register = diregister({
             config: {
                 auth: false,
                 handler(request, reply){
+                    logger.info({ req: request }, "download request");
                     download(request.params.packageHash, (e, o) => {
                         if (e) return reply(e);
                         reply(o);
@@ -59,6 +61,7 @@ export const register = diregister({
             config: {
                 auth: false,
                 handler(request, reply){
+                    logger.info({ req: request }, "report deployment status request");
                     deployReportStatus(request.payload, ok(reply));
                 }
             }
@@ -69,6 +72,7 @@ export const register = diregister({
             config: {
                 auth: false,
                 handler(request, reply){
+                    logger.info({ req: request }, "report download status request");
                     downloadReportStatus(request.payload, ok(reply));
                 }
             }

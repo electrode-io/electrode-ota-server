@@ -5,5 +5,5 @@ export const register = diregister({
     name: 'ota!account',
     multiple: false,
     connections: false,
-    dependencies: ['ota!dao']
+    dependencies: ['ota!dao', 'ota!logger']
 }, account);

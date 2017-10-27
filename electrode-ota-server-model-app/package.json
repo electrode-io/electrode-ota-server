@@ -9,6 +9,7 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
+    "bluebird": "^3.5.1",
     "electrode-ota-server-diregister": "^2.0.0-beta.8",
     "electrode-ota-server-errors": "^2.0.0-beta.8",
     "electrode-ota-server-model-manifest": "^2.0.0-beta.8",

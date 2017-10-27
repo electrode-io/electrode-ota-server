@@ -19,6 +19,7 @@
     "electrode-ota-server-errors": "^2.0.0-beta.8",
     "electrode-ota-server-fileservice-download": "^2.0.0-beta.8",
     "electrode-ota-server-fileservice-upload": "^2.0.0-beta.8",
+    "electrode-ota-server-logger": "^2.0.0-beta.8",
     "electrode-ota-server-model-account": "^2.0.0-beta.8",
     "electrode-ota-server-model-acquisition": "^2.0.0-beta.8",
     "electrode-ota-server-model-app": "^2.0.0-beta.8",

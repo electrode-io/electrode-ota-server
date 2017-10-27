@@ -2,7 +2,7 @@ import {missingParameter} from 'electrode-ota-server-errors';
 import version from 'semver';
 const fixver = (ver) => ver ? ('' + ver).replace(/^(\d+?)$/, '$1.0.0') : '0.0.0';
 
-export default (options, dao, weighted, _download, manifest) => {
+export default (options, dao, weighted, _download, manifest, logger) => {
     const api = {
         download(hash){
             return _download(hash);
@@ -85,8 +85,18 @@ export default (options, dao, weighted, _download, manifest) => {
 
                 return isNotAvailable ? makeReturn(!isNotAvailable) : api.isUpdateAble(params.clientUniqueId, pkg.packageHash, pkg.rollout).then(makeReturn);
 
+            }).tap((res) => {
+                logger.info({
+                    event : {
+                        name : "checkedForUpdate",
+                        deploymentKey : params.deploymentKey,
+                        clientUniqueId : params.clientUniqueId,
+                        available : res.isAvailable
+                    }
+                }); 
             });
         },
+
         downloadReportStatus(/*{
                               clientUniqueId,
                               deploymentKey,
@@ -94,7 +104,8 @@ export default (options, dao, weighted, _download, manifest) => {
                               }*/ metric)
         {
             metric.status = 'Downloaded';
-            return dao.insertMetric(metric);
+            return dao.insertMetric(metric)
+                .tap(() => logger.info({ depoymentKey : metric.deploymentKey, label : metric.label }, "recorded download success"));
         }
         ,
         /**
@@ -118,7 +129,8 @@ export default (options, dao, weighted, _download, manifest) => {
                             previousLabelOrAppVersion,
                             previousDeploymentKey
                             }*/ metric){
-            return dao.insertMetric(metric);
+            return dao.insertMetric(metric)
+                .tap(() => logger.info({ depoymentKey : metric.deploymentKey, label : metric.label, status : metric.status }, "recorded deployment status"));
         },
         /**
          * So this keeps track of what the client got last time.

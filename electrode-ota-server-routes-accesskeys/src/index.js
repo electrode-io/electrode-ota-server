@@ -2,8 +2,8 @@ import {wrap} from 'electrode-ota-server-util';
 import diregister from "electrode-ota-server-diregister";
 export const register = diregister({
     name: 'accessKeysRoute',
-    dependencies: ['electrode:route', 'ota!account', 'ota!scheme']
-}, (options, route, acf) => {
+    dependencies: ['electrode:route', 'ota!account', 'ota!logger', 'ota!scheme']
+}, (options, route, acf, logger) => {
 
     const {addAccessKey, listAccessKeys, updateAccessKey, removeAccessKey, account} = wrap(acf);
 
@@ -14,6 +14,7 @@ export const register = diregister({
 
             config: {
                 handler (request, reply) {
+                    logger.info({ req: request }, "get account request");
                     account(request.auth.credentials.email, (e, {account: {linkedProviders = ['GitHub'], name, email}}) => {
                         if (e) return reply(e);
                         reply({account: {linkedProviders, name, email}});
@@ -26,7 +27,7 @@ export const register = diregister({
             path: '/accessKeys/',
             config: {
                 handler(request, reply){
-
+                    logger.info({ req: request }, "add accessKey request");
                     const {auth: {credentials: {email, name}}, payload = {}, params: {key}} = request;
                     //email, createdBy, friendlyName, ttl
                     addAccessKey(email || name, request.connection.info.host, payload.friendlyName, payload.ttl, (e, accessKey) => {
@@ -51,6 +52,7 @@ export const register = diregister({
             path: '/accessKeys/{key?}',
             config: {
                 handler(request, reply){
+                    logger.info({ req: request }, "update accessKey request");
                     const {auth: {credentials: {email, name}}, payload, params: {key}} = request;
                     updateAccessKey(Object.assign({}, payload, {email, key}), (e, accessKey) => {
                         if (e) return reply(e);
@@ -74,6 +76,7 @@ export const register = diregister({
             path: '/accessKeys',
             config: {
                 handler(request, reply){
+                    logger.info({ req: request }, "get list of accessKeys request");
                     const {email, name} = request.auth.credentials;
                     listAccessKeys(email, (e, accessKeys) => {
                         if (e) return reply(e);
@@ -105,6 +108,7 @@ export const register = diregister({
             path: '/accessKeys/{key}',
             config: {
                 handler(request, reply){
+                    logger.info({ req: request }, "remove accessKey request");
                     const {auth: {credentials: {email}}, params: {key}} = request;
                     removeAccessKey({email, key}, (e, o) => {
                         if (e) return reply(e);
