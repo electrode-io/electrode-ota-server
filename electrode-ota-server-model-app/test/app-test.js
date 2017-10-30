@@ -23,9 +23,9 @@ describe('model/app', function () {
     before(async () => {
         const dao = await initDao();
         let w = 0;
-        account = accountFactory({}, dao);
+        account = accountFactory({}, dao, console);
         const up = upload({}, dao), down = download({}, dao);
-        ac = appFactory({}, dao, up, (history) => diffPackageMap(down, up, history));
+        ac = appFactory({}, dao, up, (history) => diffPackageMap(down, up, history), console);
     });
     
     after(shutdown);
@@ -160,19 +160,19 @@ describe('model/app', function () {
             }).then(eql(
                 {
                     "appVersion": "1.0.2",
-                    "blobUrl": null,
+                    "blobUrl": "8d7573816249dc6f9f34bd04dc07d4bb62c5deb6c3b1b5e574e0f26c0d2f25c9",
                     "description": "Not Super Cool",
                     "diffPackageMap": null,
                     "isDisabled": false,
                     "isMandatory": true,
-                    "label": null,
+                    "label": "v1",
                     "manifestBlobUrl": null,
                     "originalDeployment": "Staging",
                     "originalLabel": "v2",
                     "releaseMethod": "Promote",
                     "releasedBy": "test@p.com",
-                    "rollout": 50,
-                    "size": null,
+                    "rollout": null,
+                    "size": "22",
                     "packageHash": "8d7573816249dc6f9f34bd04dc07d4bb62c5deb6c3b1b5e574e0f26c0d2f25c9"
 
                 }
@@ -195,20 +195,20 @@ describe('model/app', function () {
             })
             .then(eql({
                 "appVersion": "1.2.3",
-                "blobUrl": null,
+                "blobUrl": "8d7573816249dc6f9f34bd04dc07d4bb62c5deb6c3b1b5e574e0f26c0d2f25c9",
                 "description": "Not Super Cool",
                 "diffPackageMap": null,
                 "isDisabled": true,
                 "isMandatory": true,
                 "manifestBlobUrl": null,
-                "label": null,
+                "label": "v1",
                 "originalDeployment": "Staging",
                 "originalLabel": "v2",
                 "packageHash": "8d7573816249dc6f9f34bd04dc07d4bb62c5deb6c3b1b5e574e0f26c0d2f25c9",
                 "releaseMethod": "Promote",
                 "releasedBy": "test@p.com",
                 "rollout": 50,
-                "size": null
+                "size": "22"
             }))
     });
     it('should rollback to last', () => {

@@ -106,7 +106,7 @@ export default (options, dao, upload, download, logger) => {
         removeApp(find) {
             return api._findApp(find, 'Owner', 'Must be owner of app to remove')
                 .then(app => dao.removeApp(app.id).then(v => app))
-                    .tap(() => logger.info({ name, appId : app.id }, "app removed"));
+                    .tap((app) => logger.info({ appId : app.id }, "app removed"));
         },
 
         renameApp(find){

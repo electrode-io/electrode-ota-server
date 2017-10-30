@@ -12,7 +12,7 @@ describe('model/account', function () {
     before(async () => {
         try {
             const dao = await initDao();
-            account = accountFactory({}, dao);
+            account = accountFactory({}, dao, console);
         } catch (e) {
             console.log('model/account error');
             console.trace(e);
