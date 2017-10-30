@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-model-manifest",
-  "version": "2.0.0-beta.8",
+  "version": "2.1.0-beta.1",
   "description": "OTA Manifest Service",
   "main": "lib/index.js",
   "scripts": {
@@ -10,14 +10,14 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-diregister": "^2.0.0-beta.8",
-    "electrode-ota-server-util": "^2.0.0-beta.8",
+    "electrode-ota-server-diregister": "^2.1.0-beta.1",
+    "electrode-ota-server-util": "^2.1.0-beta.1",
     "file-type": "^3.9.0",
     "yauzl": "^2.7.0",
     "yazl": "^2.4.1"
   },
   "devDependencies": {
-    "electrode-ota-server-test-support": "^2.0.0-beta.8",
-    "electrode-ota-server-util-dev": "^2.0.0-beta.8"
+    "electrode-ota-server-test-support": "^2.1.0-beta.1",
+    "electrode-ota-server-util-dev": "^2.1.0-beta.1"
   }
 }
