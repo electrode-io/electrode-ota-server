@@ -90,7 +90,8 @@ export const register = diregister({
                         if (e) return reply(e);
                         return reply({release}).code(201);
                     });
-                }
+                },
+                tags : ["api"]
             }
         },
         {
@@ -109,7 +110,8 @@ export const register = diregister({
                         if (e) return reply(e);
                         return reply({release}).code(201);
                     });
-                }
+                },
+                tags : ["api"]
             }
         },
         {
@@ -124,7 +126,8 @@ export const register = diregister({
                         if (e) return reply(e);
                         return reply(toAppOut(app)).code(201);
                     });
-                }
+                },
+                tags : ["api"]
             }
         },
         {
@@ -138,7 +141,8 @@ export const register = diregister({
                         apps = apps.map(toAppColab(request.auth.credentials.email));
                         return reply({apps});
                     });
-                }
+                },
+                tags : ["api"]
             }
         }, {
             method: 'GET',
@@ -155,7 +159,8 @@ export const register = diregister({
                         app = toAppColab(email)(app);
                         return reply({app});
                     });
-                }
+                },
+                tags : ["api"]
             }
         },
         {
@@ -170,7 +175,8 @@ export const register = diregister({
                     logger.info({ req: request }, "rename app request");
                     const {auth: {credentials: {email}}, params: {app}, payload: {name}} = request;
                     renameApp(Object.assign({}, {email, app, name}), noContent(reply));
-                }
+                },
+                tags : ["api"]
             }
         },
 
@@ -185,7 +191,8 @@ export const register = diregister({
                     logger.info({ req: request }, "remove app request");
                     const {auth: {credentials: {email}}, params: {app}} = request;
                     removeApp({email, app}, noContent(reply));
-                }
+                },
+                tags : ["api"]
             }
         },
         {
@@ -200,7 +207,8 @@ export const register = diregister({
                         if (e) return reply(e);
                         return reply('Created').code(201);
                     })
-                }
+                },
+                tags : ["api"]
             }
         },
         {
@@ -214,7 +222,8 @@ export const register = diregister({
                         if (e) return reply(e);
                         return reply({deployments});
                     });
-                }
+                },
+                tags : ["api"]
             }
 
         },
@@ -240,7 +249,8 @@ export const register = diregister({
                             }
                         }).code(201);
                     }, reply);
-                }
+                },
+                tags : ["api"]
             }
 
         },
@@ -259,7 +269,8 @@ export const register = diregister({
                     logger.info({ req: request }, "rename deployment request");
                     const {params: {app, deployment}, payload: {name}, auth: {credentials: {email}}} = request;
                     renameDeployment({app, deployment, email, name}, noContent(reply));
-                }
+                },
+                tags : ["api"]
             }
 
         },
@@ -280,7 +291,8 @@ export const register = diregister({
                             deployment
                         });
                     });
-                }
+                },
+                tags : ["api"]
             }
 
         },
@@ -295,7 +307,8 @@ export const register = diregister({
                     logger.info({ req: request }, "remove deployment request");
                     const {params: {app, deployment}, auth: {credentials: {email}}} = request;
                     removeDeployment({app, deployment, email}, noContent(reply));
-                }
+                },
+                tags : ["api"]
             }
 
         },
@@ -310,7 +323,8 @@ export const register = diregister({
                     logger.info({ req: request }, "clear history request");
                     const {params: {app, deployment}, auth: {credentials: {email}}} = request;
                     clearHistory({app, email, deployment}, noContent(reply));
-                }
+                },
+                tags : ["api"]
             }
 
         }, {
@@ -327,7 +341,8 @@ export const register = diregister({
                         if (e) return reply(e);
                         return reply({history});
                     });
-                }
+                },
+                tags : ["api"]
             }
 
         },
@@ -346,7 +361,8 @@ export const register = diregister({
                         if (e) return reply(e);
                         return reply({package: pkg}).code(201);
                     });
-                }
+                },
+                tags : ["api"]
             }
         },
         {
@@ -365,7 +381,8 @@ export const register = diregister({
                         if (e)return reply(e);
                         reply({package: pkg});
                     });
-                }
+                },
+                tags : ["api"]
             }
 
         },
@@ -387,7 +404,8 @@ export const register = diregister({
                         }
                         reply({metrics});
                     })
-                }
+                },
+                tags : ["api"]
             }
         }
         ,
@@ -413,7 +431,8 @@ export const register = diregister({
                             }, {})
                         });
                     });
-                }
+                },
+                tags : ["api"]
             }
         },
         {
@@ -429,7 +448,8 @@ export const register = diregister({
                         if (e) return reply(e);
                         return reply('Created').code(201);
                     });
-                }
+                },
+                tags : ["api"]
             }
         },
         {
@@ -441,7 +461,8 @@ export const register = diregister({
                     logger.info({ req : request }, "remove collaborator request");
                     const {params: {app, collaborator}, auth: {credentials: {email}}} = request;
                     removeCollaborator({email, app, collaborator}, noContent(reply));
-                }
+                },
+                tags : ["api"]
             }
         }
     ]);
