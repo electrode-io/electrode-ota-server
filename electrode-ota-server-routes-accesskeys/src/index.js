@@ -11,7 +11,6 @@ export const register = diregister({
         {
             method: 'GET',
             path: '/account',
-
             config: {
                 handler (request, reply) {
                     logger.info({ req: request }, "get account request");
@@ -19,7 +18,8 @@ export const register = diregister({
                         if (e) return reply(e);
                         reply({account: {linkedProviders, name, email}});
                     })
-                }
+                },
+                tags : ["api"]
             }
         },
         {
@@ -44,7 +44,8 @@ export const register = diregister({
                             }
                         });
                     })
-                }
+                },
+                tags : ["api"]
             }
         },
         {
@@ -68,7 +69,8 @@ export const register = diregister({
                             }
                         });
                     });
-                }
+                },
+                tags : ["api"]
             }
         },
         {
@@ -100,7 +102,8 @@ export const register = diregister({
                             })
                         });
                     });
-                }
+                },
+                tags : ["api"]
             }
         },
         {
@@ -114,7 +117,8 @@ export const register = diregister({
                         if (e) return reply(e);
                         reply().code(204)
                     });
-                }
+                },
+                tags : ["api"]
             }
         }
     ]);

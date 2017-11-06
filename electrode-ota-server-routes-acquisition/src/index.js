@@ -38,7 +38,8 @@ export const register = diregister({
                         }
                         reply({updateInfo});
                     });
-                }
+                },
+                tags : ["api"]
             }
         },
         {
@@ -52,7 +53,8 @@ export const register = diregister({
                         if (e) return reply(e);
                         reply(o);
                     })
-                }
+                },
+                tags : ["api"]
             }
         },
         {
@@ -63,7 +65,8 @@ export const register = diregister({
                 handler(request, reply){
                     logger.info({ req: request }, "report deployment status request");
                     deployReportStatus(request.payload, ok(reply));
-                }
+                },
+                tags : ["api"]
             }
         },
         {
@@ -74,7 +77,8 @@ export const register = diregister({
                 handler(request, reply){
                     logger.info({ req: request }, "report download status request");
                     downloadReportStatus(request.payload, ok(reply));
-                }
+                },
+                tags : ["api"]
             }
         }
     ]);
