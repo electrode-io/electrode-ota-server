@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-demo",
-  "version": "2.1.0-beta.2",
+  "version": "2.1.0-beta.3",
   "private": true,
   "description": "Example OTA Server",
   "main": "index.js",
@@ -8,6 +8,6 @@
     "start": "NODE_ENV=development node $NODE_DEBUG_OPTION ./node_modules/electrode-ota-server/index"
   },
   "dependencies": {
-    "electrode-ota-server": "^2.1.0-beta.2"
+    "electrode-ota-server": "^2.1.0-beta.3"
   }
 }

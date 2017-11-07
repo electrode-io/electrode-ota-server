@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-default-config",
-  "version": "2.1.0-beta.2",
+  "version": "2.1.0-beta.3",
   "description": "OTA Default Configuration",
   "main": "lib/index.js",
   "scripts": {
@@ -21,9 +21,9 @@
     "electrode-ota-server-fileservice-upload": "^2.1.0-beta.1",
     "electrode-ota-server-logger": "^2.1.0-beta.1",
     "electrode-ota-server-model-account": "^2.1.0-beta.1",
-    "electrode-ota-server-model-acquisition": "^2.1.0-beta.1",
-    "electrode-ota-server-model-app": "^2.1.0-beta.1",
-    "electrode-ota-server-model-manifest": "^2.1.0-beta.1",
+    "electrode-ota-server-model-acquisition": "^2.1.0-beta.3",
+    "electrode-ota-server-model-app": "^2.1.0-beta.3",
+    "electrode-ota-server-model-manifest": "^2.1.0-beta.3",
     "electrode-ota-server-model-weighted": "^2.1.0-beta.1",
     "electrode-ota-server-public": "^2.1.0-beta.1",
     "electrode-ota-server-routes-accesskeys": "^2.1.0-beta.2",
