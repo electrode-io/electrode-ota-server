@@ -66,11 +66,15 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                                 return dao.historyByIds(deployment.history_)
                                     .then(history => history.filter(v => v.packageHash == params.packageHash))
                                     .then(matches => manifest(matches.concat(pkg)).then(v => {
-                                        return dao.updatePackage(deployment.key, v[v.length - 1]).then((pkgLast) => {
-                                            const p2 = pkgLast.diffPackageMap && pkgLast.diffPackageMap[params.packageHash];
+                                        const newPackage = v[v.length - 1];
+                                        return dao.updatePackage(deployment.key, newPackage).then((pkgLast) => {
+                                            const p2 = newPackage.diffPackageMap && newPackage.diffPackageMap[params.packageHash];
                                             if (p2) {
                                                 ret.downloadURL = p2.url;
                                                 ret.packageSize = p2.size;
+                                                if (p2.diffManifestPackageHash) {
+                                                    ret.packageHash = p2.diffManifestPackageHash;
+                                                }
                                             }
                                             return ret;
                                         })

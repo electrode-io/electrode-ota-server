@@ -96,6 +96,8 @@ export const delta = (manifest, buffer)=> {
     return new Promise((resolve, reject)=> {
         yauzl[method](buffer, {lazyEntries: true}, function (err, zipfile) {
             const seen = [];
+            // this is to make react native code push work right
+            const diffManifestEntries = [];
             if (err) return reject(err);
             const retFile = new yazl.ZipFile();
 
@@ -115,6 +117,7 @@ export const delta = (manifest, buffer)=> {
                                 const mtime = entry.getLastModDate();
                                 retFile.addReadStream(readFromStream, entry.fileName, {mtime});
                             });
+                            diffManifestEntries.push(entry.fileName + ":" + hash);
                         }
                         zipfile.readEntry();
                     });
@@ -128,8 +131,20 @@ export const delta = (manifest, buffer)=> {
                 retFile.addBuffer(new Buffer(jsonContent), "hotcodepush.json", {mtime: MTIME});
                 zipfile.close();
                 retFile.end({}, (totalSize)=> {
-                    resolve(retFile);
+
+                    // This section is for react native data integrity check
+                    const sorted = diffManifestEntries.sort();
+                    const diffManifestEntriesString = JSON.stringify(sorted);
+                    const diffManifestEntriesHash = crypto.createHash("sha256");
+                    diffManifestEntriesHash.update(diffManifestEntriesString);
+                    const diffHash = diffManifestEntriesHash.digest("hex");
+
+                    resolve({
+                        zipFile : retFile,
+                        diffManifestPackageHash : diffHash
+                    });
                 });
+
             });
         });
     });
@@ -195,15 +210,20 @@ export const genDiffPackageMap = (download, upload, current, histories = [])=> {
 export const generateDiffPackage = (download, upload, latestPackage, installedPackage) => {
     return downloadOrGenerateManifest(download, upload, installedPackage)
         .then((installedPkgManifest) => {
+            let diffManifestPackageHash;
             return download(latestPackage.packageHash, latestPackage.blobUrl)
                 .then((latestPkgContent) => delta(installedPkgManifest, latestPkgContent))
-                .then(zipToBuf)
+                .then((deltaResults) => {
+                    diffManifestPackageHash = deltaResults.diffManifestPackageHash;
+                    return zipToBuf(deltaResults.zipFile);
+                })
                 .then(upload)
                 .then(({ blobUrl, size }) => {
                     const diffPackageMap = latestPackage.diffPackageMap || (latestPackage.diffPackageMap = {});
                     diffPackageMap[installedPackage.packageHash] = {
                         url : blobUrl,
-                        size
+                        size,
+                        diffManifestPackageHash
                     };
                 });
         });
