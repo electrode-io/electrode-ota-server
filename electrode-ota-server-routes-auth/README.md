@@ -12,3 +12,28 @@ $ npm install electrode-ota-server-routes-auth
 
 ## Usage
 
+Defines the links to supported authentication methods on the landing page.
+
+Example:
+```
+"electrode-ota-server-routes-auth": {
+  "options": {
+    "providers": [
+      {
+        "name": "Basic Auth",
+        "auth": "basic",
+        "label": "Walmart Basic Auth",
+        "icon": {
+          "src": "data:image/svg+xml;....",
+          "height": 30,
+          "width": 100
+        }
+      }
+    ]
+  }
+}
+```
+- name : Name used in the /auth/*/{name} route and className
+- auth: Strategy to use
+- label: Label for button
+- icon: Icon config for button.
