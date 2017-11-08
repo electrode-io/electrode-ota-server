@@ -48,6 +48,10 @@ To increase the max upload size, add this to your configuration:
 
 ```
 
+## Development
+
+To run tests, make sure you have `localhost.walmart.com` mapped to 127.0.0.1 loopback, and run..
+```> yarn test```
 
 Apache-2.0 © WalmartLabs
 <br>
