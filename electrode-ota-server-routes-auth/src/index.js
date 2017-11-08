@@ -147,10 +147,16 @@ export const register = diregister({
                             //(email, createdBy, friendlyName, ttl
                             addAccessKey(email, hostname, displayName || username, void(0), (e, token) => {
                                 if (e) {
-                                    console.error('Error adding key', e);
+                                    let message = 'Error adding access key';
+                                    let href = '';
+                                    if (e.message.indexOf('No user registered') >= 0) {
+                                        message = e.message + " Try using 'code-push register' instead of 'code-push login', or click here to register.";
+                                        href = '/auth/register/' + name;
+                                    }
                                     return reply.view('error', {
                                         title: 'Error adding accesskey',
-                                        message: 'Error adding accesskey'
+                                        message,
+                                        href
                                     });
                                 }
                                 cookieAuth.set({token: token.name});
@@ -182,7 +188,7 @@ export const register = diregister({
                                 if (e.output && e.output.payload && e.output.payload.error === 'Conflict') {
                                     return reply.view('error', {
                                         title: 'Error adding account',
-                                        message: 'This account is already registered, try logging in instead.',
+                                        message: 'This account is already registered. Click here to log in instead.',
                                         href: `/auth/login?hostname=${credentials.query && credentials.query.hostname}`
                                     })
                                 }
