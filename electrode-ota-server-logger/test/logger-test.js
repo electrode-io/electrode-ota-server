@@ -1,7 +1,6 @@
 import { loggerFactory } from "../src";
 import { expect } from "chai";
 import intercept from "intercept-stdout";
-import * as gelfStream from "gelf-stream";
 import Promise from "bluebird";
 
 describe("loggerFactory", function() {

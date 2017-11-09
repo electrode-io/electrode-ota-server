@@ -1,6 +1,4 @@
 import diregister from "electrode-ota-server-diregister";
-import bunyan from "bunyan";
-import good from "good";
 
 // default logger - bunyan (https://github.com/trentm/node-bunyan)
 export function loggerFactory(options, register) {
