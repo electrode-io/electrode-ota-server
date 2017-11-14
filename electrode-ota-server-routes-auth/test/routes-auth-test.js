@@ -1,16 +1,14 @@
 import path from 'path';
 import otaServer from 'electrode-ota-server';
 import {expect} from 'chai';
-process.env.OTA_CONFIG_DIR = path.join(__dirname, 'config');
-process.env.NODE_ENV = 'test';
-process.env.PORT = 9999;
 
 describe('sso-test', function() {
     this.timeout(50000);
 
     let server;
     before(() => {
-        return otaServer(process.env.OTA_CONFIG_DIR).then(svr => {
+        const config_dir = path.join(__dirname, 'config');
+        return otaServer(config_dir).then(svr => {
             server = svr;
         });
     });
