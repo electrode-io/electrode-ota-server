@@ -6,6 +6,8 @@ process.env.NODE_ENV = 'test';
 process.env.PORT = 9999;
 
 describe('sso-test', function() {
+    this.timeout(50000);
+
     let server;
     before(() => {
         return otaServer(process.env.OTA_CONFIG_DIR).then(svr => {
