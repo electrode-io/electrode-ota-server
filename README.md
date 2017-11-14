@@ -1,7 +1,7 @@
 Electrode OTA Server
 ===
-The Electrode OTA Server provides a server to allow hot deploy to android and ios React Native&#8482;  and Cordova&#8482;  apps.   The server 
-is API compatible with [code-push-cli](https://microsoft.github.io/code-push/docs/cli.html), the 
+The Electrode OTA Server provides a server to allow hot deploy to android and ios React Native&#8482;  and Cordova&#8482;  apps.   The server
+is API compatible with [code-push-cli](https://microsoft.github.io/code-push/docs/cli.html), the
 [Code Push React Native SDK](https://microsoft.github.io/code-push/docs/react-native.html) and the [Code Push Cordova SDK](https://microsoft.github.io/code-push/docs/cordova.html).
 
 
@@ -15,7 +15,7 @@ will happen automatically, unless the configuration to the electrode-ota-dao-cas
                     ...
                     "disableTTYConfirmation": false,
                     //this is alter by default.
-                    "migration: 'safe',
+                    "migration": "safe",
                 }
             }
  }
