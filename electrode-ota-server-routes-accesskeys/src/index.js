@@ -27,9 +27,9 @@ export const register = diregister({
             config: {
                 handler(request, reply){
 
-                    const {auth: {credentials: {email, name}}, payload = {}, params: {key}} = request;
+                    const {auth: {credentials: {email, name, username}}, payload = {}, params: {key}} = request;
                     //email, createdBy, friendlyName, ttl
-                    addAccessKey(email || name, request.connection.info.host, payload.friendlyName, payload.ttl, (e, accessKey) => {
+                    addAccessKey(email || username, request.connection.info.host, payload.friendlyName, payload.ttl, (e, accessKey) => {
                         if (e) return reply(e);
                         const {createdBy, friendlyName, description, name, createdTime, expires} = accessKey;
                         reply({
