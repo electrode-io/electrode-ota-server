@@ -1,5 +1,5 @@
 {
-  "name": "electrode-ota-server",
+  "name": "electrode-ota",
   "version": "2.0.0-beta",
   "description": "Electrode Over The Air",
   "author": "Justin Spears <jspears@walmartlabs.com>",
