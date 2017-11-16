@@ -1,4 +1,4 @@
-import {wrap} from 'electrode-ota-server-util';
+import { wrap, reqFields } from 'electrode-ota-server-util';
 import diregister from "electrode-ota-server-diregister";
 const noContent = (reply) => (e) => {
     if (e) return reply(e);
@@ -30,7 +30,7 @@ export const register = diregister({
                 auth: false,
                 handler(request, reply)
                 {
-                    logger.info({ req: request }, "updateCheck request");
+                    logger.info(reqFields(request), "updateCheck request");
                     updateCheck(request.query, (e, updateInfo) => {
                         if (e) {
                             console.log('error making update check ', request.query, e.message);
@@ -48,7 +48,7 @@ export const register = diregister({
             config: {
                 auth: false,
                 handler(request, reply){
-                    logger.info({ req: request }, "download request");
+                    logger.info(reqFields(request), "download request");
                     download(request.params.packageHash, (e, o) => {
                         if (e) return reply(e);
                         reply(o);
@@ -63,7 +63,7 @@ export const register = diregister({
             config: {
                 auth: false,
                 handler(request, reply){
-                    logger.info({ req: request }, "report deployment status request");
+                    logger.info(reqFields(request), "report deployment status request");
                     deployReportStatus(request.payload, ok(reply));
                 },
                 tags : ["api"]
@@ -75,7 +75,7 @@ export const register = diregister({
             config: {
                 auth: false,
                 handler(request, reply){
-                    logger.info({ req: request }, "report download status request");
+                    logger.info(reqFields(request), "report download status request");
                     downloadReportStatus(request.payload, ok(reply));
                 },
                 tags : ["api"]

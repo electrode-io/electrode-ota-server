@@ -1,4 +1,4 @@
-import {wrap} from 'electrode-ota-server-util';
+import { wrap, reqFields } from 'electrode-ota-server-util';
 import diregister from "electrode-ota-server-diregister";
 
 export const register = diregister({
@@ -27,7 +27,7 @@ export const register = diregister({
             config: {
                 auth: false,
                 handler(req, reply){
-                    logger.info({ req }, "auth request");
+                    logger.info(reqFields(req), "auth request");
                     reply.view('login', {
                         title: 'Login',
                         providers: options.providers,
@@ -150,8 +150,11 @@ export const register = diregister({
                                     let message = 'Error adding access key';
                                     let href = '';
                                     if (e.message.indexOf('No user registered') >= 0) {
-                                        message = e.message + " Try using 'code-push register' instead of 'code-push login', or click here to register.";
-                                        href = '/auth/register/' + name;
+                                        message = e.message + " Try using 'code-push register' instead of 'code-push login'";
+                                        if (registerPath !== false) {
+                                            href = registerPath;
+                                            message += ", or click here to register."
+                                        }
                                     }
                                     return reply.view('error', {
                                         title: 'Error adding accesskey',

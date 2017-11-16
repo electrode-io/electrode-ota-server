@@ -129,7 +129,7 @@ export default (options, dao, upload, download, logger) => {
                 return dao.updateApp(app.id, app).then(toJSON)
                     .tap(() => logger.info({
                             id : app.id,
-                            oldOwner : find.owner,
+                            oldOwner : find.email,
                             newOwner : find.transfer
                         }, "app transferred"));
             }));
@@ -198,10 +198,8 @@ export default (options, dao, upload, download, logger) => {
                     
                     // check to make sure that it is not already promoted
                     if (existingPackage) {
-                        console.log("from packageHash", pkg.packageHash);
-                        console.log("to packageHash", existingPackage.packageHash);
                         alreadyExistsMsg((existingPackage.packageHash !== pkg.packageHash), 
-                            `Deployment ${params.from}:${pkg.label} has already been promoted to ${params.to}:${existingPackage.label}.`);
+                            `Deployment ${params.deployment}:${pkg.label} has already been promoted to ${params.to}:${existingPackage.label}.`);
                     }
 
                     // rollout property should not be carried forward on promotion
@@ -213,7 +211,6 @@ export default (options, dao, upload, download, logger) => {
                         description = pkg.description,
                     } = excludeNull(params);
 
-                    console.log("adding package");
                     return dao.addPackage(t.key, {
                         packageHash: pkg.packageHash,
                         isDisabled,
@@ -404,7 +401,7 @@ export default (options, dao, upload, download, logger) => {
                             return dao.addPackage(deployments.key, Object.assign({}, pkg, resp))
                                 .tap(() => {
                                     logger.info({
-                                            appId : app.id,
+                                            appId : _app.id,
                                             deployment,
                                             releasedBy : email,
                                             label : pkg.label,

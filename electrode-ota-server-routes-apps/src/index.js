@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import {wrap} from 'electrode-ota-server-util';
+import { wrap, reqFields } from 'electrode-ota-server-util';
 import diregister from "electrode-ota-server-diregister";
 const toAppOut = (src) => {
     const app = Object.assign({}, src);
@@ -79,7 +79,7 @@ export const register = diregister({
                 payload: Object.assign({}, options.payload),
                 handler(request, reply)
                 {
-                    logger.info({ req: request }, "upload request ");
+                    logger.info(reqFields(request), "upload request ");
                     const {
                         params: {app, deployment}, auth: {credentials: {email}},
                         server: {app: {config: {app: {downloadUrl = request.server.info.uri + '/storagev2/'}}}},
@@ -104,7 +104,7 @@ export const register = diregister({
                 payload: Object.assign({}, options.payload),
                 handler(request, reply)
                 {
-                    logger.info({ req: request }, "update deployment request");
+                    logger.info(reqFields(request), "update deployment request");
                     const {params: {app, deployment}, auth: {credentials: {email}}, payload: {packageInfo}} = request;
                     updateDeployment(Object.assign({email, app, deployment}, packageInfo), (e, release) => {
                         if (e) return reply(e);
@@ -120,7 +120,7 @@ export const register = diregister({
             config: {
                 payload: Object.assign({}, options.payload),
                 handler(request, reply){
-                    logger.info({ req: request }, "create app request");
+                    logger.info(reqFields(request), "create app request");
                     const {email} = request.auth.credentials;
                     createApp(Object.assign({}, request.payload, {email}), (e, app) => {
                         if (e) return reply(e);
@@ -135,7 +135,7 @@ export const register = diregister({
             path: '/apps',
             config: {
                 handler(request, reply){
-                    logger.info({ req: request }, "app list request");
+                    logger.info(reqFields(request), "app list request");
                     listApps(request.auth.credentials, (e, apps) => {
                         if (e) return reply(e);
                         apps = apps.map(toAppColab(request.auth.credentials.email));
@@ -152,7 +152,7 @@ export const register = diregister({
                     params: PARAMS.app
                 },
                 handler(request, reply){
-                    logger.info({ req: request }, "get app request");
+                    logger.info(reqFields(request), "get app request");
                     const {auth: {credentials: {email}}, params: {app}} = request;
                     findApp({email, app}, (e, app) => {
                         if (e) return reply(e);
@@ -172,7 +172,7 @@ export const register = diregister({
                 },
                 payload: Object.assign({}, options.payload),
                 handler(request, reply){
-                    logger.info({ req: request }, "rename app request");
+                    logger.info(reqFields(request), "rename app request");
                     const {auth: {credentials: {email}}, params: {app}, payload: {name}} = request;
                     renameApp(Object.assign({}, {email, app, name}), noContent(reply));
                 },
@@ -188,7 +188,7 @@ export const register = diregister({
                     params: PARAMS.app
                 },
                 handler(request, reply){
-                    logger.info({ req: request }, "remove app request");
+                    logger.info(reqFields(request), "remove app request");
                     const {auth: {credentials: {email}}, params: {app}} = request;
                     removeApp({email, app}, noContent(reply));
                 },
@@ -201,7 +201,7 @@ export const register = diregister({
             config: {
                 payload: Object.assign({}, options.payload),
                 handler(request, reply){
-                    logger.info({ req: request }, "transfer app request");
+                    logger.info(reqFields(request), "transfer app request");
                     const {params: {app, transfer}, auth: {credentials: {email}}} = request;
                     transferApp({app, email, transfer}, (e) => {
                         if (e) return reply(e);
@@ -216,7 +216,7 @@ export const register = diregister({
             path: '/apps/{app}/deployments/',
             config: {
                 handler(request, reply){
-                    logger.info({ req: request }, "get deployment list request");
+                    logger.info(reqFields(request), "get deployment list request");
                     const {params: {app}, auth: {credentials: {email}}} = request;
                     listDeployments({app, email}, (e, deployments) => {
                         if (e) return reply(e);
@@ -239,7 +239,7 @@ export const register = diregister({
                 },
                 payload: Object.assign({}, options.payload),
                 handler(request, reply){
-                    logger.info({ req: request }, "add deployment request");
+                    logger.info(reqFields(request), "add deployment request");
                     const {params: {app}, payload, auth: {credentials: {email}}} = request;
                     addDeployment(Object.assign({}, payload, {app, email})).then(({name, key}) => {
                         reply({
@@ -266,7 +266,7 @@ export const register = diregister({
                 },
                 payload: Object.assign({}, options.payload),
                 handler(request, reply){
-                    logger.info({ req: request }, "rename deployment request");
+                    logger.info(reqFields(request), "rename deployment request");
                     const {params: {app, deployment}, payload: {name}, auth: {credentials: {email}}} = request;
                     renameDeployment({app, deployment, email, name}, noContent(reply));
                 },
@@ -282,7 +282,7 @@ export const register = diregister({
                     params: PARAMS.deployment
                 },
                 handler(request, reply){
-                    logger.info({ req: request }, "get deployment info request");
+                    logger.info(reqFields(request), "get deployment info request");
                     const {params: {app, deployment}, auth: {credentials: {email}}} = request;
 
                     getDeployment({app, email, deployment}, (e, deployment) => {
@@ -304,7 +304,7 @@ export const register = diregister({
                     params: PARAMS.deployment
                 },
                 handler(request, reply){
-                    logger.info({ req: request }, "remove deployment request");
+                    logger.info(reqFields(request), "remove deployment request");
                     const {params: {app, deployment}, auth: {credentials: {email}}} = request;
                     removeDeployment({app, deployment, email}, noContent(reply));
                 },
@@ -320,7 +320,7 @@ export const register = diregister({
                     params: PARAMS.deployment
                 },
                 handler(request, reply){
-                    logger.info({ req: request }, "clear history request");
+                    logger.info(reqFields(request), "clear history request");
                     const {params: {app, deployment}, auth: {credentials: {email}}} = request;
                     clearHistory({app, email, deployment}, noContent(reply));
                 },
@@ -335,7 +335,7 @@ export const register = diregister({
                     params: PARAMS.deployment
                 },
                 handler(request, reply){
-                    logger.info({ req: request }, "get deployment history request");
+                    logger.info(reqFields(request), "get deployment history request");
                     const {params: {app, deployment}, auth: {credentials: {email}}} = request;
                     historyDeployment({app, email, deployment}, (e, history) => {
                         if (e) return reply(e);
@@ -355,7 +355,7 @@ export const register = diregister({
                 },
                 payload: Object.assign({}, options.payload),
                 handler(request, reply){
-                    logger.info({ req: request }, "promote deployment package request");
+                    logger.info(reqFields(request), "promote deployment package request");
                     const {params: {app, deployment, to}, payload: {packageInfo}, auth: {credentials: {email}}} = request;
                     promoteDeployment(Object.assign({}, packageInfo, {app, email, deployment, to}), (e, pkg) => {
                         if (e) return reply(e);
@@ -375,7 +375,7 @@ export const register = diregister({
                 payload: Object.assign({}, options.payload),
                 handler(request, reply)
                 {
-                    logger.info({ req: request }, "rollback request");
+                    logger.info(reqFields(request), "rollback request");
                     const {params: {app, deployment, label}, auth: {credentials: {email}}} = request;
                     rollback({app, deployment, label, email}, (e, pkg) => {
                         if (e)return reply(e);
@@ -395,7 +395,7 @@ export const register = diregister({
                 },
                 handler(request, reply)
                 {
-                    logger.info({ req: request }, "get metrics request");
+                    logger.info(reqFields(request), "get metrics request");
                     const {params: {app, deployment}, auth: {credentials: {email}}} = request;
                     metrics({app, deployment, email}, (e, metrics) => {
                         if (e) {
@@ -415,7 +415,7 @@ export const register = diregister({
             config: {
                 handler(request, reply)
                 {
-                    logger.info({ req: request }, "get collaborators request");
+                    logger.info(reqFields(request), "get collaborators request");
                     const {params: {app}, auth: {credentials: {email}}} = request;
                     findApp({app, email}, (e, app) => {
                         if (e) return reply(e);
@@ -442,7 +442,7 @@ export const register = diregister({
                 payload: Object.assign({}, options.payload),
                 handler(request, reply)
                 {
-                    logger.info({ req: request }, "add collaborator request");
+                    logger.info(reqFields(request), "add collaborator request");
                     const {params: {app, collaborator}, auth: {credentials: {email}}} = request;
                     addCollaborator({email, app, collaborator}, (e, o) => {
                         if (e) return reply(e);
@@ -458,7 +458,7 @@ export const register = diregister({
             config: {
                 handler(request, reply)
                 {
-                    logger.info({ req : request }, "remove collaborator request");
+                    logger.info(reqFields(request), "remove collaborator request");
                     const {params: {app, collaborator}, auth: {credentials: {email}}} = request;
                     removeCollaborator({email, app, collaborator}, noContent(reply));
                 },
