@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-auth-basic",
-  "version": "2.1.0-beta.1",
+  "version": "2.1.0-beta.6",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -9,11 +9,11 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-diregister": "^2.1.0-beta.1",
-    "electrode-ota-server-errors": "^2.1.0-beta.1",
-    "electrode-ota-server-util": "^2.1.0-beta.1"
+    "electrode-ota-server-diregister": "^2.1.0-beta.6",
+    "electrode-ota-server-errors": "^2.1.0-beta.6",
+    "electrode-ota-server-util": "^2.1.0-beta.6"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^2.1.0-beta.1"
+    "electrode-ota-server-util-dev": "^2.1.0-beta.6"
   }
 }

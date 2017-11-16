@@ -82,11 +82,12 @@ export const promisify = (fn, scope) => function (...args) {
  */
 export const reqFields = function(req) {
     return {
-        method : req.method,
-        url : req.url,
-        headers : req.headers,
-        remoteAddress : req.connection.remoteAddress,
-        remotePort : req.connection.remotePort,
+        requestId : req.id,
+        method: req.method,
+        url: req.url,
+        headers: req.headers,
+        remoteAddress: req.info.remoteAddress,
+        remotePort: req.info.remotePort
     };
 }
 
