@@ -1,5 +1,5 @@
 {
-  "name": "electrode-ota-server-errors",
+  "name": "electrode-ota-server-logger",
   "version": "2.1.0-beta.6",
   "main": "lib/index.js",
   "scripts": {
@@ -9,11 +9,13 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "boom": "^4.3.1",
     "electrode-ota-server-diregister": "^2.1.0-beta.6",
     "electrode-ota-server-util": "^2.1.0-beta.6"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^2.1.0-beta.6"
+    "bluebird": "^3.5.1",
+    "electrode-ota-server-test-support": "^2.1.0-beta.6",
+    "electrode-ota-server-util-dev": "^2.1.0-beta.6",
+    "intercept-stdout": "^0.1.2"
   }
 }

@@ -51,6 +51,7 @@ export default function () {
             "inert": {
                 "enable": true
             },
+            "electrode-ota-server-logger": {},
             "electrode-ota-server-view": {},
             "electrode-ota-server-dao-cassandra": {
                 "options": {
@@ -153,12 +154,11 @@ export default function () {
                     "path": "/assets/{param*}"
                 }
             },
-            "electrode-ota-server-service-errors": {}
+            "electrode-ota-server-service-errors": {},
         }
     };
 
     Object.keys(conf.plugins).forEach(key => {
-
         conf.plugins[key].module = require.resolve(conf.plugins[key].module || key);
 
     });

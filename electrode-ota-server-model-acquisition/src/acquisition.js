@@ -2,7 +2,7 @@ import {missingParameter} from 'electrode-ota-server-errors';
 import version from 'semver';
 const fixver = (ver) => ver ? ('' + ver).replace(/^(\d+?)$/, '$1.0.0') : '0.0.0';
 
-export default (options, dao, weighted, _download, manifest) => {
+export default (options, dao, weighted, _download, manifest, logger) => {
     const api = {
         download(hash){
             return _download(hash);
@@ -66,11 +66,15 @@ export default (options, dao, weighted, _download, manifest) => {
                                 return dao.historyByIds(deployment.history_)
                                     .then(history => history.filter(v => v.packageHash == params.packageHash))
                                     .then(matches => manifest(matches.concat(pkg)).then(v => {
-                                        return dao.updatePackage(deployment.key, v[v.length - 1]).then((pkgLast) => {
-                                            const p2 = pkgLast.diffPackageMap && pkgLast.diffPackageMap[params.packageHash];
+                                        const newPackage = v[v.length - 1];
+                                        return dao.updatePackage(deployment.key, newPackage).then((pkgLast) => {
+                                            const p2 = newPackage.diffPackageMap && newPackage.diffPackageMap[params.packageHash];
                                             if (p2) {
                                                 ret.downloadURL = p2.url;
                                                 ret.packageSize = p2.size;
+                                                if (p2.diffManifestPackageHash) {
+                                                    ret.packageHash = p2.diffManifestPackageHash;
+                                                }
                                             }
                                             return ret;
                                         })
@@ -85,8 +89,18 @@ export default (options, dao, weighted, _download, manifest) => {
 
                 return isNotAvailable ? makeReturn(!isNotAvailable) : api.isUpdateAble(params.clientUniqueId, pkg.packageHash, pkg.rollout).then(makeReturn);
 
+            }).tap((res) => {
+                logger.info({
+                    event : {
+                        name : "checkedForUpdate",
+                        deploymentKey : params.deploymentKey,
+                        clientUniqueId : params.clientUniqueId,
+                        available : res.isAvailable
+                    }
+                }); 
             });
         },
+
         downloadReportStatus(/*{
                               clientUniqueId,
                               deploymentKey,
@@ -94,7 +108,8 @@ export default (options, dao, weighted, _download, manifest) => {
                               }*/ metric)
         {
             metric.status = 'Downloaded';
-            return dao.insertMetric(metric);
+            return dao.insertMetric(metric)
+                .tap(() => logger.info({ depoymentKey : metric.deploymentKey, label : metric.label }, "recorded download success"));
         }
         ,
         /**
@@ -118,7 +133,8 @@ export default (options, dao, weighted, _download, manifest) => {
                             previousLabelOrAppVersion,
                             previousDeploymentKey
                             }*/ metric){
-            return dao.insertMetric(metric);
+            return dao.insertMetric(metric)
+                .tap(() => logger.info({ depoymentKey : metric.deploymentKey, label : metric.label, status : metric.status }, "recorded deployment status"));
         },
         /**
          * So this keeps track of what the client got last time.

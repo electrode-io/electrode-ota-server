@@ -44,7 +44,7 @@ describe('manifest', function () {
 
         return readFixture('step.2.blob.zip')
             .then(buffer => manifest.delta(step1, buffer))
-            .then(manifest.zipToBuf)
+            .then((deltaResults) => manifest.zipToBuf(deltaResults.zipFile))
             .then(manifest.generate)
             .then(eql)
             .then(check => manifest.generate(fixture('step.2.map.c7b8f2545224a4d180f8deeebf3fbdc267600ffe1f76914236cd186be45c6229.zip'))
