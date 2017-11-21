@@ -20,6 +20,41 @@ export const register = diregister({
         linkProvider: acf.linkProvider
     });
 
+    /**
+     * Different authentication methods will return different credentials.
+     * Need to normalize those credentials into an object saved to Account's access keys
+     * {
+     *    email : email of user,
+     *    displayName : display name of user,
+     *    createdBy : description of how the access was created
+     * }
+     * @param {credentials} credentials 
+     */
+    const _normalizeCredentials = (credentials, reply) => {
+        if (credentials.profile) {
+            // Hapijs/bell based providers
+            return credentials;
+        } else if (credentials.email) {
+            // SSO
+            return {
+                provider: "sso",
+                query: {
+                    hostname: "sso",
+                },
+                profile: {
+                    email: credentials.email,
+                    displayName: credentials.name ? credentials.name : credentials.email,
+                    username: credentials.loginId ? credentials.loginId : "SSO"
+                }
+            };
+        } else {
+            return reply.view('error', {
+                title: 'Unmapped credentials',
+                message: 'Authentication Creditials is not properly formatted'
+            });
+        }
+    };
+
     route([
         {
             method: 'GET',
@@ -141,9 +176,10 @@ export const register = diregister({
                         if (!isAuthenticated) {
                             return reply('Not logged in...').code(401);
                         }
-                        if (credentials && credentials.profile) {
-                            const {email, displayName, username} = credentials.profile;
-                            const {hostname} = credentials.query || {};
+                        if (credentials) {
+                           const mappedCredential = _normalizeCredentials(credentials, reply);
+                           const {email, displayName, username} = mappedCredential.profile;
+                           const {hostname} = mappedCredential.query || {};
                             //(email, createdBy, friendlyName, ttl
                             addAccessKey(email, hostname, displayName || username, void(0), (e, token) => {
                                 if (e) {
@@ -183,8 +219,8 @@ export const register = diregister({
                                 console.error('request was not authenticated');
                                 return reply('Not logged in...').code(401);
                             }
-
-                            createToken(credentials).then((token) => {
+                            const mappedCredential = _normalizeCredentials(credentials, reply);
+                            createToken(mappedCredential).then((token) => {
                                 cookieAuth.set({ token : token.name });
                                 reply.redirect(redirectTo).code(302);
                             }).catch((e) => {
@@ -215,8 +251,9 @@ export const register = diregister({
                                 console.error('request was not authenticated');
                                 return reply('Not logged in...').code(401);
                             }
-                            if (credentials && credentials.profile) {
-                                const {email} = credentials.profile;
+                            if (credentials) {
+                                const mappedCredential = _normalizeCredentials(credentials, reply);
+                                const {email} = mappedCredential.profile;
                                 linkProvider({email, provider: name}, (e) => {
                                     if (e) {
                                         return reply.view('error', {title: 'Error', message: e.message});

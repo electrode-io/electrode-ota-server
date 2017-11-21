@@ -34,6 +34,6 @@ Example:
 }
 ```
 - name : Name used in the /auth/*/{name} route and className
-- auth: Strategy to use
+- auth: Authentication strategy to use
 - label: Label for button
 - icon: Icon config for button.
