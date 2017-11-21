@@ -97,9 +97,10 @@ export default class DaoExpressCassandra {
     Package = Mock;
     User = Mock;
 
-    constructor({client}) {
+    constructor({client, logger}) {
         Object.assign(this, client.instance);
         this._models = client;
+        this.logger = logger;
     }
 
     newApp(app) {

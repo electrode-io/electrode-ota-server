@@ -72,6 +72,25 @@ export const waitFor = function (fn, scope, ...args) {
 export const promisify = (fn, scope) => function (...args) {
     return waitFor(fn, scope || this, ...args);
 };
+
+/**
+ * Used with the logger to reduce the number of properties in a request object that are getting logged
+ * 
+ * @param {*} req a Hapi Request object
+ * 
+ * returns a new object with just the properties we are interested in
+ */
+export const reqFields = function(req) {
+    return {
+        requestId : req.id,
+        method: req.method,
+        url: req.url,
+        headers: req.headers,
+        remoteAddress: req.info.remoteAddress,
+        remotePort: req.info.remotePort
+    };
+}
+
 export default({
     toJSON,
     promisify,
@@ -87,5 +106,5 @@ export default({
     shasum,
     values,
     wrap,
-
+    reqFields,
 });

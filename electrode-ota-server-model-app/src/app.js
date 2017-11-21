@@ -71,8 +71,7 @@ const notAuthorizedPerm = (app, email, perm, message) => {
     return notAuthorized(false, message);
 };
 
-
-export default (options, dao, upload, download) => {
+export default (options, dao, upload, download, logger) => {
     const api = {};
     return Object.assign(api, {
         findApp({email, app}){
@@ -99,19 +98,23 @@ export default (options, dao, upload, download) => {
                 });
 
                 deployments.forEach((name) => app.deployments[name] = _addDeployment(app, name));
-                return dao.createApp(app);
+                return dao.createApp(app)
+                    .tap((app) => logger.info({ name, appId : app.id }, "app created"));
             });
         },
 
         removeApp(find) {
             return api._findApp(find, 'Owner', 'Must be owner of app to remove')
-                .then(app => dao.removeApp(app.id).then(v => app));
+                .then(app => dao.removeApp(app.id).then(v => app))
+                    .tap((app) => logger.info({ appId : app.id }, "app removed"));
         },
 
         renameApp(find){
             return api._findApp(find, 'Owner', 'Must be owner of app to rename').then(app => {
+                const oldName = app.name;
                 app.name = find.name;
-                return dao.updateApp(app.id, app).then(v => app);
+                return dao.updateApp(app.id, app).then(v => app)
+                    .tap(() => logger.info({ oldName, newName : app.name, appId : app.id }, "app renamed"));
             });
         },
 
@@ -123,27 +126,40 @@ export default (options, dao, upload, download) => {
                 const transfer = app.collaborators[find.transfer] || (app.collaborators[find.transfer] = {});
                 owner.permission = 'Collaborator';
                 transfer.permission = 'Owner';
-                return dao.updateApp(app.id, app).then(toJSON);
+                return dao.updateApp(app.id, app).then(toJSON)
+                    .tap(() => logger.info({
+                            id : app.id,
+                            oldOwner : find.email,
+                            newOwner : find.transfer
+                        }, "app transferred"));
             }));
         },
 
         listApps({email}){
-            return dao.appsForCollaborator(email).then(toJSON);
+            return dao.appsForCollaborator(email).then(toJSON)
+                .tap(() => logger.info({ additional : { email }}, "got app list"));
         },
 
         listDeployments(find){
             return api.findApp(find).then(app => dao.deploymentsByApp(app.id, app.deployments)
                 .then(deployments => {
-                    return app.deployments.map(name => deployments[name])
+                    logger.info({ appId : app.id }, "fetched deployments");
+                    return app.deployments.map(name => deployments[name]);
                 }));
         },
+
         async getDeployment(find){
             const app = await api.findApp(find);
             const deployment = await dao.deploymentByApp(app.id, find.deployment);
+            logger.info({ appId : app.id, deployment : find.deployment }, "fetched deployment")
             return deployment;
         },
+
         removeDeployment(params){
-            return api.findApp(params).then(app => dao.removeDeployment(app.id, params.deployment));
+            return api.findApp(params).then(app => {
+                return dao.removeDeployment(app.id, params.deployment)
+                    .tap(() => logger.info({ appId : app.id, deployment : params.deployment }, "removed deployment"));
+            });
         },
 
         renameDeployment(params){
@@ -151,7 +167,8 @@ export default (options, dao, upload, download) => {
                 const {deployment, name} = params;
                 notFound(hasDeploymentName(app, deployment), `Deployment '${deployment}' not found ${params.app}`);
                 alreadyExists(!hasDeploymentName(app, name), name, 'deployment');
-                return dao.renameDeployment(app.id, deployment, name);
+                return dao.renameDeployment(app.id, deployment, name)
+                    .tap(() => logger.info({ appId : app.id, oldName : deployment, newName : name }, "renamed deployment"));
             });
         },
 
@@ -159,18 +176,40 @@ export default (options, dao, upload, download) => {
         {
             return api.findApp(params).then(app => {
 
-                return dao.deploymentsByApp(app.id, [params.deployment, params.to]).then(deployments => {
+                return dao.deploymentsByApp(app.id, [params.deployment, params.to]).then(async (deployments) => {
                     const f = deployments[params.deployment];
 
                     notFound(f && f.package, `Deployment "${params.deployment}" does not exist.`);
 
                     const t = notFound(deployments[params.to], `Deployment "${params.to}" does not exist.`);
 
-                    const pkg = f.package;
+                    let pkg = f.package;
 
+                    if (params.label) {
+                        const packages = await dao.history(app.id, [params.deployment]);
+                        pkg = packages.find((packag) => {
+                            return packag.label === params.label;
+                        });
+
+                        notFound(pkg, `Deployment "${params.deployment}" has no package with label "${params.label}"`);
+                    }
+
+                    const existingPackage = t.package;
+                    
+                    // check to make sure that it is not already promoted
+                    if (existingPackage) {
+                        alreadyExistsMsg((existingPackage.packageHash !== pkg.packageHash), 
+                            `Deployment ${params.deployment}:${pkg.label} has already been promoted to ${params.to}:${existingPackage.label}.`);
+                    }
+
+                    // rollout property should not be carried forward on promotion
                     const {
-                        isDisabled = pkg.isDisabled, isMandatory = pkg.isMandatory, rollout = pkg.rollout, appVersion = pkg.appVersion, description = pkg.description
-                    } = params;
+                        isDisabled = pkg.isDisabled,
+                        isMandatory = pkg.isMandatory,
+                        rollout, // = pkg.rollout,
+                        appVersion = pkg.appVersion,
+                        description = pkg.description,
+                    } = excludeNull(params);
 
                     return dao.addPackage(t.key, {
                         packageHash: pkg.packageHash,
@@ -183,9 +222,20 @@ export default (options, dao, upload, download) => {
                         releasedBy: params.email,
                         releaseMethod: "Promote",
                         originalLabel: pkg.label,
-                        originalDeployment: params.deployment
+                        originalDeployment: params.deployment,
+                        blobUrl : pkg.blobUrl,
+                        manifestBlobUrl : pkg.manifestBlobUrl,
+                        size : pkg.size,
+                        label : "v" + (t.history_ ? t.history_.length + 1 : 1)
+                    }).tap(() => {
+                        logger.info({
+                                appId : app.id,
+                                fromDeployment : params.deployment,
+                                toDeployment : params.to,
+                                originalLabel : pkg.label
+                            }, "promoted deployment");
                     });
-                })
+                });
             });
         },
 
@@ -198,6 +248,7 @@ export default (options, dao, upload, download) => {
             for (let i = map.length - 1; i >= 0; --i) {
                 delete map[i].created_;
             }
+            logger.info({ appId : capp.id, deployment : deployment }, "fetched deployment history");
             return map;
         },
 
@@ -227,7 +278,8 @@ export default (options, dao, upload, download) => {
                     description
                 };
 
-                return dao.updatePackage(deployment.key, npkg);
+                return dao.updatePackage(deployment.key, npkg)
+                    .tap(() => logger.info({ appId : app.id, deployment : params.deployment }, "updated deployment"));
             })).then(toJSON);
         },
 
@@ -239,7 +291,8 @@ export default (options, dao, upload, download) => {
             }, 'Any', `Do not have permission to  add deployment to '${app}'.`).then(app => {
 
                 alreadyExists(!hasDeploymentName(app, name), name, `deployment`);
-                return dao.addDeployment(app.id, name, _newDeployment(name));
+                return dao.addDeployment(app.id, name, _newDeployment(name))
+                    .tap(() => logger.info({ appId : app.id, deployment : name }, "added deployment"));
             });
         },
 
@@ -253,7 +306,8 @@ export default (options, dao, upload, download) => {
                     `The given account is not a collaborator for this app.`);
 
                 delete app.collaborators[collaborator];
-                return dao.updateApp(app.id, app);
+                return dao.updateApp(app.id, app)
+                    .tap(() => logger.info({ appId : app.id, collaborator }, "removed collaborator"));
             });
         },
 
@@ -271,7 +325,8 @@ export default (options, dao, upload, download) => {
                     app.collaborators[collaborator] = {
                         "permission": "Collaborator"
                     };
-                    return dao.updateApp(app.id, app).then(v => true);
+                    return dao.updateApp(app.id, app).then(v => true)
+                        .tap(() => logger.info({ appId : app.id, collaborator }, "added collaborator"));
                 });
             });
         },
@@ -344,13 +399,26 @@ export default (options, dao, upload, download) => {
                         })
                         .then(resp => {
                             return dao.addPackage(deployments.key, Object.assign({}, pkg, resp))
+                                .tap(() => {
+                                    logger.info({
+                                            appId : _app.id,
+                                            deployment,
+                                            releasedBy : email,
+                                            label : pkg.label,
+                                            appVersion,
+                                        }, "package uploaded")
+                                });
                         });
                 });
             })
         },
 
         clearHistory(params){
-            return api._findApp(params, 'Owner', `Must be owner to clear history`).then(app => dao.clearHistory(app.id, params.deployment));
+            return api._findApp(params, 'Owner', `Must be owner to clear history`)
+                .then(app => {
+                    return dao.clearHistory(app.id, params.deployment)
+                        .tap(() => logger.info({ appId : app.id, deployment : params.deployment }, "history cleared"));
+                });
         },
 
 
@@ -363,6 +431,9 @@ export default (options, dao, upload, download) => {
 
                     const {label} = deployment.package || {};
                     //    "DeploymentSucceeded" |  "DeploymentFailed" |  "Downloaded";
+
+                    logger.info({ deployment : params.deployment }, 'fetched metrics');
+
                     return metrics.reduce((obj, val) => {
                         const key = val.label || val.appversion;
                         const ret = obj[key] || (obj[key] = {
@@ -403,7 +474,9 @@ export default (options, dao, upload, download) => {
 
         rollback(params)
         {
+            let appId = null;
             return api.findApp(params).then(app => {
+                appId = app.id;
                 if (params.label) {
                     return dao.historyLabel(app.id, params.deployment, params.label).then(rollto => dao.deploymentByApp(app.id, params.deployment).then(deployment => ({
                         rollto,
@@ -425,10 +498,11 @@ export default (options, dao, upload, download) => {
                     rollout: 100,
                     releasedBy: params.email,
                     releaseMethod: "Rollback",
-                    originalLabel: dpkg.label,
+                    originalLabel: rollto.label,
                     label: `v${history_.length + 1}`
                 });
-                return dao.addPackage(deployment.key, pkg).then(v => pkg);
+                return dao.addPackage(deployment.key, pkg).then(v => pkg)
+                    .tap(() => logger.info({ appId, deployment : params.deployment, originalLabel : rollto.label }, 'rolled back package'));
             });
 
         }

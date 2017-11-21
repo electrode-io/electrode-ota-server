@@ -8,7 +8,7 @@
         "keyspace": "ota_db_2"
       }
     },
-    "electrode-ota-server-fileservice": {
+    "electrode-ota-server-fileservice-upload": {
       "options": {
         "downloadUrl": "http://localhost.walmart.com:9001/storagev2/"
       }
@@ -66,4 +66,3 @@
     }
   }
 }
-
