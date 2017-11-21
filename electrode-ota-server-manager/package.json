@@ -11,7 +11,7 @@
   "dependencies": {
     "electrode-ota-server-diregister": "^2.1.0-beta.6",
     "electrode-ota-server-util": "^2.1.0-beta.6",
-    "electrode-ota-ui": "^2.0.0-beta.8",
+    "electrode-ota-ui": "^2.1.0-beta.6",
     "inert": "^4.0.1"
   },
   "devDependencies": {
