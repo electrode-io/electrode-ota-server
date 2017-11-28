@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota",
-  "version": "2.0.0-beta",
+  "version": "2.1.0-beta.7",
   "description": "Electrode Over The Air",
   "author": "Justin Spears <jspears@walmartlabs.com>",
   "license": "Apache-2.0",

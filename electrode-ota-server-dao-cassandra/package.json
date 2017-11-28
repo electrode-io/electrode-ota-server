@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-dao-cassandra",
-  "version": "2.1.0-beta.6",
+  "version": "2.1.0-beta.7",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -9,11 +9,11 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-diregister": "^2.1.0-beta.6",
-    "electrode-ota-server-util": "^2.1.0-beta.6",
+    "electrode-ota-server-diregister": "^2.1.0-beta.7",
+    "electrode-ota-server-util": "^2.1.0-beta.7",
     "express-cassandra": "^1.8.2"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^2.1.0-beta.6"
+    "electrode-ota-server-util-dev": "^2.1.0-beta.7"
   }
 }
