@@ -4,6 +4,8 @@ import {fileservice as uploadFactory} from 'electrode-ota-server-fileservice-upl
 import {shasum} from 'electrode-ota-server-util';
 
 describe("fileservice/upload", function() {
+    this.timeout(200000);
+
     let upload;
     const content = "This is my upload content";
     before(async () => {
@@ -23,5 +25,5 @@ describe("fileservice/upload", function() {
         return upload(content, customHash).then(({packageHash}) => {
             expect(packageHash).is.eql(customHash);
         });
-    });
+    })
 });
