@@ -1,5 +1,5 @@
 import {id, key, toJSON} from 'electrode-ota-server-util';
-import {isZip, generate} from 'electrode-ota-server-model-manifest/lib/manifest';
+import {isZip, generate, manifestHash} from 'electrode-ota-server-model-manifest/lib/manifest';
 import {shasum} from 'electrode-ota-server-util';
 
 import {
@@ -373,7 +373,7 @@ export default (options, dao, upload, download, logger) => {
                 notFound(hasDeploymentName(_app, deployment), `Not a valid deployment '${deployment}' for app '${app}'`);
                 const zip = isZip('', vals.package);
 
-                return dao.deploymentByApp(_app.id, deployment).then(deployments => {
+                return dao.deploymentByApp(_app.id, deployment).then(async deployments => {
 
                     alreadyExistsMsg(packageContainsChanges(deployments, vals.package), 'No changes detected in uploaded content for this deployment.');
 
@@ -386,17 +386,16 @@ export default (options, dao, upload, download, logger) => {
                         releasedBy: email
                     };
 
-                    return upload(vals.package)
-                        .then((resp) => {
-                            if (zip) {
-                                return generate(vals.package).then(toBuffer).then(upload)
-                                    .then(({blobUrl}) => {
-                                        resp.manifestBlobUrl = blobUrl;
-                                        return resp;
-                                    });
-                            }
-                            return resp;
-                        })
+                    if (zip) {
+                        // Generate manifest to get the packageHash
+                        const {blobUrl} = await generate(vals.package)
+                            .then((manifest) => {
+                                pkg.packageHash = manifestHash(manifest);
+                                return upload(toBuffer(manifest));
+                            });
+                        pkg.manifestBlobUrl = blobUrl;
+                    }
+                    return upload(vals.package, pkg.packageHash)
                         .then(resp => {
                             return dao.addPackage(deployments.key, Object.assign({}, pkg, resp))
                                 .tap(() => {

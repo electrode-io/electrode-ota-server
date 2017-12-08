@@ -1,12 +1,18 @@
 import initDao, {shutdown} from 'electrode-ota-server-test-support/lib/init-dao';
 import eql from 'electrode-ota-server-test-support/lib/eql';
-
+import path from 'path';
+import fs from 'fs';
 import appFactory from 'electrode-ota-server-model-app/lib/app';
 import accountFactory from 'electrode-ota-server-model-account/lib/account';
 import {fileservice as upload} from 'electrode-ota-server-fileservice-upload';
 import {fileservice as download} from 'electrode-ota-server-fileservice-download';
-
+import { manifestHash } from 'electrode-ota-server-model-manifest/lib/manifest';
+import {shasum} from 'electrode-ota-server-util';
 import {expect} from 'chai';
+import step0Manifest from './fixtures/step.0.manifest.json';
+
+const fixture = path.join.bind(path, __dirname, 'fixtures');
+const readFixture = (file) => fs.readFileSync(fixture(file));
 
 const shouldError = () => {
     expect(false, 'Should have an error').to.be.true;
@@ -476,6 +482,37 @@ describe('model/app', function () {
                 }
             ]))
     );
+
+    it("should upload zipped app and create manifest", () => {
+        const email = 'zipper@walmart.com';
+        const appName = 'zipped_app';
+        return ac.createApp({email, name: appName})
+            .then(_ => {
+                return ac.upload({
+                    app: appName,
+                    email,
+                    package: readFixture('step.0.blob.zip'),
+                    packageInfo: {
+                        isDisabled: false,
+                        rollout: 100,
+                        isMandatory: false,
+                        description: 'Zipped app'
+                    }
+                });
+            })
+            .then(_ => {
+                return ac.historyDeployment({app: appName, deployment: 'Staging', email});
+            })
+            .then(v => {
+                expect(v.length).to.eql(1);
+                const expectedPackageHash = manifestHash(step0Manifest);
+                const expectedManifestHash = shasum(JSON.stringify(step0Manifest));
+                // PackageHash = sha256 hash of the manifest file in a specific format
+                expect(v[0].packageHash).is.eql(expectedPackageHash);
+                // blobUrl without a host prefix = sha256 of the manifest file
+                expect(v[0].manifestBlobUrl).is.eql(expectedManifestHash);
+            });
+    });
 
 
 });

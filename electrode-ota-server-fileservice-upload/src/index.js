@@ -10,8 +10,10 @@ import {shasum} from 'electrode-ota-server-util';
  */
 export const fileservice = ({downloadUrl}, dao) => {
     downloadUrl = downloadUrl && downloadUrl.replace(/\/+?$/, '');
-    return (file) => {
-        const packageHash = shasum(file);
+    return (file, packageHash=null) => {
+        if (packageHash === null) {
+            packageHash = shasum(file);
+        }
         return dao.upload(packageHash, file).then(() => ({
             packageHash,
             size: file.length,
