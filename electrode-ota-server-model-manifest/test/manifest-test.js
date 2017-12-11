@@ -1,10 +1,11 @@
-import manifest from 'electrode-ota-server-model-manifest/lib/manifest';
+import manifest, { manifestHash } from 'electrode-ota-server-model-manifest/lib/manifest';
 import {expect} from 'chai';
 import path from 'path';
 import {shasum} from 'electrode-ota-server-util';
 import step0 from './fixtures/step.0.manifest.json';
 import step1 from './fixtures/step.1.manifest.json';
 import step2 from './fixtures/step.2.manifest.json';
+import step9 from './fixtures/step.9.manifest.json';
 import {history} from './fixtures/history.json';
 import fs from 'fs';
 
@@ -50,6 +51,9 @@ describe('manifest', function () {
             .then(check => manifest.generate(fixture('step.2.map.c7b8f2545224a4d180f8deeebf3fbdc267600ffe1f76914236cd186be45c6229.zip'))
                 .then(check));
 
+    });
+    it('should generate correct manifest hash', function() {
+        expect(manifestHash(step9)).to.eq("1e9218438992a0d9c891d03a283734e1f050cd0c944e7b8ce5811889ec3b82f5");
     });
 
     it.skip('should generate diffPackageMap', function () {

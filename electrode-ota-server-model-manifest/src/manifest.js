@@ -2,6 +2,7 @@ import yauzl from 'yauzl';
 import yazl from 'yazl';
 import crypto from 'crypto';
 import fileType from 'file-type';
+import _ from 'lodash';
 
 const MTIME = new Date(0);
 const all = (arr, fn)=>Promise.all(arr.map(fn));
@@ -44,6 +45,36 @@ export const streamHash = (stream, hashType = 'sha256', digestType = 'hex')=> {
     });
 };
 
+/**
+ * Takes a manifest dictionary of { "filename1": "file1hash", "filename2":"file2hash" ...} and generates the hash according to CodePush
+ * Convert to array, sort, and hash
+ * hash = sha256([ "filename1:file1hash", "filename2:file2hash", ...])
+ *
+ * @param {dictionary of filename:hash} manifest
+ * @returns hash
+ */
+export const manifestHash = (manifest) => {
+    const manifestAsArray = _.map(manifest, (hash, filename) => {
+        return filename + ":" + hash;
+    });
+    const sorted = manifestAsArray.sort();
+    const manifestAsString = JSON.stringify(sorted);
+    const sha256 = crypto.createHash("sha256");
+    sha256.update(manifestAsString);
+    return sha256.digest("hex");
+};
+
+/**
+ * Generates a manifest for the input buffer (zip file)
+ *
+ * Sample manifest file
+ * {
+ *    "file1": "hash_of_file_1_ABCDEF01234567890",
+ *    "file2": "hash_of_file_2_ABCDEF01234567890"
+ * }
+ *
+ * @param {input buffer} buffer
+ */
 export const generate = (buffer)=> new Promise(function (resolve, reject) {
     if (buffer instanceof Uint8Array) {
         buffer = Buffer.from(buffer);
@@ -79,6 +110,15 @@ export const generate = (buffer)=> new Promise(function (resolve, reject) {
     });
 });
 
+/**
+ * Given the manifest of the current install, and the next package (as zip file),
+ * generate a diff package containing modified or new files.
+ * Deleted files are added to `hotcodepush.json` file in resultant zip
+ *
+ * @param {dictionary of filename to hash} manifest : current install's manifest
+ * @param {zipped file as buffer} buffer   : new package to check manifest against
+ * @returns zip file of missing files, plus optional `hotcodepush.json` file
+ */
 export const delta = (manifest, buffer)=> {
     if (manifest instanceof Buffer) {
         manifest = JSON.parse(manifest.toString());
@@ -97,7 +137,6 @@ export const delta = (manifest, buffer)=> {
         yauzl[method](buffer, {lazyEntries: true}, function (err, zipfile) {
             const seen = [];
             // this is to make react native code push work right
-            const diffManifestEntries = [];
             if (err) return reject(err);
             const retFile = new yazl.ZipFile();
 
@@ -117,7 +156,6 @@ export const delta = (manifest, buffer)=> {
                                 const mtime = entry.getLastModDate();
                                 retFile.addReadStream(readFromStream, entry.fileName, {mtime});
                             });
-                            diffManifestEntries.push(entry.fileName + ":" + hash);
                         }
                         zipfile.readEntry();
                     });
@@ -131,17 +169,8 @@ export const delta = (manifest, buffer)=> {
                 retFile.addBuffer(new Buffer(jsonContent), "hotcodepush.json", {mtime: MTIME});
                 zipfile.close();
                 retFile.end({}, (totalSize)=> {
-
-                    // This section is for react native data integrity check
-                    const sorted = diffManifestEntries.sort();
-                    const diffManifestEntriesString = JSON.stringify(sorted);
-                    const diffManifestEntriesHash = crypto.createHash("sha256");
-                    diffManifestEntriesHash.update(diffManifestEntriesString);
-                    const diffHash = diffManifestEntriesHash.digest("hex");
-
                     resolve({
-                        zipFile : retFile,
-                        diffManifestPackageHash : diffHash
+                        zipFile : retFile
                     });
                 });
 
@@ -169,7 +198,7 @@ export const downloadOrGenerateManifest = (download, upload, current)=> {
     return download(current.packageHash, current.blobUrl)
         .then(generate)
         .then((manifest)=> {
-            return upload(JSON.stringify(manifest))
+            return upload(JSON.stringify(manifest), manifestHash(manifest))
                 .then(({blobUrl})=>current.manifestBlobUrl = blobUrl)
                 .then(()=>manifest);
         });
@@ -210,11 +239,9 @@ export const genDiffPackageMap = (download, upload, current, histories = [])=> {
 export const generateDiffPackage = (download, upload, latestPackage, installedPackage) => {
     return downloadOrGenerateManifest(download, upload, installedPackage)
         .then((installedPkgManifest) => {
-            let diffManifestPackageHash;
             return download(latestPackage.packageHash, latestPackage.blobUrl)
                 .then((latestPkgContent) => delta(installedPkgManifest, latestPkgContent))
                 .then((deltaResults) => {
-                    diffManifestPackageHash = deltaResults.diffManifestPackageHash;
                     return zipToBuf(deltaResults.zipFile);
                 })
                 .then(upload)
@@ -222,8 +249,7 @@ export const generateDiffPackage = (download, upload, latestPackage, installedPa
                     const diffPackageMap = latestPackage.diffPackageMap || (latestPackage.diffPackageMap = {});
                     diffPackageMap[installedPackage.packageHash] = {
                         url : blobUrl,
-                        size,
-                        diffManifestPackageHash
+                        size
                     };
                 });
         });
@@ -259,5 +285,6 @@ export default ({
     diffPackageMap,
     generate,
     delta,
-    streamHash
+    streamHash,
+    manifestHash
 });

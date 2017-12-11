@@ -72,9 +72,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                                             if (p2) {
                                                 ret.downloadURL = p2.url;
                                                 ret.packageSize = p2.size;
-                                                if (p2.diffManifestPackageHash) {
-                                                    ret.packageHash = p2.diffManifestPackageHash;
-                                                }
+                                                // Note: Diff uses the packageHash of the latest package
                                             }
                                             return ret;
                                         })
