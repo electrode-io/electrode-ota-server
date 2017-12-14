@@ -4,9 +4,19 @@ import crypto from 'crypto';
 import fileType from 'file-type';
 import _ from 'lodash';
 
+const MACOSX_DIR = "__MACOSX/";
+const DS_STORE = ".DS_Store";
+const CODEPUSH_METAFILE = ".codepushrelease";
+
 const MTIME = new Date(0);
 const all = (arr, fn)=>Promise.all(arr.map(fn));
 
+const isIgnoredFile = (fn) => fn.startsWith(MACOSX_DIR)
+    || fn === DS_STORE
+    || fn.endsWith("/" + DS_STORE)
+    || fn.endsWith("/")
+    || fn === CODEPUSH_METAFILE
+    || fn.endsWith("/" + CODEPUSH_METAFILE);
 
 export const isZip = (fileName, content)=> {
     if (typeof content === 'string') {
@@ -88,7 +98,7 @@ export const generate = (buffer)=> new Promise(function (resolve, reject) {
         if (err) return reject(err);
         zipfile.readEntry();
         zipfile.on("entry", function (entry) {
-            if (/\/$/.test(entry.fileName)) {
+            if (isIgnoredFile(entry.fileName)) {
                 zipfile.readEntry();
                 return
             }
