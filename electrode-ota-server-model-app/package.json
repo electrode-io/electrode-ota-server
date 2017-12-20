@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-model-app",
-  "version": "3.0.0",
+  "version": "3.1.0-beta",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -12,7 +12,7 @@
     "bluebird": "^3.5.1",
     "electrode-ota-server-diregister": "^2.1.0-beta.7",
     "electrode-ota-server-errors": "^3.0.0",
-    "electrode-ota-server-model-manifest": "^3.0.0",
+    "electrode-ota-server-model-manifest": "^3.1.0-beta",
     "electrode-ota-server-util": "^3.0.0"
   },
   "devDependencies": {
