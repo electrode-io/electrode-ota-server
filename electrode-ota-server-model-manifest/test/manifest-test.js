@@ -5,6 +5,7 @@ import {shasum} from 'electrode-ota-server-util';
 import step0 from './fixtures/step.0.manifest.json';
 import step1 from './fixtures/step.1.manifest.json';
 import step2 from './fixtures/step.2.manifest.json';
+import step3 from './fixtures/step.3.manifest.json';
 import step9 from './fixtures/step.9.manifest.json';
 import {history} from './fixtures/history.json';
 import fs from 'fs';
@@ -41,8 +42,10 @@ describe('manifest', function () {
     it('should generate manifest step1', () => Promise.resolve(fixture('step.1.blob.zip')).then(manifest.generate).then(eql(step1)));
     it('should generate manifest step2', () => readFixture('step.2.blob.zip').then(manifest.generate).then(eql(step2)));
 
-    it('should generate a delta file from a file and a manifest', function () {
+    it('should generate manifest without gnored files', () => 
+        readFixture('step.3.blob.zip').then(manifest.generate).then(eql(step3)));
 
+    it('should generate a delta file from a file and a manifest', function () {
         return readFixture('step.2.blob.zip')
             .then(buffer => manifest.delta(step1, buffer))
             .then((deltaResults) => manifest.zipToBuf(deltaResults.zipFile))
@@ -52,6 +55,7 @@ describe('manifest', function () {
                 .then(check));
 
     });
+
     it('should generate correct manifest hash', function() {
         expect(manifestHash(step9)).to.eq("1e9218438992a0d9c891d03a283734e1f050cd0c944e7b8ce5811889ec3b82f5");
     });

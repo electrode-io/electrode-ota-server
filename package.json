@@ -20,7 +20,7 @@
     "electrode-ota-server": "./index.js"
   },
   "engines": {
-    "node": "~6.6.0"
+    "node": "^6.6.0"
   },
   "keywords": [
     "code-push",
