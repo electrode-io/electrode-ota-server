@@ -30,7 +30,14 @@ export default (sequelize) => {
         otherKey:'packageId'
     });
     Deployment._associations = {
-        'history_': {model: Package, searchField: 'packageId', through: DeploymentHistory, attributes: ['id_']}
+        'history_': {
+            model: Package,
+            searchField: 'packageId',
+            through: DeploymentHistory,
+            attributes: ['id_'],
+            // Sort history_ by created DESC
+            order: [ {model:Package, as:'history_', through: DeploymentHistory}, 'created_', 'DESC' ]
+        }
     };
 
     Deployment.prototype.toJSON = function() {

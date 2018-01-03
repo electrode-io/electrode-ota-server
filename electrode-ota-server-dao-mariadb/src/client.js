@@ -19,8 +19,7 @@ const defaultConfig = {
 };
 
 export const createSequelizeClient = (options = {}) => {
-    let {config} = options;
-    config = Object.assign({}, defaultConfig, config);
+    let config = Object.assign({}, defaultConfig, options);
     let client = new Sequelize(config.db, config.user, config.password, {
         host: config.host,
         port: config.port,
@@ -30,14 +29,14 @@ export const createSequelizeClient = (options = {}) => {
             idle: config.pool_idle,
             acquire: config.pool_acquire
         },
-        logging: false
+        logging: config.logging || false
     });
 
     return client;
 };
 
 export const createDatabaseForTest = (options) => {
-    const configCopy = Object.assign({}, options.config);
+    const configCopy = Object.assign({}, options);
     const db = configCopy.db;
     delete configCopy.db;
     const client = createSequelizeClient({config: configCopy});
@@ -53,9 +52,11 @@ export default class DaoMariaDB {
     constructor({options, logger}) {
         this.sequelize = createSequelizeClient(options);
         this.logger = logger;
+        this.logger.info("DAO MariaDB registered with", options);
     }
 
     async init() {
+        this.logger.info("DAO MariaDB loading models and synchronizing tables");
         await this.loadModels();
         await this.synchronizeModels();
         Object.assign(this, {

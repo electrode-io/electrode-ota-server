@@ -284,6 +284,37 @@ describe('dao/mariadb', function() {
         })
     );
 
+    it('Deployment.findOneAsync should order history_ by createdAt desc', () =>
+        dao.createApp({
+            name: 'App History',
+            deployments: {
+                'staging': { key: 'sorted_history' }
+            }
+        }).then(app => {
+            let pkg1_hash, pkg2_hash, pkg3_hash;
+            return dao.addPackage('sorted_history', {
+                packageHash: 'pkg1',
+                description: 'Package 1'
+            }).then(phash => pkg1_hash = phash)
+            .then(_ => clock.tick(1000))
+            .then(_ => dao.addPackage('sorted_history', {
+                packageHash: 'pkg2',
+                description: 'Package 2'
+            }))
+            .then(phash => pkg2_hash = phash)
+            .then(_ => clock.tick(-2000))
+            .then(_ => dao.addPackage('sorted_history', {
+                packageHash: 'pkg3',
+                description: 'Package 3'
+            }))
+            .then(phash => pkg3_hash = phash)
+            .then(_ => dao.deploymentForKey('sorted_history'))
+            .then(dep => {
+                expect(dep.history_).to.have.deep.equal([pkg2_hash.id_, pkg1_hash.id_, pkg3_hash.id_]);
+            })
+        })
+    );
+
     it('history by id', () => dao.createApp({
             name: 'History by id',
             deployments: {
@@ -291,24 +322,23 @@ describe('dao/mariadb', function() {
             }
         }).then(app => dao.addPackage('history_by_ids', {
                     packageHash: 'pkg1',
-                    description: 'Package 1',
-                    created_: 123455
+                    description: 'Package 1'
                 }).then(_ => clock.tick(1000))
                 .then(_ => dao.addPackage('history_by_ids', {
                     packageHash: 'pkg2',
                     description: 'Package 2'
                 }))
-                .then(_ => clock.tick(1000))
+                .then(_ => clock.tick(-2000))
                 .then(_ => dao.addPackage('history_by_ids', {
                     packageHash: 'pkg3',
                     description: 'Package 3'
                 }))
             .then(_ => dao.history(app.id, 'staging'))
-            .then(histories => dao.historyByIds(histories.map(h => h.id_)))
+            .then(packages => dao.historyByIds(packages.map(h => h.id_)))
             .then(pkgs => {
                 expect(pkgs).has.length(3);
-                expect(pkgs[0].packageHash).to.equal('pkg1');
-                expect(pkgs[1].packageHash).to.equal('pkg2');
+                expect(pkgs[0].packageHash).to.equal('pkg2');
+                expect(pkgs[1].packageHash).to.equal('pkg1');
                 expect(pkgs[2].packageHash).to.equal('pkg3');
             })
         )
@@ -451,5 +481,4 @@ describe('dao/mariadb', function() {
             expect(content + '').to.equal('This is the package content');
         })
     );
-
 });

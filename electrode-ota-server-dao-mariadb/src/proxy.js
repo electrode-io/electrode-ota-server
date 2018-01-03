@@ -49,7 +49,7 @@ const toSequelizeIncludeTerm = (key, association, queryValue) => {
  * @param {*} query
  */
 const generateSequelizeQuery = (modelDefinition, query) => {
-    let include = [];
+    let include = [], order=[];
     let where = _.mapValues(query, (val) => toSequelizeIn(val));
 
     _.each(modelDefinition._associations, (assoc, assocAs) => {
@@ -59,10 +59,14 @@ const generateSequelizeQuery = (modelDefinition, query) => {
         } else {
             include.push(toSequelizeIncludeTerm(assocAs, assoc, null));
         }
+        if (assoc.order) {
+            order.push(assoc.order);
+        }
     });
     let seqQuery = {};
     if (!_.isEmpty(where)) seqQuery['where'] = where;
     if (!_.isEmpty(include)) seqQuery['include'] = include;
+    if (!_.isEmpty(order)) seqQuery['order'] = order;
     return seqQuery;
 };
 
@@ -181,7 +185,7 @@ export function ProxyModelWrapper(client, modelDefinition) {
          * @param {*} queryParams   : find query (key-value pairs)
          */
         static findOneAsync(queryParams) {
-            const sequelizeQuery = generateSequelizeQuery(modelDefinition, queryParams);
+            let sequelizeQuery = generateSequelizeQuery(modelDefinition, queryParams);
             return modelDefinition.findOne(sequelizeQuery)
                 .then(ProxyModel.constructFromSequelizeModel);
         }

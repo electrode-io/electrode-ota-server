@@ -57,6 +57,9 @@ export default class DaoFactory {
         this.driver = driver;
         this.logger = logger;
     }
+    async init() {
+        return this.driver.init();
+    }
 
     async createUser({email, name, accessKeys, linkedProviders = []}) {
         const user = new this.driver.User({email, name, accessKeys, linkedProviders});
@@ -227,11 +230,12 @@ export default class DaoFactory {
         return historySort(pkgs);
     }
 
-    historyByIds(historyIds) {
+    async historyByIds(historyIds) {
         if (historyIds == null || historyIds.length == 0) {
             return [];
         }
-        return this.driver.Package.findAsync({id_: historyIds});
+        const pkgs = await this.driver.Package.findAsync({id_: historyIds});
+        return historySort(pkgs);
     }
 
     async clearHistory(appId, deploymentName) {

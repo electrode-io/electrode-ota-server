@@ -9,35 +9,32 @@ import Factory from './factory';
  * 
  * Configuration Options
  * {
- *  driver: "<driver>",
- *  fileservice_driver: "<fileservice driver>"
+ *  "driver": "<driver>",
  * }
  * driver = specifies the datastore driver used to power this DAO service.
- * fileservice_driver = datatsore driver for the upload/download fileservice
+ * 
+ * Example
+ * "electrode-ota-server-dao-factory": {
+ *   "driver": "electrode-ota-server-dao-mariadb"
+ * }
+ * "electrode-ota-server-dao-mariadb": {
+ *   ...
+ * }
  * 
  * @param {dict} options : configuration options
  * @param {*} register : electrode register
  * @param {*} logger : ota logger
  */
-export const daoFactory = (options, register, logger) => {
-    return new Promise((resolve, reject) => {
-        if (options.driver == null) {
-            return resolve();
-        }
-        const client = typeof options.driver != 'string' ? options.driver : require(options.driver);
-        register.call(this, client, options.driver.conf || {}, (e) => e ? reject(e) : resolve(client));
-    })
-    .then((client) => {
-        if (client == null) {
-            throw new Error(`Failed to load DAO driver '${options.driver}'`);
-        }
-        return new Factory({driver:client, logger});
-    })
+export const daoFactory = async (options, driver, logger) => {
+    if (driver == null) {
+        throw new Error("DAO driver not loaded");
+    }
+    return new Factory({driver, logger});
 };
 
 export const register = diregister({
-    name: "ota!daofactory",
+    name: "ota!dao",
     multiple: false,
     connections: false,
-    dependencies: ['electrode:register', 'ota!logger']
+    dependencies: ['ota!dao-driver', 'ota!logger']
 }, daoFactory);
