@@ -1,4 +1,3 @@
-import _ from "lodash";
 import { Sequelize } from "sequelize";
 import { ProxyModelWrapper } from "./proxy";
 
@@ -58,7 +57,7 @@ export const createDatabaseForTest = options => {
   return client
     .query(`DROP DATABASE IF EXISTS ${db}`)
     .then(client.query(`CREATE DATABASE ${db}`))
-    .then(_ => client.close());
+    .then(() => client.close());
 };
 
 /**
