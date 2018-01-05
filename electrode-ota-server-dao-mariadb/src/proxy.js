@@ -146,7 +146,7 @@ export function ProxyModelWrapper(client, modelDefinition) {
           .create(asJson, extendedOptions)
           .then(model => this.refreshFromSequelizeModel(model))
           .catch(Sequelize.UniqueConstraintError, e => {
-            return Promise.resolve(false);
+            return false;
           });
       }
     }
