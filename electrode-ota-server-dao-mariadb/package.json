@@ -24,7 +24,6 @@
     "cordova"
   ],
   "dependencies": {
-    "continuation-local-storage": "^3.2.1",
     "electrode-ota-server-diregister": "^2.1.0-beta.7",
     "electrode-ota-server-util": "^3.0.0",
     "mysql2": "^1.5.1",

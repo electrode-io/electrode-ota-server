@@ -1,10 +1,6 @@
 import _ from 'lodash';
 import {Sequelize} from 'sequelize';
 import {ProxyModelWrapper} from './proxy';
-import cls from 'continuation-local-storage';
-
-const namespace = cls.createNamespace('mariadb_storage');
-Sequelize.useCLS(namespace);
 
 const defaultConfig = {
     host: '127.0.0.1',
