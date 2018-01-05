@@ -1,13 +1,15 @@
-import Sequelize from 'sequelize';
+import Sequelize from "sequelize";
 
-export default (sequelize) => sequelize.define('DeploymentHistory', {
-}, {
-    tableName: "deployment_history",
-    defaultScope: {
+export default sequelize =>
+  sequelize.define(
+    "DeploymentHistory",
+    {},
+    {
+      tableName: "deployment_history",
+      defaultScope: {
         order: [["createdAt", "DESC"]]
-    },
-    indexes: [
-        { fields: ["createdAt"] }
-    ],
-    version: true
-});
+      },
+      indexes: [{ fields: ["createdAt"] }],
+      version: true
+    }
+  );

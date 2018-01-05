@@ -16,13 +16,7 @@
     "coverage": "ota-nyc",
     "prepublish": "npm run build"
   },
-  "keywords": [
-    "code-push",
-    "ota",
-    "electrode",
-    "react-native",
-    "cordova"
-  ],
+  "keywords": ["code-push", "ota", "electrode", "react-native", "cordova"],
   "dependencies": {
     "electrode-ota-server-diregister": "^2.1.0-beta.7",
     "electrode-ota-server-util": "^3.0.0",

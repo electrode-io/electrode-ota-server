@@ -1,17 +1,20 @@
-electrode-ota-server-dao-mariadb
-===
+# electrode-ota-server-dao-mariadb
+
 This project is part of the [electrode-ota-server](https://github.com/electrode-io/electrode-ota-server)
 
 It is not meant to be used standalone, use at your own risk.
 
 ## Install
+
 ```
 % npm install electrode-ota-server-dao-mariadb
 ```
 
 ## Usage
+
 Specify connection information in the config options.
 Reference sequelizejs for config parameters.
+
 ```
 "plugins": {
     "electrode-ota-server-dao-mariadb": {
@@ -27,6 +30,7 @@ Reference sequelizejs for config parameters.
 ```
 
 Use this driver in DAO factory
+
 ```
 "plugins": {
     "electrode-ota-server-dao-factory": {

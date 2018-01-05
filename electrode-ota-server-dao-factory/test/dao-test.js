@@ -1,10 +1,7 @@
-import {expect} from 'chai';
+import { expect } from "chai";
 
+describe("server/dao", function() {
+  this.timeout(200000);
 
-describe('server/dao', function() {
-    this.timeout(200000);
-
-    it('test insert metric', () => {
-
-    });
+  it("test insert metric", () => {});
 });
