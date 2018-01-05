@@ -119,12 +119,21 @@ export default class DaoFactory {
         return savedApp;
     }
 
+    /**
+     * Remove an app
+     * @param {*} appId
+     */
     async removeApp(appId) {
         const app = await this.appById(appId);
         if (isEmpty(app)) return;
         return app.deleteAsync();
     }
 
+    /**
+     * Update an app
+     * @param {*} id
+     * @param {*} param1
+     */
     async updateApp(id, {name, collaborators}) {
         const app = await this.appById(id);
         app.name = name;
@@ -133,10 +142,19 @@ export default class DaoFactory {
         return app;
     }
 
+    /**
+     * Get an app by id
+     * @param {*} id
+     */
     appById(id) {
         return this.driver.App.findOneAsync({id});
     }
 
+    /**
+     * Get all apps for a given email
+     *
+     * @param {*} email
+     */
     appsForCollaborator(email) {
         return this.driver.App.findAsync({collaborators: email});
     }
@@ -145,22 +163,46 @@ export default class DaoFactory {
         return this.driver.App.findOneAsync({collaborators: email, name: appName});
     }
 
+    /**
+     * Add a deployment
+     * @param {*} app
+     * @param {*} name
+     * @param {*} param2
+     */
     addDeployment(app, name, {key}) {
         const deployment = new this.driver.Deployment({name, key, AppId:app});
         return deployment.saveAsync();
     }
 
+    /**
+     * Remove a deployment
+     *
+     * @param {*} appId
+     * @param {*} deploymentName
+     */
     async removeDeployment(appId, deploymentName) {
         const deployment = await this.driver.Deployment.findOneAsync({AppId:appId, name:deploymentName});
         return deployment.deleteAsync();
     }
 
+    /**
+     * Rename a deployment
+     *
+     * @param {*} appId
+     * @param {*} oldName
+     * @param {*} newName
+     */
     async renameDeployment(appId, oldName, newName) {
         const deployment = await this.driver.Deployment.findOneAsync({AppId:appId, name:oldName});
         deployment.name = newName;
         return deployment.saveAsync();
     }
 
+    /**
+     * Get deployment by key
+     *
+     * @param {*} deploymentKey
+     */
     async deploymentForKey(deploymentKey) {
         let dep = await this.driver.Deployment.findOneAsync({key: deploymentKey});
         if (dep && isNotEmpty(dep.history_)) {
@@ -171,6 +213,12 @@ export default class DaoFactory {
         return dep;
     }
 
+    /**
+     * Get all deployments for an app
+     *
+     * @param {*} appId
+     * @param {*} deployments
+     */
     async deploymentsByApp(appId, deployments) {
         if (isEmpty(deployments)) {
             return [];
@@ -180,6 +228,12 @@ export default class DaoFactory {
         return promiseMap(reducer(deps, (ret, d) => (ret[d.name] = this.deploymentForKey(d.key))));
     }
 
+    /**
+     * Get a deployment
+     *
+     * @param {*} appId
+     * @param {*} deployment
+     */
     async deploymentByApp(appId, deployment) {
         const d = await this.driver.Deployment.findOneAsync({appId, name: deployment});
         if (!d) return;
@@ -191,6 +245,12 @@ export default class DaoFactory {
         return res.history_;
     }
 
+    /**
+     * Add a package to a deployment
+     *
+     * @param {*} deploymentKey
+     * @param {*} value
+     */
     async addPackage(deploymentKey, value) {
 
         const deployment = await this.driver.Deployment.findOneAsync({key:deploymentKey});
@@ -204,6 +264,13 @@ export default class DaoFactory {
         return pkg;
     }
 
+    /**
+     * Update a package of a deployment
+     *
+     * @param {*} deploymentKey
+     * @param {*} pkg
+     * @param {*} label
+     */
     async updatePackage(deploymentKey, pkg, label) {
         const history_ = await this._historyForDeployment(deploymentKey);
         if (isEmpty(history_)) {
@@ -221,6 +288,11 @@ export default class DaoFactory {
 
     }
 
+    /**
+     * Get history of a deployment.
+     * @param {*} appId
+     * @param {*} deploymentName
+     */
     async history(appId, deploymentName) {
         const deployment = await this.deploymentByApp(appId, deploymentName);
         if (!deployment || !deployment.history_) {
@@ -231,6 +303,11 @@ export default class DaoFactory {
         return historySort(pkgs);
     }
 
+    /**
+     * Get history of a deployment by id(s)
+     *
+     * @param {*} historyIds
+     */
     async historyByIds(historyIds) {
         if (historyIds == null || historyIds.length == 0) {
             return [];
@@ -239,6 +316,12 @@ export default class DaoFactory {
         return historySort(pkgs);
     }
 
+    /**
+     * Clear the history of a deployment
+     *
+     * @param {*} appId
+     * @param {*} deploymentName
+     */
     async clearHistory(appId, deploymentName) {
         const deployment = await this.deploymentByApp(appId, deploymentName);
         if (deployment && isNotEmpty(deployment.history_)) {
@@ -246,6 +329,13 @@ export default class DaoFactory {
         }
     }
 
+    /**
+     * Get history of a deployment by label
+     *
+     * @param {*} appId
+     * @param {*} deploymentName
+     * @param {*} label
+     */
     async historyLabel(appId, deploymentName, label) {
         const deployment = await this.deploymentByApp(appId, deploymentName);
         if (!deployment || isEmpty(deployment.history_)) {
@@ -255,11 +345,18 @@ export default class DaoFactory {
         return pkg;
     }
 
+    /**
+     * Get a package by Id
+     */
     async packageById(pkgId) {
         if (!pkgId) return;
         return this.driver.Package.findOneAsync({id_:pkgId});
     }
 
+    /**
+     * Upload a package
+     *
+     */
     async upload(packageHash, content) {
         if (!Buffer.isBuffer(content)) {
             content = Buffer.from(content, 'utf8')
@@ -269,6 +366,10 @@ export default class DaoFactory {
         return exists;
     }
 
+    /**
+     * Download a package
+     *
+     */
     async download(packageHash) {
         const pkg = await this.driver.PackageContent.findOneAsync({packageHash});
         if (pkg != null) {
@@ -276,6 +377,10 @@ export default class DaoFactory {
         }
     }
 
+    /**
+     * Get metrics for a deployment
+     *
+     */
     metrics(deploymentKey) {
         return this.driver.Metric.findAsync({deploymentKey});
     }
@@ -311,6 +416,7 @@ export default class DaoFactory {
 
     /**
      * Tracks whether we updated the client or not last time.
+     *
      * @param {string} clientUniqueId : Client Device Unique ID
      * @param {string} packageHash : Package hash to update to.
      * @param {float} ratio : Deployment ratio
