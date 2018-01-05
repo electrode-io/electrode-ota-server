@@ -1,7 +1,14 @@
 {
     "name": "electrode-ota-server-dao-factory",
     "version": "3.0.0",
-    "description": "OTA DAO",
+    "description": "Electrode OTA Server - DAO Factory",
+    "author": "Dat Vong <Dat.Vong@walmartlabs.com>",
+    "license": "Apache-2.0",
+    "repository": "https://github.com/electrode-io/electrode-ota-server",
+    "bugs": {
+        "url": "https://github.com/electrode-io/electrode-ota-server/issues"
+    },
+    "homepage": "https://github.com/electrode-io/electrode-ota-server",
     "main": "lib/index.js",
     "scripts": {
         "test": "ota-mocha",
@@ -9,6 +16,13 @@
         "coverage": "ota-nyc",
         "prepublish": "npm run build"
     },
+    "keywords": [
+        "electrode",
+        "ota",
+        "code-push",
+        "react-native",
+        "cordova"
+    ],
     "dependencies": {
         "electrode-ota-server-diregister": "^2.1.0-beta.7"
     },

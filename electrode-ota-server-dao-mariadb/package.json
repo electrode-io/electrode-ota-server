@@ -1,6 +1,14 @@
 {
   "name": "electrode-ota-server-dao-mariadb",
   "version": "3.0.0",
+  "description": "Electrode OTA - MariaDB driver",
+  "author": "Dat Vong <Dat.Vong@walmartlabs.com>",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/electrode-io/electrode-ota-server",
+  "bugs": {
+    "url": "https://github.com/electrode-io/electrode-ota-server/issues"
+  },
+  "homepage": "https://github.com/electrode-io/electrode-ota-server",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -8,6 +16,13 @@
     "coverage": "ota-nyc",
     "prepublish": "npm run build"
   },
+  "keywords": [
+    "code-push",
+    "ota",
+    "electrode",
+    "react-native",
+    "cordova"
+  ],
   "dependencies": {
     "continuation-local-storage": "^3.2.1",
     "electrode-ota-server-diregister": "^2.1.0-beta.7",

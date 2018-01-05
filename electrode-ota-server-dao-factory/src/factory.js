@@ -25,7 +25,8 @@ const apply = (target, source) => {
 
 const ACCESSKEY = ["name", "id", "expires", "description", "lastAccess", "createdTime", "createdBy", "friendlyName"];
 
-const nullUnlessValue = (obj, keys) => {
+// Set any property that's undefined or not exist to null
+const objDefaultNull = (obj, keys) => {
     for (const key of keys) {
         if (obj[key] === void(0)) {
             obj[key] = null;
@@ -38,13 +39,13 @@ const historySort = history => history && history.sort((a, b) => b.created_.getT
 
 /**
  * DAO Factory methods to save/update/delete DAOs to/from DataStore.
- * 
+ *
  * Models
  * - App
  * - Deployment
  * - Package
  * - User
- * 
+ *
  * Model functions
  * - deleteAsync()
  * - findOneAsync(query, options)
@@ -76,7 +77,7 @@ export default class DaoFactory {
     userByAccessKey(accessKeys) {
         return this.driver.User.findOneAsync({accessKeys});
     }
-    
+
     async userByEmail(email) {
         return this.driver.User.findOneAsync({email});
 
@@ -88,25 +89,25 @@ export default class DaoFactory {
         await user.saveAsync();
         const js = toJSON(user);
 
-        for (const key of Object.keys(js.accessKeys)) {
-            nullUnlessValue(js.accessKeys[key], ACCESSKEY);
-        }
+        _.each(js.accessKeys, (value, key) => {
+            objDefaultNull(js.accessKeys[key], ACCESSKEY);
+        });
         return js;
 
     }
 
     /**
      * Create a new App
-     * 
-     * @param {object} values 
+     *
+     * @param {object} values
      *  name: name of app, string
      *  deployments: list of deployments
      *  collaborators: map of collaborators
-     * 
+     *
      */
     async createApp({name, deployments={}, collaborators}) {
         const app = new this.driver.App({name, collaborators});
-        const savedApp = await app.saveAsync(); 
+        const savedApp = await app.saveAsync();
 
         const deps = Object.keys(deployments);
         if (isNotEmpty(deps)) {
@@ -281,8 +282,8 @@ export default class DaoFactory {
 
     /**
      * Record download or deploy metric
-     * 
-     * @param {object} values 
+     *
+     * @param {object} values
      *      appVersion text,
      *      deploymentKey text,
      *      clientUniqueId text,
@@ -290,7 +291,7 @@ export default class DaoFactory {
      *      status text,
      *      previousLabelOrAppVersion text,
      *      previousDeploymentKey text,
-     * 
+     *
      * "appVersion": "1.0.0",
 	 * "deploymentKey": "5UfjnOxv1FnCJ_DwPqMWQYSVlp0H4yecGHaB-",
 	 * "clientUniqueId": "fe231438a4f62c70",
@@ -309,7 +310,7 @@ export default class DaoFactory {
     }
 
     /**
-     * Tracks whether we updated the client or not last time. 
+     * Tracks whether we updated the client or not last time.
      * @param {string} clientUniqueId : Client Device Unique ID
      * @param {string} packageHash : Package hash to update to.
      * @param {float} ratio : Deployment ratio
