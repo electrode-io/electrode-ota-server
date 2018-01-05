@@ -1,9 +1,12 @@
 import _ from "lodash";
 import Sequelize from "sequelize";
 
-// Use `in` for querying an array
-// OTA Query:               { name: ['cat', 'tom'] }
-// Sequelize equivalent:    { name: {[Sequelize.Op.in]: ['cat', 'tom']} }
+/**
+ * Use `in` for querying an array
+ * OTA Query:               { name: ['cat', 'tom'] }
+ * Sequelize equivalent:    { name: {[Sequelize.Op.in]: ['cat', 'tom']} }
+ * @param {*} val
+ */
 const toSequelizeIn = (val) => {
     if (_.isArray(val)) return {[Sequelize.Op.in]: val };
     else return val;
@@ -72,7 +75,7 @@ const generateSequelizeQuery = (modelDefinition, query) => {
 
 /**
  * Options to include for updates/inserts
- * 
+ *
  * @param {*} modelDefinition
  * @param {*} options
  */
@@ -98,7 +101,7 @@ export function ProxyModelWrapper(client, modelDefinition) {
 
             var _originalModel = null;
             this._setOriginal = function(m) {
-                _originalModel = m; 
+                _originalModel = m;
             };
             this._getOriginal = function() {
                 return _originalModel;
@@ -107,7 +110,7 @@ export function ProxyModelWrapper(client, modelDefinition) {
 
         /**
          * Create ProxyModel from MySQL Model
-         * @param {*} model 
+         * @param {*} model
          */
         static constructFromSequelizeModel(model) {
             if (model == null) return null;
@@ -118,7 +121,7 @@ export function ProxyModelWrapper(client, modelDefinition) {
 
         /**
          * Update this ProxyModel to match the Sequelize Model.
-         * @param {*} model 
+         * @param {*} model
          */
         refreshFromSequelizeModel(model) {
             this._setOriginal(model);
@@ -129,7 +132,7 @@ export function ProxyModelWrapper(client, modelDefinition) {
 
         /**
          * Save this ProxyModel Async
-         * @param {*} options 
+         * @param {*} options
          */
         saveAsync(options={}) {
             if (this._getOriginal()) {
@@ -145,6 +148,12 @@ export function ProxyModelWrapper(client, modelDefinition) {
             }
         }
 
+        /**
+         * Update async
+         * @param {object} updates
+         * @param {object} options
+         *      sequelize options
+         */
         updateAsync(updates, options={}) {
             const jsonUpdates = ProxyModel._toSequelizeFormat(updates);
             const seqOptions = toSequelizeOptions(modelDefinition, options);
@@ -155,10 +164,17 @@ export function ProxyModelWrapper(client, modelDefinition) {
             });
         }
 
+        /**
+         * Delete async
+         */
         deleteAsync() {
             return this._getOriginal().destroy();
         }
 
+        /**
+         * Add an associated object
+         * @param {ProxyModel} model - associated object to add
+         */
         associateAsync(model) {
             return this._getOriginal().associate(model._getOriginal());
         }
@@ -190,11 +206,20 @@ export function ProxyModelWrapper(client, modelDefinition) {
                 .then(ProxyModel.constructFromSequelizeModel);
         }
 
+        /**
+         * Find all objects that match the provided query
+         * @param {*} queryParams
+         */
         static findAsync(queryParams) {
             const sequelizeQuery = generateSequelizeQuery(modelDefinition, queryParams);
             return modelDefinition.findAll(sequelizeQuery)
                 .then(results => _.map(results, ProxyModel.constructFromSequelizeModel));
         }
+
+        /**
+         * Delete objects matching the specified query
+         * @param {*} query
+         */
         static delete(query) {
             return ProxyModel.findOneAsync(query)
                 .then(model => model.deleteAsync());
