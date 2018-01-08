@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-boot",
-  "version": "3.0.0",
+  "version": "3.2.1-0",
   "main": "lib/index.js",
   "bin": {
     "electrode-ota": "bin/boot.js"
@@ -12,11 +12,11 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-util": "^3.0.0",
+    "electrode-ota-server-util": "^3.2.1-0",
     "electrode-server": "^1.2.2",
     "packpath": "^0.1.0"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^2.1.0-beta.7"
+    "electrode-ota-server-util-dev": "^3.2.1-0"
   }
 }
