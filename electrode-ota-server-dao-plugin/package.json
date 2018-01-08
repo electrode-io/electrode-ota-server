@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-dao-plugin",
-  "version": "3.0.0",
+  "version": "3.2.0-0",
   "description": "OTA Express-Cassandra DAO",
   "main": "lib/index.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "express-cassandra": "^1.7.5"
   },
   "devDependencies": {
-    "electrode-ota-server-test-support": "^3.0.0",
+    "electrode-ota-server-test-support": "^3.2.0-0",
     "electrode-ota-server-util-dev": "^2.1.0-beta.7"
   }
 }

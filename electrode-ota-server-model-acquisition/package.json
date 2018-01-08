@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-model-acquisition",
-  "version": "3.0.0",
+  "version": "3.2.0-0",
   "description": "OTA Acquistion Service",
   "main": "lib/index.js",
   "scripts": {
@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "electrode-ota-server-dao-cassandra": "^3.0.0",
-    "electrode-ota-server-test-support": "^3.0.0",
+    "electrode-ota-server-test-support": "^3.2.0-0",
     "electrode-ota-server-util-dev": "^2.1.0-beta.7"
   }
 }

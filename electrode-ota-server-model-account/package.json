@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-model-account",
-  "version": "3.0.0",
+  "version": "3.2.0-0",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "electrode-ota-server-dao-cassandra": "^3.0.0",
-    "electrode-ota-server-test-support": "^3.0.0",
+    "electrode-ota-server-test-support": "^3.2.0-0",
     "electrode-ota-server-util-dev": "^2.1.0-beta.7"
   }
 }
