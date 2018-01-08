@@ -383,6 +383,44 @@ describe("dao/mariadb", function() {
             ]);
           });
       }));
+  it("updatePackage updates the latest package", () =>
+    dao
+      .createApp({
+        name: "updatePackage updates latest",
+        deployments: { staging: { key: "updatepackage" } }
+      })
+      .then(app => {
+        let pkg_id;
+        return dao
+          .addPackage("updatepackage", {
+            packageHash: "Old package",
+            description: "Old package"
+          })
+          .then(_ => clock.tick(3000))
+          .then(_ =>
+            dao.addPackage("updatepackage", {
+              packageHash: "Latest package",
+              description: "Latest package"
+            })
+          )
+          .then(pkg => (pkg_id = pkg.id_))
+          .then(_ => clock.tick(-5000))
+          .then(_ =>
+            dao.addPackage("updatepackage", {
+              packageHash: "Oldest package",
+              description: "Oldest package"
+            })
+          )
+          .then(_ =>
+            dao.updatePackage("updatepackage", {
+              description: "Latest greatest package"
+            })
+          )
+          .then(pkg => dao.packageById(pkg_id))
+          .then(pkg => {
+            expect(pkg.description).to.equal("Latest greatest package");
+          });
+      }));
 
   it("history by id", () =>
     dao

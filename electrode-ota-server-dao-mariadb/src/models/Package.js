@@ -41,6 +41,9 @@ export default sequelize => {
           fields: ["label"]
         }
       ],
+      defaultScope: {
+        order: [["created_", "DESC"]]
+      },
       version: true
     }
   );
