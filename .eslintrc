@@ -1,0 +1,7 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 2017
+  },
+  "plugins": ["mocha"],
+  "extends": "walmart"
+}
