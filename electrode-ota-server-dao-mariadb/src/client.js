@@ -19,11 +19,12 @@ const defaultConfig = {
 /**
  * Create a Sequelize instance with given options
  *
- * @param {*} options
+ * @param {object} options - connection options
+ * @returns {client} sequelize client
  */
 export const createSequelizeClient = (options = {}) => {
-  let config = Object.assign({}, defaultConfig, options);
-  let client = new Sequelize(config.db, config.user, config.password, {
+  const config = Object.assign({}, defaultConfig, options);
+  const client = new Sequelize(config.db, config.user, config.password, {
     host: config.host,
     port: config.port,
     dialect: config.dialect,
@@ -42,7 +43,8 @@ export const createSequelizeClient = (options = {}) => {
  * Create a test database
  * Note: Should only be used for tests
  *
- * @param {*} options
+ * @param {*} options - connection options
+ * @returns {client} sequelize client
  */
 export const createDatabaseForTest = options => {
   const configCopy = Object.assign({}, options);
@@ -74,29 +76,48 @@ export default class DaoMariaDB {
    * Initialize this driver asynchronously.
    *
    * Loads the DB models and synchronizing with the database (creates if missing)
-   *
+   * @returns {none} None
    */
   async init() {
     this.logger.info("DAO MariaDB loading models and synchronizing tables");
     await this._loadModels();
     await this._synchronizeModels();
     Object.assign(this, {
-      App: ProxyModelWrapper(this.sequelize, this.sequelize.models.App),
+      App: ProxyModelWrapper(
+        this.sequelize,
+        this.sequelize.models.App,
+        this.logger
+      ),
       ClientRatio: ProxyModelWrapper(
         this.sequelize,
-        this.sequelize.models.ClientRatio
+        this.sequelize.models.ClientRatio,
+        this.logger
       ),
       Deployment: ProxyModelWrapper(
         this.sequelize,
-        this.sequelize.models.Deployment
+        this.sequelize.models.Deployment,
+        this.logger
       ),
-      Metric: ProxyModelWrapper(this.sequelize, this.sequelize.models.Metric),
-      Package: ProxyModelWrapper(this.sequelize, this.sequelize.models.Package),
+      Metric: ProxyModelWrapper(
+        this.sequelize,
+        this.sequelize.models.Metric,
+        this.logger
+      ),
+      Package: ProxyModelWrapper(
+        this.sequelize,
+        this.sequelize.models.Package,
+        this.logger
+      ),
       PackageContent: ProxyModelWrapper(
         this.sequelize,
-        this.sequelize.models.PackageContent
+        this.sequelize.models.PackageContent,
+        this.logger
       ),
-      User: ProxyModelWrapper(this.sequelize, this.sequelize.models.User)
+      User: ProxyModelWrapper(
+        this.sequelize,
+        this.sequelize.models.User,
+        this.logger
+      )
     });
   }
 
@@ -113,6 +134,8 @@ export default class DaoMariaDB {
 
   /**
    * Close the connection
+   *
+   * @returns {status} close status
    */
   closeAsync() {
     return this.sequelize.close();

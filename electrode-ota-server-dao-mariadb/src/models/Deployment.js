@@ -51,6 +51,7 @@ export default sequelize => {
     return asJson;
   };
   Deployment.prototype.associate = function(pkg) {
+    assert(pkg != null, "Associating null package to Deployment");
     assert(
       pkg instanceof Package,
       "Only Package can be associated to Deployment"

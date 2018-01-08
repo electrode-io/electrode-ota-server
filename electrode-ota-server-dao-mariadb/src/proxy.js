@@ -5,7 +5,8 @@ import Sequelize from "sequelize";
  * Use `in` for querying an array
  * OTA Query:               { name: ['cat', 'tom'] }
  * Sequelize equivalent:    { name: {[Sequelize.Op.in]: ['cat', 'tom']} }
- * @param {*} val
+ * @param {*} val  If value is an array, use `in`
+ * @returns sequelize search value
  */
 const toSequelizeIn = val => {
   if (_.isArray(val)) return { [Sequelize.Op.in]: val };
@@ -25,6 +26,7 @@ const toSequelizeIn = val => {
  * @param {*} key
  * @param {*} association
  * @param {*} queryValue
+ * @return Sequelize include term
  */
 const toSequelizeIncludeTerm = (key, association, queryValue) => {
   let term = {
@@ -50,6 +52,7 @@ const toSequelizeIncludeTerm = (key, association, queryValue) => {
  *
  * @param {*} modelDefinition
  * @param {*} query
+ * @returns Sequelize query
  */
 const generateSequelizeQuery = (modelDefinition, query) => {
   let include = [],
@@ -79,6 +82,7 @@ const generateSequelizeQuery = (modelDefinition, query) => {
  *
  * @param {*} modelDefinition
  * @param {*} options
+ * @returns sequelize option parameters
  */
 const toSequelizeOptions = (modelDefinition, options) => {
   let extensions = {
@@ -92,7 +96,16 @@ const toSequelizeOptions = (modelDefinition, options) => {
   return Object.assign({}, options, extensions);
 };
 
-export function ProxyModelWrapper(client, modelDefinition) {
+const NullLogger = {
+  info: () => {},
+  error: () => {}
+};
+
+export function ProxyModelWrapper(
+  client,
+  modelDefinition,
+  logger = NullLogger
+) {
   /**
    * ProxyModel wraps a Sequelize Model.
    * Provides consistent interface to OTA server
@@ -146,6 +159,7 @@ export function ProxyModelWrapper(client, modelDefinition) {
           .create(asJson, extendedOptions)
           .then(model => this.refreshFromSequelizeModel(model))
           .catch(Sequelize.UniqueConstraintError, e => {
+            logger.info("UniqueConstraint violation", e);
             return false;
           });
       }

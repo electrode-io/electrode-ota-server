@@ -538,6 +538,43 @@ describe("dao/mariadb", function() {
             ]);
           });
       }));
+  it("Test rollback thru addPackage()", () =>
+    dao
+      .createApp({
+        name: "App for rollback",
+        deployments: { staging: { key: "rollback_deployment" } }
+      })
+      .then(app => {
+        return dao
+          .addPackage("rollback_deployment", {
+            packageHash: "originalFirstPackage",
+            description: "Original Package to rollback"
+          })
+          .then(rollbackTo => {
+            const pkg = Object.assign({}, rollbackTo, {
+              uploadTime: Date.now(),
+              rollout: 100,
+              releasedBy: "rollback_man@walmart.com",
+              releaseMethod: "Rollback",
+              originalLabel: rollbackTo.label,
+              label: `v12`
+            });
+            delete pkg["id_"];
+            delete pkg["created_"];
+            return dao
+              .addPackage("rollback_deployment", pkg)
+              .then(rolledBackPkg => {
+                expect(rolledBackPkg.releaseMethod).to.equal("Rollback");
+                expect(rolledBackPkg.rollout).to.equal(100);
+                expect(rolledBackPkg.created_).to.not.equal(
+                  rollbackTo.created_
+                );
+                expect(rolledBackPkg.releasedBy).to.equal(
+                  "rollback_man@walmart.com"
+                );
+              });
+          });
+      }));
 
   it("should insert and get metrics", () =>
     dao
