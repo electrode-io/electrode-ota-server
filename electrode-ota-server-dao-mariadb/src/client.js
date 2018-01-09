@@ -28,6 +28,10 @@ export const createSequelizeClient = (options = {}) => {
     host: config.host,
     port: config.port,
     dialect: config.dialect,
+    define: {
+      charset: "utf8mb4",
+      collate: "utf8mb4_general_ci"
+    },
     pool: {
       max: config.pool_max,
       idle: config.pool_idle,
