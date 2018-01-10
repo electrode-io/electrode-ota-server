@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-logger",
-  "version": "3.2.1-0",
+  "version": "3.2.2-0",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -9,13 +9,13 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-diregister": "^3.2.1-0",
-    "electrode-ota-server-util": "^3.2.1-0"
+    "electrode-ota-server-diregister": "^3.2.2-0",
+    "electrode-ota-server-util": "^3.2.2-0"
   },
   "devDependencies": {
     "bluebird": "^3.5.1",
-    "electrode-ota-server-test-support": "^3.2.1-0",
-    "electrode-ota-server-util-dev": "^3.2.1-0",
+    "electrode-ota-server-test-support": "^3.2.2-0",
+    "electrode-ota-server-util-dev": "^3.2.2-0",
     "intercept-stdout": "^0.1.2"
   }
 }
