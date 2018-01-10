@@ -5,7 +5,7 @@ export default sequelize => {
     "PackageContent",
     {
       packageHash: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(191),
         primaryKey: true
       },
       content: Sequelize.BLOB("long")

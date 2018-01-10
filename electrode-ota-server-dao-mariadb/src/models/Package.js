@@ -26,7 +26,7 @@ export default sequelize => {
       manifestBlobUrl: Sequelize.STRING(2048),
       originalDeployment: Sequelize.STRING,
       originalLabel: Sequelize.STRING,
-      packageHash: Sequelize.STRING,
+      packageHash: Sequelize.STRING(191),
       releaseMethod: Sequelize.STRING,
       releasedBy: Sequelize.STRING,
       rollout: Sequelize.INTEGER,

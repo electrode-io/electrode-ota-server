@@ -12,7 +12,7 @@ export default sequelize => {
         primaryKey: true
       },
       email: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(191),
         allowNull: false,
         unique: true
       },

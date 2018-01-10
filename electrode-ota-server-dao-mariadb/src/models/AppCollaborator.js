@@ -9,7 +9,7 @@ export default sequelize => {
     },
     {
       tableName: "app_collaborators",
-      indexes: [{ fields: ["user", "AppId"], unique: true }],
+      indexes: [{ fields: ["user", "AppId"] }],
       version: true
     }
   );
