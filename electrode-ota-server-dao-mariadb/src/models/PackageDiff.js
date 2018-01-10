@@ -4,7 +4,7 @@ export default sequelize => {
   const PackageDiff = sequelize.define(
     "PackageDiff",
     {
-      packageHash: Sequelize.STRING,
+      packageHash: Sequelize.STRING(191),
       size: Sequelize.BIGINT.UNSIGNED,
       url: Sequelize.STRING(2048)
     },

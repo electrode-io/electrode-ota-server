@@ -9,7 +9,7 @@ export default sequelize => {
     "UserAccessKey",
     {
       key: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(191),
         primaryKey: true
       },
       id: Sequelize.STRING,

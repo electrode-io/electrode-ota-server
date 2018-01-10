@@ -9,7 +9,7 @@ export default sequelize => {
         allowNull: false
       },
       packageHash: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(191),
         allowNull: false
       },
       inserted: Sequelize.DATE,
