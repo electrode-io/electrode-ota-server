@@ -50,13 +50,13 @@ export default sequelize => {
     asJson.history_ = _.map(asJson.history_, p => p.id_);
     return asJson;
   };
-  Deployment.prototype.associate = function(pkg) {
+  Deployment.prototype.associate = function(pkg, options = {}) {
     assert(pkg != null, "Associating null package to Deployment");
     assert(
       pkg instanceof Package,
       "Only Package can be associated to Deployment"
     );
-    return this.addHistory_(pkg);
+    return this.addHistory_(pkg, options);
   };
 
   return Deployment;

@@ -26,6 +26,11 @@ export default async (options = {}) => {
       host: "localhost",
       port: 3306,
       db: "ota_db_test",
+      dialect: "mysql",
+      define: {
+        charset: "utf8mb4",
+        collate: "utf8mb4_general_ci"
+      },
       user: "root",
       password: ""
     };

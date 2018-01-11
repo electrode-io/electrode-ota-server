@@ -383,6 +383,7 @@ describe("dao/mariadb", function() {
             ]);
           });
       }));
+
   it("updatePackage updates the latest package", () =>
     dao
       .createApp({
@@ -416,7 +417,7 @@ describe("dao/mariadb", function() {
               description: "Latest greatest package"
             })
           )
-          .then(pkg => dao.packageById(pkg_id))
+          .then(() => dao.packageById(pkg_id))
           .then(pkg => {
             expect(pkg.description).to.equal("Latest greatest package");
           });
@@ -516,7 +517,6 @@ describe("dao/mariadb", function() {
           .then(_ => dao.history(app.id, "staging"))
           .then(history => expect(history).to.be.empty)
       ));
-
   it("should set and update isDisabled and isMandatory", () =>
     dao
       .createApp({

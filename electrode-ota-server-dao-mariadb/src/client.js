@@ -37,6 +37,7 @@ export const createSequelizeClient = (options = {}) => {
       idle: config.pool_idle,
       acquire: config.pool_acquire
     },
+    isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.READ_COMMITTED,
     logging: config.logging || false
   });
 
@@ -54,7 +55,7 @@ export const createDatabaseForTest = options => {
   const configCopy = Object.assign({}, options);
   const db = configCopy.db;
   delete configCopy.db;
-  const client = createSequelizeClient({ config: configCopy });
+  const client = createSequelizeClient(configCopy);
   if (process.env.NODE_ENV == "production") {
     throw new Error(
       "testCreateDatabase() should not be called in production; only in test"
@@ -133,7 +134,9 @@ export default class DaoMariaDB {
 
   _synchronizeModels() {
     // creates tables if missing
-    return this.sequelize.sync();
+    return this.sequelize.transaction(transaction =>
+      this.sequelize.sync({ transaction })
+    );
   }
 
   /**
