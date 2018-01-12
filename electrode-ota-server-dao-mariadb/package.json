@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-dao-mariadb",
-  "version": "3.2.3-0",
+  "version": "3.2.4-0",
   "description": "Electrode OTA - MariaDB driver",
   "author": "Dat Vong <Dat.Vong@walmartlabs.com>",
   "license": "Apache-2.0",
@@ -24,14 +24,14 @@
     "cordova"
   ],
   "dependencies": {
-    "electrode-ota-server-diregister": "^3.2.2-0",
-    "electrode-ota-server-util": "^3.2.3-0",
+    "electrode-ota-server-diregister": "^3.2.4-0",
+    "electrode-ota-server-util": "^3.2.4-0",
     "mysql2": "^1.5.1",
     "sequelize": "^4.28.1"
   },
   "devDependencies": {
     "bluebird": "^3.5.1",
-    "electrode-ota-server-util-dev": "^3.2.2-0",
+    "electrode-ota-server-util-dev": "^3.2.4-0",
     "sinon": "^4.1.3"
   }
 }
