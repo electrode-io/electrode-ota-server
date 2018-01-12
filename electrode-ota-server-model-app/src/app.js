@@ -37,13 +37,12 @@ const hasDeploymentName = ({ deployments }, deployment) => {
   return deployment in deployments;
 };
 
-const packageContainsChanges = (deploymentInDb, uploadedContent) => {
+const packageContainsChanges = (deploymentInDb, uploadedContentPackageHash) => {
   if (
     deploymentInDb &&
     deploymentInDb.package &&
     deploymentInDb.package.packageHash
   ) {
-    let uploadedContentPackageHash = shasum(uploadedContent);
     return uploadedContentPackageHash !== deploymentInDb.package.packageHash;
   }
   return true;
@@ -495,7 +494,7 @@ export default (options, dao, upload, download, logger) => {
          * param packageInfo
          */
 
-    upload(vals) {
+    async upload(vals) {
       const {
         app,
         email,
@@ -511,65 +510,64 @@ export default (options, dao, upload, download, logger) => {
         }
       } = vals;
 
-      return api.findApp({ email, app }).then(_app => {
-        notFound(
-          hasDeploymentName(_app, deployment),
-          `Not a valid deployment '${deployment}' for app '${app}'`
-        );
-        const zip = isZip("", vals.package);
+      const _app = await api.findApp({ email, app });
 
-        return dao
-          .deploymentByApp(_app.id, deployment)
-          .then(async deployments => {
-            alreadyExistsMsg(
-              packageContainsChanges(deployments, vals.package),
-              "No changes detected in uploaded content for this deployment."
-            );
+      notFound(
+        hasDeploymentName(_app, deployment),
+        `Not a valid deployment '${deployment}' for app '${app}'`
+      );
+      const zip = isZip("", vals.package);
+      let manifest, packageHash;
+      if (zip) {
+        // Generate manifest and package hash
+        manifest = await generate(vals.package);
+        packageHash = manifestHash(manifest);
+      } else {
+        packageHash = shasum(vals.package);
+      }
 
-            //noinspection JSUnresolvedVariable
-            const pkg = {
-              description,
-              isDisabled,
-              isMandatory,
-              rollout,
-              appVersion,
-              releaseMethod: "Upload",
-              uploadTime: Date.now(),
-              label:
-                label ||
-                "v" +
-                  (deployments.history_ ? deployments.history_.length + 1 : 1),
-              releasedBy: email
-            };
+      const deployments = await dao.deploymentByApp(_app.id, deployment);
+      alreadyExistsMsg(
+        packageContainsChanges(deployments, packageHash),
+        "No changes detected in uploaded content for this deployment."
+      );
 
-            if (zip) {
-              // Generate manifest to get the packageHash
-              const { blobUrl } = await generate(vals.package).then(
-                manifest => {
-                  pkg.packageHash = manifestHash(manifest);
-                  return upload(toBuffer(manifest));
-                }
-              );
-              pkg.manifestBlobUrl = blobUrl;
-            }
-            return upload(vals.package, pkg.packageHash).then(resp => {
-              return dao
-                .addPackage(deployments.key, Object.assign({}, pkg, resp))
-                .tap(() => {
-                  logger.info(
-                    {
-                      appId: _app.id,
-                      deployment,
-                      releasedBy: email,
-                      label: pkg.label,
-                      appVersion
-                    },
-                    "package uploaded"
-                  );
-                });
-            });
-          });
-      });
+      //noinspection JSUnresolvedVariable
+      const pkg = {
+        description,
+        isDisabled,
+        isMandatory,
+        rollout,
+        appVersion,
+        packageHash,
+        releaseMethod: "Upload",
+        uploadTime: Date.now(),
+        label:
+          label ||
+          "v" + (deployments.history_ ? deployments.history_.length + 1 : 1),
+        releasedBy: email
+      };
+
+      if (zip) {
+        // Upload manifest
+        const { blobUrl } = await upload(toBuffer(manifest));
+        pkg.manifestBlobUrl = blobUrl;
+      }
+      const resp = await upload(vals.package, pkg.packageHash);
+      return dao
+        .addPackage(deployments.key, Object.assign({}, pkg, resp))
+        .tap(() => {
+          logger.info(
+            {
+              appId: _app.id,
+              deployment,
+              releasedBy: email,
+              label: pkg.label,
+              appVersion
+            },
+            "package uploaded"
+          );
+        });
     },
 
     clearHistory(params) {
