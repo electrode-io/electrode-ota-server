@@ -19,4 +19,5 @@ before_install:
   - java -version
   - wget https://www.dropbox.com/s/f86zyi3qmhqvfbp/apache-cassandra-3.9.tar.gz?dl=1 -O apache-cassandra-3.9.tar.gz && tar -xvzf apache-cassandra-3.9.tar.gz
   - sudo sh ./apache-cassandra-3.9/bin/cassandra -R
+  - mysql -u root -e 'SET GLOBAL binlog_format=ROW;'
   - sleep 20

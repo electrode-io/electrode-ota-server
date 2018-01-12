@@ -70,7 +70,7 @@ const generateSequelizeQuery = (modelDefinition, query) => {
       order.push(assoc.order);
     }
   });
-  let seqQuery = {};
+  let seqQuery = { autocommit: false };
   if (!_.isEmpty(where)) seqQuery["where"] = where;
   if (!_.isEmpty(include)) seqQuery["include"] = include;
   if (!_.isEmpty(order)) seqQuery["order"] = order;
@@ -153,15 +153,18 @@ export function ProxyModelWrapper(
       if (this._getOriginal()) {
         return this.updateAsync(this, options);
       } else {
-        const extendedOptions = toSequelizeOptions(modelDefinition, options);
+        let extendedOptions = toSequelizeOptions(modelDefinition, options);
         const asJson = ProxyModel._toSequelizeFormat(this);
-        return modelDefinition
-          .create(asJson, extendedOptions)
-          .then(model => this.refreshFromSequelizeModel(model))
-          .catch(Sequelize.UniqueConstraintError, e => {
-            logger.info("UniqueConstraint violation", e);
-            return false;
-          });
+        return client.transaction(transaction => {
+          extendedOptions["transaction"] = transaction;
+          return modelDefinition
+            .create(asJson, extendedOptions)
+            .then(model => this.refreshFromSequelizeModel(model))
+            .catch(Sequelize.UniqueConstraintError, e => {
+              logger.info("UniqueConstraint violation", e);
+              return false;
+            });
+        });
       }
     }
 
@@ -190,7 +193,9 @@ export function ProxyModelWrapper(
      * Delete async
      */
     deleteAsync() {
-      return this._getOriginal().destroy();
+      return client.transaction(transaction =>
+        this._getOriginal().destroy({ transaction })
+      );
     }
 
     /**
@@ -198,7 +203,9 @@ export function ProxyModelWrapper(
      * @param {ProxyModel} model - associated object to add
      */
     associateAsync(model) {
-      return this._getOriginal().associate(model._getOriginal());
+      return client.transaction(transaction =>
+        this._getOriginal().associate(model._getOriginal(), { transaction })
+      );
     }
 
     static _fromSequelizeFormat(sequelizeRecord) {
@@ -264,7 +271,10 @@ export function ProxyModelWrapper(
                   this._getOriginal() &&
                   this._getOriginal().createOrUpdateAssociate
                 ) {
-                  return this._getOriginal().createOrUpdateAssociate(assocItem);
+                  return this._getOriginal().createOrUpdateAssociate(
+                    assocItem,
+                    options
+                  );
                 } else {
                   return Promise.resolve();
                 }

@@ -57,19 +57,20 @@ export default sequelize => {
     diffPackageMap: { model: PackageDiff, searchField: "packageHash" }
   };
 
-  Package.prototype.createOrUpdateAssociate = function(updates) {
+  Package.prototype.createOrUpdateAssociate = function(updates, options = {}) {
     const packDiff = _.find(this.diffPackageMap, {
       packageId: this.id_,
       packageHash: updates.packageHash
     });
     if (packDiff) {
-      return packDiff.update(updates);
+      return packDiff.update(updates, options);
     } else {
       return PackageDiff.create(
         _.assign(updates, {
           packageId: this.id_,
           packageHash: updates.packageHash
-        })
+        }),
+        options
       ).then(packageDiff => {
         this.diffPackageMap.push(packageDiff);
         return packageDiff;

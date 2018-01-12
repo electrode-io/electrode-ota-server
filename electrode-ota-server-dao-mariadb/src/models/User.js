@@ -58,13 +58,13 @@ export default sequelize => {
   User._associations = {
     accessKeys: { model: UserAccessKey, searchField: "key" }
   };
-  User.prototype.createOrUpdateAssociate = function(values) {
+  User.prototype.createOrUpdateAssociate = function(values, options = {}) {
     const accessKey = _.find(this.accessKeys, { key: values.key });
     const valuesWithAssoc = Object.assign({}, values, { UserId: this.id });
     if (accessKey) {
-      return accessKey.update(values);
+      return accessKey.update(values, options);
     } else {
-      return UserAccessKey.create(valuesWithAssoc);
+      return UserAccessKey.create(valuesWithAssoc, options);
     }
   };
 
