@@ -16,15 +16,11 @@
     "coverage": "ota-nyc",
     "prepublish": "npm run build"
   },
-  "keywords": [
-    "electrode",
-    "ota",
-    "code-push",
-    "react-native",
-    "cordova"
-  ],
+  "keywords": ["electrode", "ota", "code-push", "react-native", "cordova"],
   "dependencies": {
-    "electrode-ota-server-diregister": "^3.2.2-0"
+    "electrode-ota-server-diregister": "^3.2.2-0",
+    "electrode-ota-server-errors": "^3.2.2-0",
+    "electrode-ota-server-util": "^3.2.2-0"
   },
   "devDependencies": {
     "bluebird": "^3.5.1",
