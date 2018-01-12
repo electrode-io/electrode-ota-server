@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-fileservice-download",
-  "version": "3.2.2-0",
+  "version": "3.2.3-0",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "electrode-ota-server-diregister": "^3.2.2-0",
-    "electrode-ota-server-util": "^3.2.2-0"
+    "electrode-ota-server-util": "^3.2.3-0"
   },
   "devDependencies": {
     "electrode-ota-server-util-dev": "^3.2.2-0"

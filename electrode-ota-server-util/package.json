@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-util",
-  "version": "3.2.2-0",
+  "version": "3.2.3-0",
   "description": "OTA Utils",
   "main": "lib/index.js",
   "scripts": {
