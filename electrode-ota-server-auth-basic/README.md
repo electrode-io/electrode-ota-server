@@ -16,7 +16,7 @@ See https://hapijs.com/tutorials/auth for HapiJS authentication.
 https://github.com/hapijs/bell
 
 
-You can define your authentication strategy with the electrode-ota-server-auth module.  In this example, we define a validateFunc within the options of the the basic auth.
+You can define your authentication strategy with the electrode-ota-server-auth module.  In this example, we define a validateFunc within the options of the the basic auth.  Note you will need to convert your config json file to a js file.
 ```json
 "plugins": {
    ...
