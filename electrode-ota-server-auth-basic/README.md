@@ -92,9 +92,15 @@ module.exports = {register};
 
 In the config, override electrode-ota-server-validate with your custom validate.  Provide options if desired.
 ```json
-"electrode-ota-server-auth-validate": {
-     "module": root("lib/my-custom-auth-validate"),
-     "options": {}
+const root = path.join.bind(path, __dirname, "..");
+
+module.exports = {
+....
+   "electrode-ota-server-auth-validate": {
+        "module": root("lib/my-custom-auth-validate"),
+        "options": {}
+   }
+...
 }
 ```
 
