@@ -129,6 +129,31 @@ describe("dao/mariadb", function() {
           expect(fu.accessKeys["abc123"].friendlyName).to.eql("Friendly");
         })
       ));
+  it("should update user lastAccess", () =>
+    dao
+      .createUser({
+        email: "smuck@walmart.com",
+        name: "Smuck",
+        accessKeys: {
+          abc134: {
+            name: "keye",
+            lastAccess: new Date(2017, 12, 1)
+          }
+        }
+      })
+      .then(() =>
+        dao.userByAccessKey("abc134").then(user => {
+          const account = user.accessKeys["abc134"];
+          account.lastAccess = new Date(2017, 12, 9);
+          return dao.updateUser(user.email, user).then(v => user);
+        })
+      )
+      .then(() =>
+        dao.userByAccessKey("abc134").then(user => {
+          const account = user.accessKeys["abc134"];
+          expect(account.lastAccess).to.eql(new Date(2017, 12, 9));
+        })
+      ));
 
   it("should add an app and find by collaborators", () =>
     dao

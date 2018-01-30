@@ -179,12 +179,13 @@ export function ProxyModelWrapper(
       const seqOptions = toSequelizeOptions(modelDefinition, options);
       return client.transaction(transaction => {
         return this._assignAssociations(jsonUpdates, { transaction })
-          .then(_ =>
-            this._getOriginal().update(
+          .then(_ => {
+            console.log("=== update()");
+            return this._getOriginal().update(
               jsonUpdates,
               Object.assign(seqOptions, { transaction })
-            )
-          )
+            );
+          })
           .then(model => this.refreshFromSequelizeModel(model));
       });
     }
