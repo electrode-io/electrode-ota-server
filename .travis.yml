@@ -1,12 +1,11 @@
 language: node_js
 node_js:
  - "6"
+jdk:
+  - oraclejdk7
 
 
 addons:
-  apt:
-    packages:
-      - oracle-java8-installer
   code_climate:
     repo_token: 205921b25cd059b92e7234ee98533a35f08c81c5debd68dad3e6d468258c0489
   hosts:
@@ -14,7 +13,6 @@ addons:
   mariadb: '10.0'
 
 before_install:
-  - jdk_switcher use oraclejdk7
   - java -version
   - wget https://www.dropbox.com/s/f86zyi3qmhqvfbp/apache-cassandra-3.9.tar.gz?dl=1 -O apache-cassandra-3.9.tar.gz && tar -xvzf apache-cassandra-3.9.tar.gz
   - sudo sh ./apache-cassandra-3.9/bin/cassandra -R
