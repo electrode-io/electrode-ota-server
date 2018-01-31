@@ -14,9 +14,7 @@ addons:
   mariadb: '10.0'
 
 before_install:
-  - sudo update-java-alternatives -l
-  - sudo update-java-alternatives -s java-1.8.0_152-b16
-  - export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+  - jdk_switcher use oraclejdk7
   - java -version
   - wget https://www.dropbox.com/s/f86zyi3qmhqvfbp/apache-cassandra-3.9.tar.gz?dl=1 -O apache-cassandra-3.9.tar.gz && tar -xvzf apache-cassandra-3.9.tar.gz
   - sudo sh ./apache-cassandra-3.9/bin/cassandra -R
