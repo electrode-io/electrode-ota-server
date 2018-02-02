@@ -15,7 +15,7 @@
     "electrode-ota-server-diregister": "^3.2.5-0",
     "electrode-ota-server-util": "^3.2.5-0",
     "hapi-auth-bearer-token": "^4.1.1",
-    "hapi-auth-cookie": "^6.1.1",
+    "hapi-auth-cookie": "^7.0.0",
     "hapi-server-session": "^3.0.0"
   },
   "devDependencies": {
