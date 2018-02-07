@@ -1,5 +1,9 @@
-import { Sequelize } from "sequelize";
-import { ProxyModelWrapper } from "./proxy";
+import {
+  Sequelize
+} from "sequelize";
+import {
+  ProxyModelWrapper
+} from "./proxy";
 
 /**
  * Default database connection configs
@@ -40,6 +44,7 @@ export const createSequelizeClient = (options = {}) => {
     isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.READ_COMMITTED,
     logging: config.logging || false
   });
+  client.config = config;
 
   return client;
 };
@@ -71,7 +76,10 @@ export const createDatabaseForTest = options => {
  * MariaDB driver for use with `electrode-ota-server-dao-factory`.
  */
 export default class DaoMariaDB {
-  constructor({ options, logger }) {
+  constructor({
+    options,
+    logger
+  }) {
     this.sequelize = createSequelizeClient(options);
     this.logger = logger;
     this.logger.info("DAO MariaDB registered with", options);
@@ -135,7 +143,9 @@ export default class DaoMariaDB {
   _synchronizeModels() {
     // creates tables if missing
     return this.sequelize.transaction(transaction =>
-      this.sequelize.sync({ transaction })
+      this.sequelize.sync({
+        transaction
+      })
     );
   }
 

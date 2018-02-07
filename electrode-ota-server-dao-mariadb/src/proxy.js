@@ -9,7 +9,9 @@ import Sequelize from "sequelize";
  * @returns sequelize search value
  */
 const toSequelizeIn = val => {
-  if (_.isArray(val)) return { [Sequelize.Op.in]: val };
+  if (_.isArray(val)) return {
+    [Sequelize.Op.in]: val
+  };
   else return val;
 };
 
@@ -70,7 +72,9 @@ const generateSequelizeQuery = (modelDefinition, query) => {
       order.push(assoc.order);
     }
   });
-  let seqQuery = { autocommit: false };
+  let seqQuery = {
+    autocommit: false
+  };
   if (!_.isEmpty(where)) seqQuery["where"] = where;
   if (!_.isEmpty(include)) seqQuery["include"] = include;
   if (!_.isEmpty(order)) seqQuery["order"] = order;
@@ -115,10 +119,10 @@ export function ProxyModelWrapper(
       Object.assign(this, values);
 
       var _originalModel = null;
-      this._setOriginal = function(m) {
+      this._setOriginal = function (m) {
         _originalModel = m;
       };
-      this._getOriginal = function() {
+      this._getOriginal = function () {
         return _originalModel;
       };
     }
@@ -178,12 +182,15 @@ export function ProxyModelWrapper(
       const jsonUpdates = ProxyModel._toSequelizeFormat(updates);
       const seqOptions = toSequelizeOptions(modelDefinition, options);
       return client.transaction(transaction => {
-        return this._assignAssociations(jsonUpdates, { transaction })
+        return this._assignAssociations(jsonUpdates, {
+            transaction
+          })
           .then(_ => {
-            console.log("=== update()");
             return this._getOriginal().update(
               jsonUpdates,
-              Object.assign(seqOptions, { transaction })
+              Object.assign(seqOptions, {
+                transaction
+              })
             );
           })
           .then(model => this.refreshFromSequelizeModel(model));
@@ -195,7 +202,9 @@ export function ProxyModelWrapper(
      */
     deleteAsync() {
       return client.transaction(transaction =>
-        this._getOriginal().destroy({ transaction })
+        this._getOriginal().destroy({
+          transaction
+        })
       );
     }
 
@@ -205,7 +214,9 @@ export function ProxyModelWrapper(
      */
     associateAsync(model) {
       return client.transaction(transaction =>
-        this._getOriginal().associate(model._getOriginal(), { transaction })
+        this._getOriginal().associate(model._getOriginal(), {
+          transaction
+        })
       );
     }
 
@@ -219,7 +230,9 @@ export function ProxyModelWrapper(
       if (modelDefinition._associations) {
         _.each(modelDefinition._associations, (assocation, associationAs) => {
           ret[associationAs] = _.map(ret[associationAs], (vals, key) =>
-            Object.assign({}, vals, { [assocation.searchField]: key })
+            Object.assign({}, vals, {
+              [assocation.searchField]: key
+            })
           );
         });
       }
@@ -283,8 +296,7 @@ export function ProxyModelWrapper(
             );
           }
           return accu;
-        },
-        []
+        }, []
       );
       return Promise.all(actions);
     }
