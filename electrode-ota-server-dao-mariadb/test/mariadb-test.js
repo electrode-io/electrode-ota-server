@@ -214,7 +214,6 @@ describe("dao/mariadb", function () {
         expect(account.lastAccess).to.eql(new Date(2017, 12, 9));
       })
     ));
->>>>>>> Stashed changes
 
   it("should add an app and find by collaborators", () =>
     dao
