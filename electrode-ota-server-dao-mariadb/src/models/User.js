@@ -1,21 +1,28 @@
-import { Sequelize, Model } from "sequelize";
+import {
+  Sequelize,
+  Model
+} from "sequelize";
+import {
+  encryptField,
+  encryptWhereForFind
+} from "./helper";
 import _ from "lodash";
 
 export default sequelize => {
   const UserAccessKey = sequelize.import("./UserAccessKey");
   const User = sequelize.define(
-    "User",
-    {
+    "User", {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV1,
         primaryKey: true
       },
-      email: {
+      email: encryptField(sequelize, "email", {
+        name: "email",
         type: Sequelize.STRING(191),
         allowNull: false,
         unique: true
-      },
+      }),
       linkedProviders: {
         type: Sequelize.STRING(2048),
         get() {
@@ -28,25 +35,39 @@ export default sequelize => {
           }
         }
       },
-      name: Sequelize.STRING
-    },
-    {
+      name: encryptField(sequelize, "name", {
+        type: Sequelize.STRING,
+      })
+    }, {
       tableName: "users",
       createdAt: "createdTime",
-      indexes: [{ fields: ["email"] }],
+      indexes: [{
+        fields: ["email"]
+      }],
       version: true
     }
   );
+  User.hook("beforeFind", encryptWhereForFind(sequelize, User));
 
-  User.prototype.toJSON = function() {
+  User.prototype.toJSON = function () {
     let accessKeys = _.keyBy(this.accessKeys, c => c.key);
     accessKeys = _.mapValues(accessKeys, k => k.toJSON());
     return {
-      id: this.get("id", { plain: true }),
-      email: this.get("email", { plain: true }),
-      name: this.get("name", { plain: true }),
-      createdTime: this.get("createdTime", { plain: true }),
-      linkedProviders: this.get("linkedProviders", { plain: true }),
+      id: this.get("id", {
+        plain: true
+      }),
+      email: this.get("email", {
+        plain: true
+      }),
+      name: this.get("name", {
+        plain: true
+      }),
+      createdTime: this.get("createdTime", {
+        plain: true
+      }),
+      linkedProviders: this.get("linkedProviders", {
+        plain: true
+      }),
       accessKeys
     };
   };
@@ -56,11 +77,18 @@ export default sequelize => {
     onDelete: "CASCADE"
   });
   User._associations = {
-    accessKeys: { model: UserAccessKey, searchField: "key" }
+    accessKeys: {
+      model: UserAccessKey,
+      searchField: "key"
+    }
   };
-  User.prototype.createOrUpdateAssociate = function(values, options = {}) {
-    const accessKey = _.find(this.accessKeys, { key: values.key });
-    const valuesWithAssoc = Object.assign({}, values, { UserId: this.id });
+  User.prototype.createOrUpdateAssociate = function (values, options = {}) {
+    const accessKey = _.find(this.accessKeys, {
+      key: values.key
+    });
+    const valuesWithAssoc = Object.assign({}, values, {
+      UserId: this.id
+    });
     if (accessKey) {
       return accessKey.update(values, options);
     } else {
