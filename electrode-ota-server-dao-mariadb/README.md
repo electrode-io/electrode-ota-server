@@ -10,6 +10,11 @@ It is not meant to be used standalone, use at your own risk.
 % npm install electrode-ota-server-dao-mariadb
 ```
 
+## To Test
+```
+% npm test
+```
+
 ## Usage
 
 Specify connection information in the config options.
