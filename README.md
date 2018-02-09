@@ -31,9 +31,9 @@ Rewrite of mariadb module; simplify needed configuration to use the mariadb modu
         },
 ```
 
-The underlying implementation uses the npm module [mysql](https://www.npmjs.com/package/mysql).  The options are described in further detail in the module's [readme]("electrode-ota-server-dao-mariadb/README.md").
+The underlying implementation uses the npm module [mysql](https://www.npmjs.com/package/mysql).  The options are described in further detail in the module's [readme](./electrode-ota-server-dao-mariadb/README.md).
 
-The schema for mariadb is in the [electrode-ota-mariadb-schema folder]("electrode-ota-mariadb-schema/README.md").  The module does not use sequelize anymore, and the schema is created separately using liquibase.
+The schema for mariadb is in the [electrode-ota-mariadb-schema folder](./electrode-ota-mariadb-schema/README.md).  The module does not use sequelize anymore, and the schema is created separately using liquibase.
 
 ### Version 3.2.1
 Version 3.2.1 adds support for MySQL/MariaDB.  To use, enable `logger`, `dao-factory`, `dao-mariadb`, and disable `dao-plugin` and `dao-cassandra`.  Connection settings can be specified under `dao-mariadb`.
