@@ -1,0 +1,34 @@
+version: "3.0"
+services:
+  ota-db:
+    ## location of Dockerfile for MariaDB
+    build: ./docker/mysql
+    environment:
+      ## these are user and passwords for docker instance, not production instance
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: ota
+      MYSQL_PASSWORD: ota
+      MYSQL_DATABASE: electrode_ota
+    ports:
+      - 33060:3306
+    volumes:
+      - ./sql-tests/:/tests
+      - ./docker/common/:/common
+  liquibase:
+    ## location of Dockerfile for liquibase
+    build: ./docker/liquibase
+    ## this is the liquibase subcommand to run; use "dropAll" to clear the db like a reset button
+    command: update
+    depends_on:
+      - ota-db
+    environment:
+      ## these are user and passwords for docker instance, not production instance
+      LIQUIBASE_USERNAME: ota
+      LIQUIBASE_PASSWORD: ota
+      LIQUIBASE_CHANGELOG: /liquibase/core-changelog.xml
+      LIQUIBASE_URL: jdbc:mysql://ota-db:3306/electrode_ota?createDatabaseIfNotExist=true
+    links:
+      - ota-db
+    volumes:
+      - ./electrode-ota-db/:/liquibase
+      - ./docker/common/:/common

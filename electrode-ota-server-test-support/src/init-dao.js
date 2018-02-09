@@ -1,25 +1,25 @@
 import {daoFactory} from 'electrode-ota-server-dao-plugin';
-import {clientFactory} from 'electrode-ota-server-dao-cassandra';
+import {loggerFactory} from 'electrode-ota-server-logger';
+// import {clientFactory} from 'electrode-ota-server-dao-cassandra';
 
-let client;
+let dao;
 export const shutdown = async () => {
-    if (client) {
-        await client.closeAsync();
-        client = null;
+    if (dao) {
+        await dao.disconnect();
+        dao = null;
     }
 };
 export default async (options = {}) => {
     try {
-        if (client != null) {
+        if (dao != null) {
             throw new Error(`shutdown was not called`);
         }
-        client = await clientFactory({
+        dao = await daoFactory({
             contactPoints: ['localhost'],
             keyspace: `ota_server_test`,
             dangerouslyDropKeyspaceBeforeUse: true,
-            ...options
-        });
-        const dao = await daoFactory({}, client);
+            ...options            
+        }, loggerFactory);
         return dao;
     } catch (e) {
         console.trace(e);

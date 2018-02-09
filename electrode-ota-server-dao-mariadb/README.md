@@ -1,40 +1,45 @@
-# electrode-ota-server-dao-mariadb
-
-This project is part of the [electrode-ota-server](https://github.com/electrode-io/electrode-ota-server)
-
-It is not meant to be used standalone, use at your own risk.
-
-## Install
-
-```
-% npm install electrode-ota-server-dao-mariadb
-```
+# electrode-ota-server-dao-rdbms
+An implementation of the Electrode OTA Server's data access layer using RDBMS as a back-end.
 
 ## Usage
-
-Specify connection information in the config options.
-Reference sequelizejs for config parameters.
+In your electrode ota server implementation, include this module as a dependency.
 
 ```
-"plugins": {
-    "electrode-ota-server-dao-mariadb": {
-        "config": {
-            "host": "localhost",
-            "port": 3306,
-            "db": "example",
-            "user": "root",
-            "password": ""
-        }
+npm install --save @walmart/electrode-ota-server-dao-rdbms
+```
+
+Update your OTA server configuration to override the DAO plugin.  *This is assuming your config is in JavaScript format (not JSON).*
+
+```JavaScript
+const conf = {
+    plugins : {
+        // ...
+
+        "electrode-ota-server-dao-plugin" : {
+            module : require.resolve("@walmart/electrode-ota-server-dao-rdbms"),
+            // connection options based on typeorm;
+            // 'type' and 'entities' are defaulted but may be overriden
+            options : {
+                clusterConfig : {
+                    canRetry : true,
+                    defaultSelector : "ORDER",
+                    removeNodeErrorCount : 5,
+                    restoreNodeTimeout : 0,
+                },
+                poolConfigs : [{
+                    database: "bento_ota",
+                    host: "localhost",
+                    password: "password",
+                    port: 3306,
+                    user: "user",
+                }],            }
+        },
+
+        // ...
     }
 }
 ```
 
-Use this driver in DAO factory
+The ```clusterConfig``` is the settings for the mysql [PoolCluster options](https://github.com/mysqljs/mysql#poolcluster-options).
 
-```
-"plugins": {
-    "electrode-ota-server-dao-factory": {
-        driver: "electrode-ota-server-dao-mariadb"
-    }
-}
-```
+The ```poolConfigs``` property is an array of [Connection options](https://github.com/mysqljs/mysql#connection-options).

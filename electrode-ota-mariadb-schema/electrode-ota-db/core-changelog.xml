@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" 
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+	
+	<!-- <include file="tables/1__bento_table.sql" relativeToChangelogFile="true" /> -->
+	
+	<include file="tables/1__user.sql" relativeToChangelogFile="true" />
+	<include file="tables/2__app.sql" relativeToChangelogFile="true" />
+	<include file="tables/3__app_permission.sql" relativeToChangelogFile="true" />
+	<include file="tables/4__access_key.sql" relativeToChangelogFile="true" />
+	<include file="tables/5__user_auth_provider.sql" relativeToChangelogFile="true" />
+	<include file="tables/6__deployment.sql" relativeToChangelogFile="true" />
+	<include file="tables/7__package.sql" relativeToChangelogFile="true" />
+	<include file="tables/8__deployment_package_history.sql" relativeToChangelogFile="true" />
+	<include file="tables/9__package_diff.sql" relativeToChangelogFile="true" />
+	<include file="tables/10__client_ratio.sql" relativeToChangelogFile="true" />
+	<include file="tables/11__metric.sql" relativeToChangelogFile="true" />
+	<include file="tables/12_deployment_app.sql" relativeToChangelogFile="true" />
+	<include file="tables/13_package_tag.sql" relativeToChangelogFile="true" />
+	<include file="tables/14_package_content.sql" relativeToChangelogFile="true" />
+	
+</databaseChangeLog>

@@ -14,9 +14,10 @@
     "electrode-ota-server-diregister": "^3.2.5-0",
     "electrode-ota-server-errors": "^3.2.6-0",
     "electrode-ota-server-util": "^3.2.6-0",
-    "express-cassandra": "^1.7.5"
+    "express-cassandra": "1.9.0"
   },
   "devDependencies": {
+    "electrode-ota-server-logger": "^3.2.6-0",
     "electrode-ota-server-test-support": "^3.2.6-0",
     "electrode-ota-server-util-dev": "^3.2.5-0"
   }

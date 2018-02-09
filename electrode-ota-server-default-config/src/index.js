@@ -53,16 +53,15 @@ export default function () {
             },
             "electrode-ota-server-logger": {},
             "electrode-ota-server-view": {},
-            "electrode-ota-server-dao-cassandra": {
+            "electrode-ota-server-dao-plugin": {
                 "options": {
                     "contactPoints": [
                         "localhost"
                     ],
                     "keyspace": "wm_ota",
                     "disableTTYConfirmation": !TTY.isatty()
-                }
+                }                
             },
-            "electrode-ota-server-dao-plugin": {},
             "electrode-ota-server-fileservice-upload": {},
             "electrode-ota-server-fileservice-download": {},
             "electrode-ota-server-fileservice": {
