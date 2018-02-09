@@ -16,7 +16,7 @@ const conf = {
         // ...
 
         "electrode-ota-server-dao-plugin" : {
-            module : require.resolve("electrode-ota-server-dao-mariadb"),
+            module : "electrode-ota-server-dao-mariadb",
             // connection options based on typeorm;
             // 'type' and 'entities' are defaulted but may be overriden
             options : {
