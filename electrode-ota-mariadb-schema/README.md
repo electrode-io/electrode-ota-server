@@ -5,7 +5,9 @@ This is a MariaDB database that can support the Electrode Over-The-Air update se
 This is a set of xml and sql files intended to be used with [liquibase](http://www.liquibase.org/index.html), but they can also be used independently.
 
 ### Files
+- ```./docker/*``` : files to support running mariadb and liquibase in docker
 - ```./electrode-ota-db/tables/*``` : table definitions
+- ```./sql-tests/*``` : files to support a quick smoke test for the tables after creation
 
 More info on the tables can be found [here](tables.md)
 
