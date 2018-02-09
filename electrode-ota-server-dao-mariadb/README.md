@@ -1,11 +1,11 @@
-# electrode-ota-server-dao-rdbms
-An implementation of the Electrode OTA Server's data access layer using RDBMS as a back-end.
+# electrode-ota-server-dao-mariadb
+An implementation of the Electrode OTA Server's data access layer using MariaDB as a back-end.
 
 ## Usage
 In your electrode ota server implementation, include this module as a dependency.
 
 ```
-npm install --save @walmart/electrode-ota-server-dao-rdbms
+npm install --save electrode-ota-server-dao-mariadb
 ```
 
 Update your OTA server configuration to override the DAO plugin.  *This is assuming your config is in JavaScript format (not JSON).*
@@ -16,7 +16,7 @@ const conf = {
         // ...
 
         "electrode-ota-server-dao-plugin" : {
-            module : require.resolve("@walmart/electrode-ota-server-dao-rdbms"),
+            module : require.resolve("electrode-ota-server-dao-mariadb"),
             // connection options based on typeorm;
             // 'type' and 'entities' are defaulted but may be overriden
             options : {
@@ -32,7 +32,8 @@ const conf = {
                     password: "password",
                     port: 3306,
                     user: "user",
-                }],            }
+                }],            
+            }
         },
 
         // ...
