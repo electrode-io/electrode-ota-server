@@ -1,17 +1,11 @@
-# bento-ota-db
-This is the MariaDB-based Cloud RDBMS database that supports the Electrode Over-The-Air update server.
+# electrode-ota-mariadb-schema
+This is a MariaDB database that can support the Electrode Over-The-Air update server.
 
 ## Background
-This is a liquibase project created in Eclipse using the Maven project type.
+This is a set of xml and sql files intended to be used with [liquibase](http://www.liquibase.org/index.html), but they can also be used independently.
 
 ### Files
-```src/assembly/dbaas-assembly.xml``` :  packaging instructions for the build; referenced in pom.xml
-
-```src/assembly/main/resources/db```
-- ```dbaascode.xml``` : used by DBEvolver for proper mapping
-- ```./mysql/base/*``` : database creation script
-- ```./mysql/schema-user/*``` : creates users for db
-- ```./mysql/tables/*``` : table definitions
+- ```./electrode-ota-db/tables/*``` : table definitions
 
 More info on the tables can be found [here](tables.md)
 
