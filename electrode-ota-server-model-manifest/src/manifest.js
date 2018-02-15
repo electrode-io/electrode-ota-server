@@ -3,6 +3,7 @@ import yazl from 'yazl';
 import crypto from 'crypto';
 import fileType from 'file-type';
 import _ from 'lodash';
+import { Stream } from 'stream';
 
 const MACOSX_DIR = "__MACOSX/";
 const DS_STORE = ".DS_Store";
@@ -53,6 +54,18 @@ export const streamHash = (stream, hashType = 'sha256', digestType = 'hex')=> {
             resolve(hash.digest(digestType)); // 34f7a3113803f8ed3b8fd7ce5656ebec
         });
     });
+};
+
+export const streamToBuf = (stream) => {
+    if (stream instanceof Buffer) {
+        return Promise.resolve(stream);
+    }
+    if (stream instanceof Uint8Array) {
+        return Promise.resolve(Buffer.from(stream));
+    }
+    if (stream instanceof Stream) {
+        return toBuf(stream);
+    }
 };
 
 /**
@@ -250,6 +263,7 @@ export const generateDiffPackage = (download, upload, latestPackage, installedPa
     return downloadOrGenerateManifest(download, upload, installedPackage)
         .then((installedPkgManifest) => {
             return download(latestPackage.packageHash, latestPackage.blobUrl)
+                .then((latestPkgContent) => streamToBuf(latestPkgContent))
                 .then((latestPkgContent) => delta(installedPkgManifest, latestPkgContent))
                 .then((deltaResults) => {
                     return zipToBuf(deltaResults.zipFile);

@@ -1,4 +1,4 @@
-import manifest, { manifestHash } from 'electrode-ota-server-model-manifest/lib/manifest';
+import manifest, { manifestHash, streamToBuf } from 'electrode-ota-server-model-manifest/lib/manifest';
 import {expect} from 'chai';
 import path from 'path';
 import {shasum} from 'electrode-ota-server-util';
@@ -59,6 +59,32 @@ describe('manifest', function () {
     it('should generate correct manifest hash', function() {
         expect(manifestHash(step9)).to.eq("1e9218438992a0d9c891d03a283734e1f050cd0c944e7b8ce5811889ec3b82f5");
     });
+
+    describe('streamToBuf', () => {
+        it('should convert a stream to a buffer', () => {
+            const path = fixture('stream-test.txt');
+            const expected = fs.readFileSync(path, 'utf8');
+            const readStream = fs.createReadStream(path);
+            return streamToBuf(readStream).then((buffer) => {
+                expect(buffer instanceof Buffer).to.eq(true);
+                expect(buffer.toString()).to.eq(expected);
+            });
+        });
+
+        it('should resolve to the buffer if the incoming param is already a Buffer', () => {
+            const expected = Buffer.from("1234");
+            return streamToBuf(expected).then((buffer) => {
+                expect(buffer).to.eq(expected);
+            });
+        });
+
+        it('should resolve to a buffer if the incoming param is a Uint8Array', () => {
+            const uint8Array = new Uint8Array();
+            return streamToBuf(uint8Array).then((buffer) => {
+                expect(buffer instanceof Buffer).to.eq(true);
+            });
+        });
+    })
 
     it.skip('should generate diffPackageMap', function () {
         const blobs = {}, hashes = {}, manifests = {};
