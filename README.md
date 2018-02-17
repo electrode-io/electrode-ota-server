@@ -7,6 +7,34 @@ is API compatible with [code-push-cli](https://microsoft.github.io/code-push/doc
 
 ## Upgrade
 
+### Version 3.3.0
+Rewrite of mariadb module; simplify needed configuration to use the mariadb module.
+
+```json
+        "electrode-ota-server-dao-plugin" : {
+            "module" : "electrode-ota-server-dao-mariadb",
+            "options": {
+                "clusterConfig" : {
+                    "canRetry" : true,
+                    "defaultSelector" : "ORDER",
+                    "removeNodeErrorCount" : 5,
+                    "restoreNodeTimeout" : 0,
+                },
+                "poolConfigs" : [{
+                    "database": "electrode_ota",
+                    "host": "localhost",
+                    "password": "ota",
+                    "port": 33060,
+                    "user": "ota",
+                }],  
+            }
+        },
+```
+
+The underlying implementation uses the npm module [mysql](https://www.npmjs.com/package/mysql).  The options are described in further detail in the module's [readme](./electrode-ota-server-dao-mariadb/README.md).
+
+The schema for mariadb is in the [electrode-ota-mariadb-schema folder](./electrode-ota-mariadb-schema/README.md).  The module does not use sequelize anymore, and the schema is created separately using liquibase.
+
 ### Version 3.2.1
 Version 3.2.1 adds support for MySQL/MariaDB.  To use, enable `logger`, `dao-factory`, `dao-mariadb`, and disable `dao-plugin` and `dao-cassandra`.  Connection settings can be specified under `dao-mariadb`.
 ```json

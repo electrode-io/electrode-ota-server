@@ -103,6 +103,12 @@ export default class DaoExpressCassandra {
         this.logger = logger;
     }
 
+    async disconnect() {
+        if (this._models) {
+            await this._models.closeAsync();
+        }
+    }
+
     newApp(app) {
         app.id = this._models.uuid();
         return new this.App(app);
