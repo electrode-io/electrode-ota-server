@@ -12,6 +12,15 @@
         "keyspace": "ota_server_test"
       }
     },
+    "electrode-ota-server-dao-plugin": {
+      "options": {
+        "dangerouslyDropKeyspaceBeforeUse": true,
+        "contactPoints": [
+          "localhost"
+        ],
+        "keyspace": "ota_server_test"
+      }
+    },
     "electrode-ota-server-fileservice-upload": {
       "options": {
         "downloadUrl": "http://localhost:9001/storagev2/"
@@ -59,4 +68,3 @@
     }
   }
 }
-
