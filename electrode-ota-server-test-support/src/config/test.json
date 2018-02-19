@@ -3,7 +3,7 @@
     "port": 9999
   },
   "plugins": {
-    "electrode-ota-server-dao-cassandra": {
+    "electrode-ota-server-dao-plugin": {
       "options": {
         "dangerouslyDropKeyspaceBeforeUse": true,
         "contactPoints": [
@@ -59,4 +59,3 @@
     }
   }
 }
-
