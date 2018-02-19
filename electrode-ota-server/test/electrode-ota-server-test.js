@@ -1,7 +1,7 @@
 "use strict";
 
 import path from "path";
-import {expect} from "chai";
+import { expect } from "chai";
 import {
     auth,
     makeRequester,
@@ -9,10 +9,9 @@ import {
     match,
     tokenRe
 } from 'electrode-ota-server-test-support/lib/request';
+import testInit from 'electrode-ota-server-test-support/lib/init-test-config';
 import otaServer from '../src';
-process.env.NODE_ENV = 'test';
-process.env.PORT = 9999;
-process.env.OTA_CONFIG_DIR = path.join(__dirname, 'config');
+testInit();
 
 /**
  *  **** IMPORTANT ***
@@ -29,7 +28,7 @@ process.env.OTA_CONFIG_DIR = path.join(__dirname, 'config');
 describe('electrode-ota-server', function () {
     this.timeout(500000);
     let server;
-    before(()=>{
+    before(() => {
         return otaServer().then(r => server = r)
     });
 
@@ -37,7 +36,7 @@ describe('electrode-ota-server', function () {
 
     const request = (options, check, errorCheck) => () => makeRequester(server)(options, check, errorCheck);
 
-    it("should be authenticated false", request({method: 'GET', url: '/authenticated'}, body({authenticated: false})));
+    it("should be authenticated false", request({ method: 'GET', url: '/authenticated' }, body({ authenticated: false })));
     it("should show register options", request({
         method: 'GET', url: '/auth/login', headers: {
             authentication: `Basic `
@@ -50,7 +49,7 @@ describe('electrode-ota-server', function () {
         headers: {
             authorization: auth("test@walmartlabs.com", "abc123")
         }
-    }, ({statusCode, headers}) => {
+    }, ({ statusCode, headers }) => {
         expect(statusCode).to.eql(302);
         expect(headers).to.have.property("location", "/accesskey");
         return request({
@@ -59,15 +58,15 @@ describe('electrode-ota-server', function () {
                 Cookie: headers['set-cookie'][0].split(';')[0]
             }
         }, [
-            match(tokenRe),
-            ({result}) => request({
-                url: '/authenticated',
-                headers: {
-                    authorization: `Bearer ${tokenRe.exec(result)[1]}`
-                }
-            }, body({authenticated: true}))()
+                match(tokenRe),
+                ({ result }) => request({
+                    url: '/authenticated',
+                    headers: {
+                        authorization: `Bearer ${tokenRe.exec(result)[1]}`
+                    }
+                }, body({ authenticated: true }))()
 
-        ])();
+            ])();
     }));
 
     it('should survive request without valid packageHash', request({

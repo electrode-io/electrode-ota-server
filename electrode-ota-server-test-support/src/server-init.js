@@ -1,14 +1,12 @@
 import path from 'path';
-import init from './init-dao';
+import init, { shutdown } from './init-dao';
+import testInit from './init-test-config';
 import otaServer from 'electrode-ota-server';
 import supertest from 'supertest';
-import {makeRequester, tokenRe, auth} from './request';
-process.env.OTA_CONFIG_DIR = path.join(__dirname, 'config');
-process.env.NODE_ENV = 'test';
-process.env.PORT = 9999;
+import { makeRequester, tokenRe, auth } from './request';
+testInit();
 
 export default () => init().then(client => {
-
     return otaServer().then((server) => {
         const request = makeRequester(server);
         const makeUser = (user) => {
@@ -18,14 +16,14 @@ export default () => init().then(client => {
                 headers: {
                     authorization: auth(user, "abc123")
                 }
-            }, ({statusCode, headers}) => {
+            }, ({ statusCode, headers }) => {
                 return request({
-                        url: headers.location,
-                        headers: {
-                            Cookie: headers['set-cookie'][0].split(';')[0]
-                        }
-                    },
-                    ({result}) => (tokenRe.exec(result)[1])
+                    url: headers.location,
+                    headers: {
+                        Cookie: headers['set-cookie'][0].split(';')[0]
+                    }
+                },
+                    ({ result }) => (tokenRe.exec(result)[1])
                 )
             });
         };
@@ -39,11 +37,11 @@ export default () => init().then(client => {
                 extraAccessKey,
                 collaborator: 'test2@walmartlabs.com',
                 extraCollaborator: 'test@walmartlabs.com',
-                stop(){
+                stop() {
+                    shutdown();
                     return server && server.stop();
                 }
             }
         }));
     });
 });
-

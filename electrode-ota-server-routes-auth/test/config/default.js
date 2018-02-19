@@ -5,7 +5,7 @@ module.exports = {
     "port": 9999
   },
   "plugins": {
-    "electrode-ota-server-dao-cassandra": {
+    "electrode-ota-server-dao-plugin": {
       "options": {
         "dangerouslyDropKeyspaceBeforeUse": true,
         "contactPoints": [
@@ -15,7 +15,7 @@ module.exports = {
       }
     },
     "my-sso-plugin": {
-      "module": path.join(__dirname,"../my-sso"),
+      "module": path.join(__dirname, "../my-sso"),
       "priority": -9800,
       "enabled": true
     },
