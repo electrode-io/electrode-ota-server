@@ -44,3 +44,5 @@ const conf = {
 The ```clusterConfig``` is the settings for the mysql [PoolCluster options](https://github.com/mysqljs/mysql#poolcluster-options).
 
 The ```poolConfigs``` property is an array of [Connection options](https://github.com/mysqljs/mysql#connection-options).
+
+The database schema can be found at [electrode-ota-mariadb-schema](https://github.com/electrode-io/electrode-ota-server/tree/master/electrode-ota-mariadb-schema)
