@@ -114,8 +114,6 @@ var config = {
 };
 if (isHot) {
 	
-	config.plugins.unshift(new webpack.HotModuleReplacementPlugin());
-	config.devServer.hot = true;
 	config.entry = [
 		'react-hot-loader/patch',
 		// activate HMR for React
