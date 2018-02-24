@@ -61,6 +61,7 @@
     "@types/node": "^8.0.24",
     "bluebird": "^3.5.1",
     "electrode-ota-server-diregister": "^4.1.0-0",
+    "electrode-ota-server-util": "^4.1.0-0",
     "lodash": "^4.17.4",
     "mysql": "^2.14.1"
   }

@@ -11,25 +11,31 @@ import { clearTables } from "./ClearTables";
 
 import { AppDTO, MetricInDTO, MetricOutDTO, PackageDTO, UserDTO } from "../src/dto";
 
+import Encryptor from "../src/Encryptor";
+
 import { readFileSync } from "fs";
 
 // tslint:disable:no-console
 
 const dao = new ElectrodeOtaDaoRdbms();
 const testDBConfig = {
-    clusterConfig : {
-        canRetry : true,
-        defaultSelector : "ORDER",
-        removeNodeErrorCount : 5,
-        restoreNodeTimeout : 0,
+    clusterConfig: {
+        canRetry: true,
+        defaultSelector: "ORDER",
+        removeNodeErrorCount: 5,
+        restoreNodeTimeout: 0,
     },
-    poolConfigs : [{
+    poolConfigs: [{
         database: "electrode_ota",
         host: "localhost",
         password: "ota",
         port: 33060,
         user: "ota",
     }],
+    encryptionConfig: {
+        keyfile: "./test/sample_encryption.key",
+        fields: ["user.name", "user.email"]
+    }
 };
 
 const stageDeploymentKey = "qjPVRyntQQrKJhkkNbVJeULhAIfVtHaBDfCFggzL";
@@ -48,12 +54,12 @@ process.on("unhandledRejection", (reason, p) => {
 });
 
 // tslint:disable-next-line:only-arrow-functions
-describe("Data Access via RDBMS", function() {
+describe("Data Access via RDBMS", function () {
     this.timeout(30000);
 
     describe("connect", () => {
         it("connects to the database", () => {
-            return dao.connect(testDBConfig).then(() =>  dao.close());
+            return dao.connect(testDBConfig).then(() => dao.close());
         });
     });
 
@@ -87,14 +93,14 @@ describe("Data Access via RDBMS", function() {
             userDTO.linkedProviders = ["ldap"];
             userDTO.accessKeys = {};
             userDTO.accessKeys[keyName] = {
-                createdBy : undefined,
+                createdBy: undefined,
                 createdTime,
-                description : "Some junk",
-                email : userDTO.email,
+                description: "Some junk",
+                email: userDTO.email,
                 expires,
-                friendlyName : "Login-" + expires,
-                id : "some junk",
-                name : keyName,
+                friendlyName: "Login-" + expires,
+                id: "some junk",
+                name: keyName,
             };
 
             describe("createUser", () => {
@@ -139,15 +145,15 @@ describe("Data Access via RDBMS", function() {
                     const testLastAccess = new Date();
                     anotherUser.accessKeys = {};
                     anotherUser.accessKeys[testKey] = {
-                        createdBy : undefined,
+                        createdBy: undefined,
                         createdTime,
-                        description : "Some junk",
-                        email : userDTO.email,
-                        expires : testExpiration,
-                        friendlyName : "Login-" + expires,
-                        id : "some junk",
-                        lastAccess : testLastAccess,
-                        name : testKey,
+                        description: "Some junk",
+                        email: userDTO.email,
+                        expires: testExpiration,
+                        friendlyName: "Login-" + expires,
+                        id: "some junk",
+                        lastAccess: testLastAccess,
+                        name: testKey,
                     };
 
                     return dao.createUser(anotherUser).then((created) => {
@@ -225,8 +231,6 @@ describe("Data Access via RDBMS", function() {
                     updateInfo.email = userDTO.email;
                     updateInfo.accessKeys = userDTO.accessKeys;
                     updateInfo.linkedProviders = ([] as string[]).concat(userDTO.linkedProviders, ["github"]);
-
-                    // console.log("linkedProviders", updateInfo.linkedProviders);
 
                     return dao.updateUser(userDTO.email, updateInfo).then((updated) => {
                         expect(updated).not.to.be.undefined;
@@ -331,14 +335,14 @@ describe("Data Access via RDBMS", function() {
                     updateInfo.email = userDTO.email;
                     updateInfo.accessKeys = {};
                     updateInfo.accessKeys[newKeyName] = {
-                        createdBy : undefined,
+                        createdBy: undefined,
                         createdTime,
-                        description : "Some junk 2",
-                        email : userDTO.email,
+                        description: "Some junk 2",
+                        email: userDTO.email,
                         expires,
-                        friendlyName : "Login-" + expires,
-                        id : "some junk",
-                        name : newKeyName,
+                        friendlyName: "Login-" + expires,
+                        id: "some junk",
+                        name: newKeyName,
                     };
 
                     return dao.updateUser(userDTO.email, updateInfo).then((updated) => {
@@ -429,12 +433,12 @@ describe("Data Access via RDBMS", function() {
                 it("will create an app record with permissions and deployments", () => {
                     appDTO.collaborators[email] = { permission };
                     appDTO.deployments[STAGING] = {
-                        key : stageDeploymentKey,
-                        name : STAGING,
+                        key: stageDeploymentKey,
+                        name: STAGING,
                     };
                     appDTO.deployments[PROD] = {
-                        key : prodDeploymentKey,
-                        name : PROD,
+                        key: prodDeploymentKey,
+                        name: PROD,
                     };
 
                     return dao.createApp(appDTO).then((updated) => {
@@ -486,7 +490,6 @@ describe("Data Access via RDBMS", function() {
                     return dao.appsForCollaborator(email).then((apps) => {
                         expect(apps).not.to.be.undefined;
                         expect(apps.length).to.be.gt(0);
-                        // console.log("apps[0]", apps[0]);
                         expect(apps[0].name).not.to.be.undefined;
                         expect(apps[0].collaborators).not.to.be.undefined;
                         expect(apps[0].collaborators[email]).not.to.be.undefined;
@@ -527,14 +530,14 @@ describe("Data Access via RDBMS", function() {
                 collaborator.linkedProviders = ["ldap"];
                 collaborator.accessKeys = {};
                 collaborator.accessKeys[collabAccessKey] = {
-                    createdBy : undefined,
-                    createdTime : Date.now(),
-                    description : "Some junk 2",
-                    email : collaborator.email,
+                    createdBy: undefined,
+                    createdTime: Date.now(),
+                    description: "Some junk 2",
+                    email: collaborator.email,
                     expires,
-                    friendlyName : "Login-" + expires,
-                    id : "some junk",
-                    name : collabAccessKey,
+                    friendlyName: "Login-" + expires,
+                    id: "some junk",
+                    name: collabAccessKey,
                 };
 
                 before(() => {
@@ -561,8 +564,8 @@ describe("Data Access via RDBMS", function() {
                     const updateInfo = new AppDTO();
                     updateInfo.name = appDTO.name;
                     updateInfo.collaborators = {};
-                    updateInfo.collaborators[email] = { permission : "Owner" };
-                    updateInfo.collaborators[collaborator.email] = { permission : "Collaborator" };
+                    updateInfo.collaborators[email] = { permission: "Owner" };
+                    updateInfo.collaborators[collaborator.email] = { permission: "Collaborator" };
                     return dao.updateApp(appDTO.id, updateInfo).then((updated) => {
                         expect(updated).not.to.be.undefined;
                         expect(updated.name).to.eq(appDTO.name);
@@ -586,7 +589,7 @@ describe("Data Access via RDBMS", function() {
                     const updateInfo = new AppDTO();
                     updateInfo.name = appDTO.name;
                     updateInfo.collaborators = {};
-                    updateInfo.collaborators[email] = { permission : "Owner" };
+                    updateInfo.collaborators[email] = { permission: "Owner" };
                     return dao.updateApp(appDTO.id, updateInfo).then((updated) => {
                         expect(updated).not.to.be.undefined;
                         expect(updated.name).to.eq(appDTO.name);
@@ -601,8 +604,8 @@ describe("Data Access via RDBMS", function() {
                     const updateInfo = new AppDTO();
                     updateInfo.name = appDTO.name;
                     updateInfo.collaborators = {};
-                    updateInfo.collaborators[email] = { permission : "Collaborator" };
-                    updateInfo.collaborators[collaborator.email] = { permission : "Owner" };
+                    updateInfo.collaborators[email] = { permission: "Collaborator" };
+                    updateInfo.collaborators[collaborator.email] = { permission: "Owner" };
                     return dao.updateApp(appDTO.id, updateInfo).then((updated) => {
                         expect(updated).not.to.be.undefined;
                         expect(updated.name).to.eq(appDTO.name);
@@ -612,8 +615,8 @@ describe("Data Access via RDBMS", function() {
                         expect(updated.collaborators[collaborator.email]).not.to.be.undefined;
                         expect(updated.collaborators[collaborator.email].permission).to.eq("Owner");
 
-                        updateInfo.collaborators[email] = { permission : "Owner" };
-                        updateInfo.collaborators[collaborator.email] = { permission : "Collaborator" };
+                        updateInfo.collaborators[email] = { permission: "Owner" };
+                        updateInfo.collaborators[collaborator.email] = { permission: "Collaborator" };
                         return dao.updateApp(appDTO.id, updateInfo).then((reverted) => {
                             expect(reverted).not.to.be.undefined;
                             expect(reverted.name).to.eq(appDTO.name);
@@ -630,7 +633,7 @@ describe("Data Access via RDBMS", function() {
                     const updateInfo = new AppDTO();
                     updateInfo.name = appDTO.name;
                     updateInfo.collaborators = {};
-                    updateInfo.collaborators[email] = { permission : "Owner" };
+                    updateInfo.collaborators[email] = { permission: "Owner" };
 
                     // first update will effectively delete the collaborator created in the last test
                     return dao.updateApp(appDTO.id, updateInfo).then((updated) => {
@@ -682,7 +685,7 @@ describe("Data Access via RDBMS", function() {
 
             describe("addDeployment", () => {
                 it("will fail if the deployment key already exists", () => {
-                    return dao.addDeployment(appId, STAGING, { key : stageDeploymentKey }).catch((err) => {
+                    return dao.addDeployment(appId, STAGING, { key: stageDeploymentKey }).catch((err) => {
                         expect(err).not.to.be.undefined;
                         expect(err.toString()).to.contain("already exists");
                     });
@@ -690,7 +693,7 @@ describe("Data Access via RDBMS", function() {
 
                 it("adds a new deployment", () => {
 
-                    return dao.addDeployment(appId, myDeploymentName, { key : myDeploymentKey }).then((deployment) => {
+                    return dao.addDeployment(appId, myDeploymentName, { key: myDeploymentKey }).then((deployment) => {
                         expect(deployment).not.to.be.undefined;
                         expect(deployment.key).to.eq(myDeploymentKey);
                         expect(deployment.name).to.eq(myDeploymentName);
@@ -726,7 +729,6 @@ describe("Data Access via RDBMS", function() {
                 it("will find and return the deployments for given app id and key names", () => {
                     return dao.deploymentsByApp(appId, [STAGING, myDeploymentName]).then((deployments) => {
                         expect(deployments).not.to.be.undefined;
-                        console.log("deploymentsByApp - deployments", deployments);
                         expect(deployments[STAGING]).not.to.be.undefined;
                         expect(deployments[STAGING].key).to.eq(stageDeploymentKey);
                         expect(deployments[myDeploymentName]).not.to.be.undefined;
@@ -847,7 +849,6 @@ describe("Data Access via RDBMS", function() {
                         expect(updated).not.to.be.undefined;
                         newPkg.id = updated.id;
                         newPkgId = updated.id;
-                        console.log("after update, newPkgId is", newPkgId);
                         expect(updated.tags).to.deep.equal(tags);
                     });
                 });
@@ -925,11 +926,11 @@ describe("Data Access via RDBMS", function() {
 
                 it("will update a few key fields for a package", () => {
                     const updateInfo = {
-                        appVersion : "0.0.3",
-                        description : "NewDescriptio for this package",
-                        isDisabled : true,
-                        isMandatory : true,
-                        rollout : 94,
+                        appVersion: "0.0.3",
+                        description: "NewDescriptio for this package",
+                        isDisabled: true,
+                        isMandatory: true,
+                        rollout: 94,
                     };
 
                     return dao.updatePackage(stageDeploymentKey, updateInfo, "").then((updated) => {
@@ -959,8 +960,8 @@ describe("Data Access via RDBMS", function() {
 
                     const diffPackageMap: any = {};
                     diffPackageMap[newPkgHash] = {
-                        size : 144103903,
-                        url : "http://stuff.com/afoi320...",
+                        size: 144103903,
+                        url: "http://stuff.com/afoi320...",
                     };
 
                     const updateInfo = {
@@ -1027,7 +1028,7 @@ describe("Data Access via RDBMS", function() {
 
                                 // let's remove them
                                 const nextUpdateInfo = {
-                                    tags : [],
+                                    tags: [],
                                 };
 
                                 return dao.updatePackage(stageDeploymentKey, nextUpdateInfo, "").then((nextUpdated) => {
@@ -1057,8 +1058,8 @@ describe("Data Access via RDBMS", function() {
                     appDTO.collaborators[email] = { permission };
                     appDTO.deployments = {};
                     appDTO.deployments[STAGING] = {
-                        key : deplKey,
-                        name : STAGING,
+                        key: deplKey,
+                        name: STAGING,
                     };
                     return dao.createApp(appDTO).then((app) => {
                         return dao.deploymentForKey(deplKey).then((deployment) => {
@@ -1316,18 +1317,18 @@ describe("Data Access via RDBMS", function() {
                                                 ratio, is_updated
                                                 FROM client_ratio
                                                 WHERE client_unique_id = ?`,
-                                                [clientUniqueId], (err, results) => {
-                                    if (err) {
-                                        reject(err);
-                                    } else {
-                                        expect(results).not.to.be.undefined;
-                                        expect(results.length).to.eq(1);
-                                        expect(results[0].client_unique_id).to.eq(clientUniqueId);
-                                        expect(results[0].ratio).to.eq(initRatio);
-                                        expect(results[0].is_updated === 1).to.eq(initUpdated);
-                                        resolve();
-                                    }
-                                });
+                                    [clientUniqueId], (err, results) => {
+                                        if (err) {
+                                            reject(err);
+                                        } else {
+                                            expect(results).not.to.be.undefined;
+                                            expect(results.length).to.eq(1);
+                                            expect(results[0].client_unique_id).to.eq(clientUniqueId);
+                                            expect(results[0].ratio).to.eq(initRatio);
+                                            expect(results[0].is_updated === 1).to.eq(initUpdated);
+                                            resolve();
+                                        }
+                                    });
                             });
                         });
                     });
@@ -1341,18 +1342,18 @@ describe("Data Access via RDBMS", function() {
                                                 ratio, is_updated
                                                 FROM client_ratio
                                                 WHERE client_unique_id = ?`,
-                                                [clientUniqueId], (err, results) => {
-                                    if (err) {
-                                        reject(err);
-                                    } else {
-                                        expect(results).not.to.be.undefined;
-                                        expect(results.length).to.eq(1);
-                                        expect(results[0].client_unique_id).to.eq(clientUniqueId);
-                                        expect(results[0].ratio).to.eq(newRatio);
-                                        expect(results[0].is_updated === 1).to.eq(newUpdated);
-                                        resolve();
-                                    }
-                                });
+                                    [clientUniqueId], (err, results) => {
+                                        if (err) {
+                                            reject(err);
+                                        } else {
+                                            expect(results).not.to.be.undefined;
+                                            expect(results.length).to.eq(1);
+                                            expect(results[0].client_unique_id).to.eq(clientUniqueId);
+                                            expect(results[0].ratio).to.eq(newRatio);
+                                            expect(results[0].is_updated === 1).to.eq(newUpdated);
+                                            resolve();
+                                        }
+                                    });
                             });
                         });
                     });
@@ -1413,17 +1414,17 @@ describe("Data Access via RDBMS", function() {
                         return dao.getConnection().then((connection) => {
                             return new Promise((resolve, reject) => {
                                 connection.query("SELECT COUNT(*) AS count FROM metric WHERE deployment_id = " +
-                                                "(SELECT id FROM deployment WHERE deployment_key = ?)",
-                                                [stageDeploymentKey], (err, results) => {
-                                    if (err) {
-                                        reject(err);
-                                    } else {
-                                        expect(results).not.to.be.undefined;
-                                        expect(results.length).to.eq(1);
-                                        expect(results[0].count).to.be.gte(1);
-                                        resolve();
-                                    }
-                                });
+                                    "(SELECT id FROM deployment WHERE deployment_key = ?)",
+                                    [stageDeploymentKey], (err, results) => {
+                                        if (err) {
+                                            reject(err);
+                                        } else {
+                                            expect(results).not.to.be.undefined;
+                                            expect(results.length).to.eq(1);
+                                            expect(results[0].count).to.be.gte(1);
+                                            resolve();
+                                        }
+                                    });
                             });
                         });
                     });
@@ -1470,12 +1471,12 @@ describe("Data Access via RDBMS", function() {
                                 connection.query(`SELECT COUNT(pc.package_hash) AS count
                                                 FROM package_content pc
                                                 WHERE pc.package_hash = ?`, [packageHash], (e, result) => {
-                                                    expect(result).not.to.be.undefined;
-                                                    expect(result.length).to.be.greaterThan(0);
+                                        expect(result).not.to.be.undefined;
+                                        expect(result.length).to.be.greaterThan(0);
 
-                                                    expect(result[0].count).to.eq(1);
-                                                    resolve();
-                                                });
+                                        expect(result[0].count).to.eq(1);
+                                        resolve();
+                                    });
                             });
                         });
                     });
@@ -1565,6 +1566,50 @@ describe("Data Access via RDBMS", function() {
         it("will throw an error if there's a problem ending the pool", () => {
             return myDAO.close().catch((err) => {
                 expect(err).not.to.be.undefined;
+            });
+        });
+    });
+
+    describe("encrypted fields", () => {
+        const encryptedDao = new ElectrodeOtaDaoRdbms();
+        const userDTO = new UserDTO();
+        userDTO.email = "encrypt_me@walmart.com";
+        userDTO.name = "Encrypt Me";
+
+        before(() => {
+            return Encryptor.instance.initialize(testDBConfig.encryptionConfig)
+                .then(() => encryptedDao.connect(testDBConfig).then(() => {
+                    return encryptedDao.getConnection().then((conn) => clearTables(conn));
+                }));
+        });
+
+        after(() => {
+            return encryptedDao.close();
+        });
+
+        it("User saved with encrypted email", () => {
+            // Test encryption is enabled
+            expect(Encryptor.instance.encrypt("user.email", userDTO.email)).to.not.eq(userDTO.email);
+
+            // Test email and name stored encrypted
+            return encryptedDao.createUser(userDTO).then(createdUser => {
+                expect(createdUser.email).to.eq(userDTO.email);
+                expect(createdUser.name).to.eq(userDTO.name);
+                return createdUser;
+            }).then((createdUser) => {
+                return encryptedDao.getConnection().then(conn => {
+                    return new Promise((resolve, reject) => {
+                        conn.query(`SELECT email, name FROM user WHERE email = ?`, [Encryptor.instance.encrypt("user.email", createdUser.email)], (err, results) => {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                expect(results.length).to.eq(1);
+                                expect(Encryptor.instance.decrypt("user.email", results[0].name)).to.eq(userDTO.name);
+                                resolve();
+                            }
+                        });
+                    });
+                });
             });
         });
     });

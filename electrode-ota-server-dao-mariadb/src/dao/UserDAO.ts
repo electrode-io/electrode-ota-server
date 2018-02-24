@@ -4,6 +4,7 @@ import { AccessKeyQueries, UserAuthProviderQueries, UserQueries } from "../queri
 import BaseDAO from "./BaseDAO";
 
 import { UserDTO } from "../dto";
+import Encryptor from "../Encryptor";
 
 import { difference, forOwn, omit, pick } from "lodash";
 
@@ -23,6 +24,7 @@ export default class UserDAO extends BaseDAO {
             outgoing.email = userMatches[0].email;
             outgoing.createdTime = userMatches[0].created_time;
             outgoing.name = userMatches[0].name;
+            Encryptor.instance.decryptDTO(outgoing);
 
             if (user.linkedProviders) {
                 outgoing.linkedProviders = await UserDAO.createLinkedProviders(connection, userId,
@@ -67,7 +69,7 @@ export default class UserDAO extends BaseDAO {
     }
 
     public static async updateUser(connection: IConnection, currentEmail: string,
-                                   updateInfo: UserDTO): Promise<UserDTO> {
+        updateInfo: UserDTO): Promise<UserDTO> {
         /*
             This function is used to
             - add a new access key
@@ -164,20 +166,23 @@ export default class UserDAO extends BaseDAO {
         outgoing.email = userResult[0].email;
         outgoing.createdTime = userResult[0].created_time;
         outgoing.name = userResult[0].name;
+        Encryptor.instance.decryptDTO(outgoing);
 
         outgoing.accessKeys = await UserDAO.getAccessKeysByUserId(connection, userId)
-                                            .then(UserDAO.transformOutgoingAccessKeys);
+            .then(UserDAO.transformOutgoingAccessKeys);
         outgoing.linkedProviders = await UserDAO.getLinkedProvidersForUser(connection, userId)
-                                            .then(UserDAO.transformOutgoingLinkedProviders);
+            .then(UserDAO.transformOutgoingLinkedProviders);
         return outgoing;
     }
 
     private static async getUserByEmail(connection: IConnection, email: string): Promise<any> {
-        return UserDAO.query(connection, UserQueries.getUserByEmail, [email]);
+        return UserDAO.query(connection, UserQueries.getUserByEmail, [Encryptor.instance.encrypt("user.email", email)]);
     }
 
     private static async insertUser(connection: IConnection, user: UserDTO): Promise<any> {
-        return UserDAO.query(connection, UserQueries.insertUser, [user.email, user.name]);
+        const user_email = Encryptor.instance.encrypt("user.email", user.email);
+        const user_name = Encryptor.instance.encrypt("user.name", user.name);
+        return UserDAO.query(connection, UserQueries.insertUser, [user_email, user_name]);
     }
 
     private static async getUserById(connection: IConnection, id: number): Promise<any> {
@@ -219,7 +224,7 @@ export default class UserDAO extends BaseDAO {
     private static async insertAccessKey(connection: IConnection, userId: number, accessKey: any): Promise<any> {
         const expires = (typeof accessKey.expires === "number") ? new Date(accessKey.expires) : accessKey.expires;
         return UserDAO.query(connection, AccessKeyQueries.insertAccessKey,
-                [userId, accessKey.name, accessKey.createdBy,
+            [userId, accessKey.name, accessKey.createdBy,
                 expires, accessKey.friendlyName, accessKey.description]);
     }
 
@@ -243,14 +248,14 @@ export default class UserDAO extends BaseDAO {
     private static transformOutgoingAccessKeys(accessKeys: any[]): any {
         return accessKeys.reduce((obj: any, accessKey: any) => {
             obj[accessKey.name] = {
-                createdTime : accessKey.created_time,
-                description : accessKey.description,
-                email : accessKey.email,
-                expires : accessKey.expires,
-                friendlyName : accessKey.friendly_name,
-                id : accessKey.id,
-                lastAccess : accessKey.last_access,
-                name : accessKey.name,
+                createdTime: accessKey.created_time,
+                description: accessKey.description,
+                email: accessKey.email,
+                expires: accessKey.expires,
+                friendlyName: accessKey.friendly_name,
+                id: accessKey.id,
+                lastAccess: accessKey.last_access,
+                name: accessKey.name,
             };
             return obj;
         }, {});
