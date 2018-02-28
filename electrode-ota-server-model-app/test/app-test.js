@@ -161,7 +161,8 @@ describe("model/app", function() {
             releaseMethod: "Upload",
             releasedBy: "test@p.com",
             rollout: 50,
-            size: "22"
+            size: "22",
+            tags: null,
           },
           {
             appVersion: "1.0.0",
@@ -180,7 +181,8 @@ describe("model/app", function() {
             releaseMethod: "Upload",
             releasedBy: "test@p.com",
             rollout: 25,
-            size: "16"
+            size: "16",
+            tags: null,
           }
         ])
       )
@@ -218,7 +220,8 @@ describe("model/app", function() {
           rollout: null,
           size: "22",
           packageHash:
-            "8d7573816249dc6f9f34bd04dc07d4bb62c5deb6c3b1b5e574e0f26c0d2f25c9"
+            "8d7573816249dc6f9f34bd04dc07d4bb62c5deb6c3b1b5e574e0f26c0d2f25c9",
+          tags: null,
         })
       )
       .then(dep =>
@@ -257,7 +260,8 @@ describe("model/app", function() {
           releaseMethod: "Promote",
           releasedBy: "test@p.com",
           rollout: 50,
-          size: "22"
+          size: "22",
+          tags: null,
         })
       );
   });
@@ -324,7 +328,8 @@ describe("model/app", function() {
             releaseMethod: "Rollback",
             releasedBy: "test@p.com",
             rollout: 100,
-            size: "16"
+            size: "16",
+            tags: null,
           },
           {
             appVersion: "1.0.2",
@@ -343,7 +348,8 @@ describe("model/app", function() {
             releaseMethod: "Upload",
             releasedBy: "test@p.com",
             rollout: 50,
-            size: "26"
+            size: "26",
+            tags: null,
           },
           {
             appVersion: "1.0.0",
@@ -362,7 +368,8 @@ describe("model/app", function() {
             releaseMethod: "Upload",
             releasedBy: "test@p.com",
             rollout: 25,
-            size: "16"
+            size: "16",
+            tags: null,
           }
         ])
       );
@@ -439,7 +446,8 @@ describe("model/app", function() {
             releaseMethod: "Rollback",
             releasedBy: "test@p.com",
             rollout: 100,
-            size: "16"
+            size: "16",
+            tags: null,
           },
           {
             appVersion: "1.0.2",
@@ -458,7 +466,8 @@ describe("model/app", function() {
             releaseMethod: "Upload",
             releasedBy: "test@p.com",
             rollout: 50,
-            size: "26"
+            size: "26",
+            tags: null,
           },
           {
             appVersion: "1.0.0",
@@ -477,7 +486,8 @@ describe("model/app", function() {
             releaseMethod: "Upload",
             releasedBy: "test@p.com",
             rollout: 25,
-            size: "16"
+            size: "16",
+            tags: null,
           }
         ])
       );
@@ -694,6 +704,94 @@ describe("model/app", function() {
           .then(() => {
             expect(hasException, "Duplicate content Error expected").to.be.true;
           });
+      });
+  });
+
+  it("should handle tags on upload", () => {
+    const email = "tagger@taggington.com";
+    const appName = "appWillUseTags";
+    const tags = ["SOCCER-MOMS", "NASCAR-DADS"];
+    return ac
+      .createApp({ email, name: appName })
+      .then(() => {
+        return ac.upload({
+          app: appName,
+          email,
+          package: readFixture("step.0.blob.zip"),
+          deployment: "Staging",
+          packageInfo : {
+            description : "release with tags",
+            tags,
+          }
+        }).then((newPkg) => {
+          expect(newPkg).not.to.be.undefined;
+          expect(newPkg.tags).not.to.be.undefined;
+          expect(newPkg.tags.length).to.eq(tags.length);
+          expect(newPkg.tags.indexOf(tags[0])).to.be.gte(0);
+          expect(newPkg.tags.indexOf(tags[1])).to.be.gte(0);
+        });
+      });
+  });
+
+  it("should handle tags on promote", () => {
+    const email = "taggy@mctaggerson.com";
+    const appName = "appWillUseTagsOnPromotion";
+    const tags = ["SITE-1222"];
+
+    return ac
+      .createApp({ email, name: appName })
+      .then(() => ac.upload({
+          app: appName,
+          email,
+          package: readFixture("step.0.blob.zip"),
+          deployment: "Staging",
+          packageInfo: {
+            description: "release without tags"
+          }
+        }))
+      .then(() => ac.promoteDeployment({
+        app: appName,
+        email,
+        deployment: "Staging",
+        to: "Production",
+        tags,
+      }))
+      .then((promoted) => {
+        expect(promoted).not.to.be.undefined;
+        expect(promoted.tags).not.to.be.undefined;
+        expect(promoted.tags.length).to.eq(tags.length);
+        expect(promoted.tags.indexOf(tags[0])).to.eq(0);
+      });
+  });
+
+  it("should handle tags on update", () => {
+    const email = "tag_updater@tagtronics.com";
+    const appName = "appWillUpdateTags";
+    const tags = ["SOUTHERN-US", "MIDWEST-US"];
+
+    return ac
+      .createApp({ email, name: appName })
+      .then(() => ac.upload({
+        app: appName,
+        email,
+        package: readFixture("step.0.blob.zip"),
+        deployment: "Staging",
+        packageInfo: {
+          description: "release without tags initially"
+        }
+      }))
+      .then(() => ac.updateDeployment({
+        app: appName,
+        email,
+        deployment: "Staging",
+        tags,
+      }))
+      .then((updated) => {
+        expect(updated).not.to.be.undefined;
+        expect(updated.tags).not.to.be.undefined;
+        expect(updated.tags.length).to.eq(tags.length);
+        expect(updated.tags.indexOf(tags[0])).to.be.gte(0);
+        expect(updated.tags.indexOf(tags[1])).to.be.gte(0);      
       });
   });
 });

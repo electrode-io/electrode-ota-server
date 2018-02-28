@@ -309,7 +309,8 @@ export default (options, dao, upload, download, logger) => {
                 blobUrl: pkg.blobUrl,
                 manifestBlobUrl: pkg.manifestBlobUrl,
                 size: pkg.size,
-                label: "v" + (t.history_ ? t.history_.length + 1 : 1)
+                label: "v" + (t.history_ ? t.history_.length + 1 : 1),
+                tags: params.tags,
               })
               .tap(() => {
                 logger.info(
@@ -355,7 +356,8 @@ export default (options, dao, upload, download, logger) => {
               isMandatory = pkg.isMandatory,
               rollout = pkg.rollout,
               appVersion = pkg.appVersion,
-              description = pkg.description
+              description = pkg.description,
+              tags = pkg.tags,
             } = excludeNull(params);
 
             invalidRequest(
@@ -371,7 +373,8 @@ export default (options, dao, upload, download, logger) => {
               isMandatory,
               rollout,
               appVersion,
-              description
+              description,
+              tags,
             };
 
             return dao
@@ -506,7 +509,8 @@ export default (options, dao, upload, download, logger) => {
           label,
           isMandatory = false,
           rollout = 100,
-          appVersion = "1.0.0"
+          appVersion = "1.0.0",
+          tags,
         }
       } = vals;
 
@@ -548,11 +552,16 @@ export default (options, dao, upload, download, logger) => {
         releasedBy: email
       };
 
+      if (tags && tags.length) {
+        pkg.tags = tags;
+      }
+
       if (zip) {
         // Upload manifest
         const { blobUrl } = await upload(toBuffer(manifest));
         pkg.manifestBlobUrl = blobUrl;
       }
+
       const resp = await upload(vals.package, pkg.packageHash);
       return dao
         .addPackage(deployments.key, Object.assign({}, pkg, resp))
