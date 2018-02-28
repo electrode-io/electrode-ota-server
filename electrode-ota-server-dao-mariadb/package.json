@@ -60,11 +60,7 @@
   "dependencies": {
     "@types/node": "^8.0.24",
     "bluebird": "^3.5.1",
-<<<<<<< HEAD
-    "electrode-ota-server-diregister": "^3.2.5-0",
-=======
     "electrode-ota-server-diregister": "^4.0.0-0",
->>>>>>> dc90d4de48bc1f0c58b4fbbd58185cf06b3ca963
     "lodash": "^4.17.4",
     "mysql": "^2.14.1"
   }
