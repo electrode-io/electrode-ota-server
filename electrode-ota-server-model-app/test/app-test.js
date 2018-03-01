@@ -139,7 +139,10 @@ describe("model/app", function() {
       })
       .then(v => {
         expect(v.length, "should be 2").to.eql(2);
-        v.forEach(v => expect(delete v.uploadTime).to.be.true);
+        v.forEach(v => {
+          expect(delete v.uploadTime).to.be.true;
+          delete v.lastUpdated;
+        });
         return v;
       })
       .then(
@@ -199,7 +202,10 @@ describe("model/app", function() {
       )
       .then(v => {
         expect(v.length, "should be 1").to.eql(1);
-        v.forEach(v => delete v.uploadTime);
+        v.forEach(v => {
+          delete v.uploadTime;
+          delete v.lastUpdated;
+        });
         return v[0];
       })
       .then(
@@ -240,6 +246,7 @@ describe("model/app", function() {
         delete dep.created_;
         //part of api
         expect(delete dep.uploadTime).to.be.true;
+        delete dep.lastUpdated;
         return dep;
       })
       .then(
@@ -303,9 +310,10 @@ describe("model/app", function() {
         expect(history, "history length")
           .to.be.an("array")
           .with.length(3);
-        history.forEach(
-          v => expect(delete v.uploadTime, "should have uploadTime").to.be.true
-        );
+        history.forEach(v => {
+          expect(delete v.uploadTime, "should have uploadTime").to.be.true
+          delete v.lastUpdated;
+        });
         return history;
       })
       .then(
@@ -421,9 +429,10 @@ describe("model/app", function() {
       )
       .then(history => {
         expect(history.length, "history length").to.eql(3);
-        history.forEach(
-          v => expect(delete v.uploadTime, "should have uploadTime").to.be.true
-        );
+        history.forEach(v => {
+          expect(delete v.uploadTime, "should have uploadTime").to.be.true;
+          delete v.lastUpdated;
+        });
         return history;
       })
       .then(

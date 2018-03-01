@@ -27,8 +27,9 @@
     "uploadTime": "timestamp",
     "tags": {
       "type": "set",
-      "typeDef": "<text>"
-    }
+      "typeDef": "<varchar>"
+    },
+    "lastUpdated": "timestamp"
   },
   "key": [
     [

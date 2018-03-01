@@ -4,6 +4,10 @@ import UDTS from './models/UDTS.json';
 
 const historySort = history => history && history.sort((a, b) => b.created_.getTime() - a.created_.getTime());
 
+const releaseSort = (packageList) => {
+    return packageList.sort((a, b) => b.lastUpdated.getTime() - a.lastUpdated.getTime());
+};
+
 const toLowerCaseKeys = (obj) => {
     if (!obj) return obj;
     const ret = {};
@@ -138,6 +142,7 @@ export default class DaoExpressCassandra {
     newPackage(pkg) {
         pkg.id_ = this._models.timeuuid();
         pkg.created_ = Date.now();
+        pkg.lastUpdated = Date.now();
         if (pkg.size)
             pkg.size = this._models.driver.types.Integer.fromNumber(pkg.size);
 
@@ -287,11 +292,52 @@ export default class DaoExpressCassandra {
             rpkg = await this.Package.findOneAsync({id_: within(history_)});
         }
         apply(rpkg, pkg);
+        rpkg.lastUpdated = Date.now();
         await rpkg.saveAsync();
         return rpkg;
 
     }
 
+    /**
+     * For a given deployment, it gets the latest available release package
+     * that matches the passed in tags.
+     * 
+     * @param {*} deploymentKey string - the deployment key of the app on the device
+     * @param {*} tags string[] - the list of tags the device has sent
+     */
+    async getNewestApplicablePackage(deploymentKey, tags) {
+        const packageHashes = await this._historyForDeployment(deploymentKey);
+        if (packageHashes && packageHashes.length > 0) {
+            let packages = await this.Package.findAsync({ id_: within(packageHashes) });
+            packages = releaseSort(packages);
+
+            if (!tags || tags.length === 0) {
+                // if the caller does not pass in tags, give back the
+                // newest release that has no tags
+                for (let i = 0; i < packages.length; i++) {
+                    let pkg = packages[i];
+                    if (!pkg.tags || pkg.tags.length === 0) {
+                        return pkg;
+                    }
+                }
+            } else {
+                // caller passed in tags
+                for (let i = 0; i < packages.length; i++) {
+                    let pkg = packages[i];
+                    if (pkg.tags) {
+                        for (let j = 0; j < tags.length; j++) {
+                            if (pkg.tags.indexOf(tags[j]) >= 0) {
+                                return pkg;
+                            }
+                        }
+                    } else {
+                        // if there are no tags on a package, then it is available for everyone
+                        return pkg;
+                    }
+                }
+            }
+        }
+    }
 
     async updateUser(currentEmail, update) {
         const user = await this.userByEmail(currentEmail);

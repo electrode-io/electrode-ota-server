@@ -23,8 +23,8 @@ export default (options, dao, weighted, _download, manifest, logger) => {
             missingParameter(params.deploymentKey, `Deployment key missing`);
             missingParameter(params.appVersion, `appVersion missing`);
 
-            return dao.deploymentForKey(params.deploymentKey).then(deployment => {
-                const pkg = deployment && deployment.package;
+            return dao.deploymentForKey(params.deploymentKey).then(async deployment => {
+                let pkg = deployment && deployment.package;
                 if (!pkg) {
                     /**
                      * If no packages have been published just return this.
@@ -34,6 +34,8 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         shouldRunBinaryVersion: false
                     }
                 }
+
+                pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags);
 
                 let isNotAvailable = pkg.packageHash == params.packageHash || !('clientUniqueId' in params);
 
@@ -85,7 +87,9 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                     return ret;
                 }
 
-                return isNotAvailable ? makeReturn(!isNotAvailable) : api.isUpdateAble(params.clientUniqueId, pkg.packageHash, pkg.rollout).then(makeReturn);
+                return isNotAvailable ? 
+                    makeReturn(!isNotAvailable) : 
+                    api.isUpdateAble(params.clientUniqueId, pkg.packageHash, pkg.rollout, pkg.tags).then(makeReturn);
 
             }).tap((res) => {
                 logger.info({
@@ -145,9 +149,16 @@ export default (options, dao, weighted, _download, manifest, logger) => {
          * @param uniqueClientId
          * @param packageHash
          * @param ratio
+         * @param tags
          * @returns {*}
          */
-        isUpdateAble(uniqueClientId, packageHash, ratio){
+        isUpdateAble(uniqueClientId, packageHash, ratio, tags) {
+            // if the package has tags, the rollout will not be taken into account;
+            // we are not mixing tags and rollout
+            if (tags && tags.length > 0) {
+                return Promise.resolve(true);
+            }
+
             //ratio 0 means no deployment.
             if (ratio == 0) {
                 return Promise.resolve(false);
