@@ -371,18 +371,6 @@ describe('dao/cassandra', function () {
                 });
             });
         });
-
-        it("will return a release that has been recently updated to have no tags", () => {
-            pkg3.tags = [];
-            return dao.updatePackage(stagingKey, pkg3).then((updated3) => {
-                expect(updated3).not.to.be.undefined;
-
-                return dao.getNewestApplicablePackage(stagingKey, ["TAG-10"]).then((newest) => {
-                    expect(newest).not.to.be.undefined;
-                    expect(newest.packageHash).to.eq(pkg3.packageHash);
-                });
-            });
-        });
     });
 });
 

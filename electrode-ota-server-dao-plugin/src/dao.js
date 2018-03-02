@@ -4,10 +4,6 @@ import UDTS from './models/UDTS.json';
 
 const historySort = history => history && history.sort((a, b) => b.created_.getTime() - a.created_.getTime());
 
-const releaseSort = (packageList) => {
-    return packageList.sort((a, b) => b.lastUpdated.getTime() - a.lastUpdated.getTime());
-};
-
 const toLowerCaseKeys = (obj) => {
     if (!obj) return obj;
     const ret = {};
@@ -309,7 +305,7 @@ export default class DaoExpressCassandra {
         const packageHashes = await this._historyForDeployment(deploymentKey);
         if (packageHashes && packageHashes.length > 0) {
             let packages = await this.Package.findAsync({ id_: within(packageHashes) });
-            packages = releaseSort(packages);
+            packages = historySort(packages);
 
             if (!tags || tags.length === 0) {
                 // if the caller does not pass in tags, give back the
