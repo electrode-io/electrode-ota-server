@@ -1220,35 +1220,6 @@ describe("Data Access via RDBMS", function() {
                         });
                     });
                 });
-
-                it("will return a release that has been recently updated to have no tags", () => {
-                    pkg3DTO.tags = [];
-                    return dao.updatePackage(deplKey, pkg3DTO, pkg3DTO.label).then((updated) => {
-                        expect(updated).not.to.be.undefined;
-                        expect(updated.tags).to.be.undefined;
-
-                        console.log("deployment id", deplId);
-
-                        /*
-
-                        Now we have
-
-                        pkg3 - no tags
-                        pkg5 - ["TAG-10", "TAG-11", "TAG-12", "TAG-13", "TAG-14"]
-                        pkg4 - no tags
-                        pkg2 - ["TAG-1", "TAG-2"]
-                        pkg1 - no tags
-
-                        */
-
-                        return dao.getNewestApplicablePackage(deplKey, ["TAG-10"]).then((newest) => {
-                            expect(newest).not.to.be.undefined;
-                            if (newest) {
-                                expect(newest.id).to.eq(pkg3DTO.id);
-                            }
-                        });
-                    });
-                });
             });
         });
 
