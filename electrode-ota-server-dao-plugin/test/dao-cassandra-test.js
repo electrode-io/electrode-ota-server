@@ -209,5 +209,168 @@ describe('dao/cassandra', function () {
                 expect(deployments.other).to.exist;
             })
     );
+
+    describe('getNewestApplicablePackage', () => {
+        const email = 'test@unit-test.com';
+        let app;
+        let stagingKey = '2f0fnni10fn1n13nf';
+        let productionKey = '490u034hg09j19g20';
+        let pkg1, pkg2, pkg3,  pkg4, pkg5;
+
+        before(() => {
+            return dao.createApp({
+                name: 'TestApp',
+                deployments: {
+                    Staging: {
+                        key: stagingKey
+                    },
+                    Production: {
+                        key: productionKey
+                    }
+                },
+                collaborators: {
+                    'test@unit-test.com' : {
+                        permission : 'Owner'
+                    }
+                }
+            }).then((a) => {
+                app = a;
+            });
+        });
+
+        it("will return no package if there are no matching releases", () => {
+            return dao.getNewestApplicablePackage(stagingKey, undefined).then((newest) => {
+                expect(newest).to.be.undefined;
+            });
+        });
+
+        it("will return a release with no tags if that release is the most up-to-date release", () => {
+            pkg1 = {
+                appVersion : "1.0.0",
+                blobUrl : "http://stuff.com/package1",
+                packageHash : "2930fj2j923892f9h9f831899182889hf",
+                isDisabled : false,
+                isMandatory : false,
+                label : "v1",
+                manifestBlobUrl : "http://stuff.com/manifest1",
+                rollout : 100,
+                size : 1500,
+                releaseMethod : "Upload",
+                releasedBy : email
+            };
+
+            return dao.addPackage(stagingKey, pkg1).then(() => {
+                return dao.getNewestApplicablePackage(stagingKey, undefined).then((newest) => {
+                    expect(newest).not.to.be.undefined;
+                    expect(newest.packageHash).to.eq(pkg1.packageHash);
+                });
+            });
+        });
+
+        it("will return a release with no tags if none of the incoming tags match", () => {
+            pkg2 = {
+                appVersion : "1.0.0",
+                blobUrl : "http://stuff.com/package2",
+                packageHash : "jnowfim20m3@@#%FMM@FK@K",
+                isDisabled : false,
+                isMandatory : false,
+                label : "v2",
+                manifestBlobUrl : "http://stuff.com/manifest2",
+                rollout : 100,
+                size : 1600,
+                tags : ["TAG-1", "TAG-2"],
+                releaseMethod : "Upload",
+                releasedBy : email                
+            };
+
+            return dao.addPackage(stagingKey, pkg2).then(() => {
+                return dao.getNewestApplicablePackage(stagingKey, undefined).then((newest) => {
+                    expect(newest).not.to.be.undefined;
+                    expect(newest.packageHash).to.eq(pkg1.packageHash);
+                }).then(() => {
+                    return dao.getNewestApplicablePackage(stagingKey, ["TAG-3"]).then((newest) => {
+                        expect(newest).not.to.be.undefined;
+                        expect(newest.packageHash).to.eq(pkg1.packageHash);
+                    });
+                });
+            });
+        });
+
+        it("will return a release with tags if at least one incoming tag matches", () => {
+            return dao.getNewestApplicablePackage(stagingKey, ["TAG-1", "TAG-3"]).then((newest) => {
+                expect(newest).not.to.be.undefined;
+                expect(newest.packageHash).to.eq(pkg2.packageHash);
+            });
+        });
+
+        it("will return a release if there is an intermediate release that matches the incoming tags", () => {
+            pkg3 = Object.assign({}, pkg1, {
+                packageHash : "fion2ff@F#@NN@!@9100j1n1",
+                blobUrl : "https://stuff.com/package3",
+                manifestBlobUrl : "https://stuff.com/manifest3",
+                size : 1700,
+                label : "v3",
+                tags : ["TAG-4", "TAG-5", "TAG-6"]
+            });
+            
+            return dao.addPackage(stagingKey, pkg3).then(() => {
+                /*
+
+                Now we have in the table
+
+                pkg3 - ["TAG-4", "TAG-5", "TAG-6"]
+                pkg2 - ["TAG-1", "TAG-2"]
+                pgk1 - no tags
+
+                */
+
+                return dao.getNewestApplicablePackage(stagingKey, ["TAG-2"]).then((newest) => {
+                    expect(newest).not.to.be.undefined;
+                    expect(newest.packageHash).to.eq(pkg2.packageHash);
+                });
+            });
+        });
+
+        it("will return a release if there is an intermediate release with no tags", () => {
+            pkg4 = Object.assign({}, pkg1, {
+                packageHash : "wfn2i0f02390239gnbr2",
+                blobUrl : "https://stuff.com/package4",
+                manifestBlobUrl : "https://stuff.com/manifest4",
+                size : 1800,
+                label : "v4"
+            });
+
+            return dao.addPackage(stagingKey, pkg4).then(() => {
+
+                pkg5 = Object.assign({}, pkg1, {
+                    packageHash : "aio059gn2nf30920910189",
+                    blobUrl : "https://stuff.com/package5",
+                    manifestBlobUrl : "https://stuff.com/manifest5",
+                    size : 9800,
+                    label : "v5",
+                    tags : ["TAG-10", "TAG-11", "TAG-12", "TAG-13", "TAG-14"]
+                });
+
+                return dao.addPackage(stagingKey, pkg5).then(() => {
+                    /*
+
+                    Now we have in the table
+
+                    pkg5 - ["TAG-10", "TAG-11", "TAG-12", "TAG-13", "TAG-14"]
+                    pkg4 - no tags
+                    pkg3 - ["TAG-4", "TAG-5", "TAG-6"]
+                    pkg2 - ["TAG-1", "TAG-2"]
+                    pkg1 - no tags
+
+                    */
+
+                    return dao.getNewestApplicablePackage(stagingKey, []).then((newest) => {
+                        expect(newest).not.to.be.undefined;
+                        expect(newest.packageHash).to.eq(pkg4.packageHash);
+                    });
+                });
+            });
+        });
+    });
 });
 

@@ -58,8 +58,11 @@ export default class PackageDAO extends BaseDAO {
         return pkg;
     }
 
-    public static async getNewestApplicablePackage(connection: IConnection, deploymentId: number,
+    public static async getNewestApplicablePackage(connection: IConnection, deploymentKey: string,
                                                    tags: string[] | undefined): Promise<PackageDTO | void> {
+
+        const deployment = await DeploymentDAO.deploymentForKey(connection, deploymentKey);
+        const deploymentId = deployment.id;
 
         const query = (tags && tags.length > 0) ? PackageQueries.getMostRecentPackageIdByDeploymentAndTags :
                                                   PackageQueries.getMostRecentPackageIdByDeploymentNoTags;
@@ -229,15 +232,6 @@ export default class PackageDAO extends BaseDAO {
         if (results && results.length > 0) {
             // newest package should be first in the list according to query result ordering
             return await PackageDAO.packageById(connection, results[0].package_id);
-        }
-        return undefined;
-    }
-
-    public static async getMatchingTagsForPackage(connection: IConnection,
-                                                  pkgId: number, tags: string[]): Promise<any[] | undefined> {
-        if( tags.length > 0){
-            const results = await PackageDAO.query(connection, PackageTagQueries.getMatchingTagsForPackage, [pkgId, tags]);
-            return results.length > 0 ? results : undefined;
         }
         return undefined;
     }

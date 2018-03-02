@@ -24,7 +24,12 @@
     "releasedBy": "text",
     "rollout": "tinyint",
     "size": "varint",
-    "uploadTime": "timestamp"
+    "uploadTime": "timestamp",
+    "tags": {
+      "type": "set",
+      "typeDef": "<varchar>"
+    },
+    "lastUpdated": "timestamp"
   },
   "key": [
     [

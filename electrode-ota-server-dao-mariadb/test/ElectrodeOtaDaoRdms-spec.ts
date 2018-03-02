@@ -967,7 +967,7 @@ describe("Data Access via RDBMS", function() {
                         diffPackageMap,
                     };
 
-                    return dao.addPackage(stageDeploymentKey, newPkg).then(() => {
+                    return dao.addPackage(stageDeploymentKey, newPkg).then((result) => {
                         // adding
                         return dao.updatePackage(stageDeploymentKey, updateInfo, "").then((updated) => {
                             expect(updated).not.to.be.undefined;
@@ -1068,7 +1068,7 @@ describe("Data Access via RDBMS", function() {
                 });
 
                 it("will return no package if there are no matching releases", () => {
-                    return dao.getNewestApplicablePackage(deplId, undefined).then((newest) => {
+                    return dao.getNewestApplicablePackage(deplKey, undefined).then((newest) => {
                         expect(newest).to.be.undefined;
                     });
                 });
@@ -1090,7 +1090,7 @@ describe("Data Access via RDBMS", function() {
                     return dao.addPackage(deplKey, pkg1DTO).then((updated) => {
                         pkg1DTO.id = updated.id;
 
-                        return dao.getNewestApplicablePackage(deplId, undefined).then((newest) => {
+                        return dao.getNewestApplicablePackage(deplKey, undefined).then((newest) => {
                             expect(newest).not.to.be.undefined;
                             if (newest) {
                                 expect(newest.id).to.eq(pkg1DTO.id);
@@ -1117,13 +1117,13 @@ describe("Data Access via RDBMS", function() {
 
                     return dao.addPackage(deplKey, pkg2DTO).then((updated) => {
                         pkg2DTO.id = updated.id;
-                        return dao.getNewestApplicablePackage(deplId, undefined).then((newest) => {
+                        return dao.getNewestApplicablePackage(deplKey, undefined).then((newest) => {
                             expect(newest).not.to.be.undefined;
                             if (newest) {
                                 expect(newest.id).to.eq(pkg1DTO.id);
                             }
                         }).then(() => {
-                            return dao.getNewestApplicablePackage(deplId, ["TAG-3"]).then((newest) => {
+                            return dao.getNewestApplicablePackage(deplKey, ["TAG-3"]).then((newest) => {
                                 expect(newest).not.to.be.undefined;
                                 if (newest) {
                                     expect(newest.id).to.eq(pkg1DTO.id);
@@ -1134,7 +1134,7 @@ describe("Data Access via RDBMS", function() {
                 });
 
                 it("will return a release with tags if at least one incoming tag matches", () => {
-                    return dao.getNewestApplicablePackage(deplId, ["TAG-1", "TAG-3"]).then((newest) => {
+                    return dao.getNewestApplicablePackage(deplKey, ["TAG-1", "TAG-3"]).then((newest) => {
                         expect(newest).not.to.be.undefined;
                         if (newest) {
                             expect(newest.id).to.eq(pkg2DTO.id);
@@ -1165,7 +1165,7 @@ describe("Data Access via RDBMS", function() {
 
                         */
 
-                        return dao.getNewestApplicablePackage(deplId, ["TAG-2"]).then((newest) => {
+                        return dao.getNewestApplicablePackage(deplKey, ["TAG-2"]).then((newest) => {
                             expect(newest).not.to.be.undefined;
                             if (newest) {
                                 expect(newest.id).to.eq(pkg2DTO.id);
@@ -1211,92 +1211,12 @@ describe("Data Access via RDBMS", function() {
 
                             */
 
-                            return dao.getNewestApplicablePackage(deplId, []).then((newest) => {
+                            return dao.getNewestApplicablePackage(deplKey, []).then((newest) => {
                                 expect(newest).not.to.be.undefined;
                                 if (newest) {
                                     expect(newest.id).to.eq(pkg4DTO.id);
                                 }
                             });
-                        });
-                    });
-                });
-
-                it("will return a release that has been recently updated to have no tags", () => {
-                    pkg3DTO.tags = [];
-                    return dao.updatePackage(deplKey, pkg3DTO, pkg3DTO.label).then((updated) => {
-                        expect(updated).not.to.be.undefined;
-                        expect(updated.tags).to.be.undefined;
-
-                        console.log("deployment id", deplId);
-
-                        /*
-
-                        Now we have
-
-                        pkg3 - no tags
-                        pkg5 - ["TAG-10", "TAG-11", "TAG-12", "TAG-13", "TAG-14"]
-                        pkg4 - no tags
-                        pkg2 - ["TAG-1", "TAG-2"]
-                        pkg1 - no tags
-
-                        */
-
-                        return dao.getNewestApplicablePackage(deplId, ["TAG-10"]).then((newest) => {
-                            expect(newest).not.to.be.undefined;
-                            if (newest) {
-                                expect(newest.id).to.eq(pkg3DTO.id);
-                            }
-                        });
-                    });
-                });
-            });
-            describe("getMatchingTagsForPackage", () => {
-                const deplKey: string = "3290fnf20jf02jfjwf0ij20fj209fj20j";
-                const pkg = new PackageDTO();
-                pkg.appVersion = "0.0.1";
-                pkg.blobUrl = "http://stuff.com/pkg...";
-                pkg.description = "my new uploaded package";
-                pkg.isDisabled = false;
-                pkg.isMandatory = false;
-                pkg.label = "v1";
-                pkg.manifestBlobUrl = "http://stuff.com/manifest...";
-                pkg.packageHash = packageHash;
-                pkg.releasedBy = "testUser";
-                pkg.releaseMethod = "Upload";
-                pkg.rollout = 100;
-                pkg.size = 12908201;
-                pkg.tags = ["TAG-10", "TAG-11", "TAG-12", "TAG-13", "TAG-14"];
-                  
-                    
-                
-                it("should return an object if tags are passed into the query", () => {
-                    const tags = ["TAG-10", "TAG-13"];
-                    return dao.addPackage(deplKey, pkg).then((updated) => {
-                        const id = updated.id;
-                        return dao.getMatchingTagsForPackage(id, tags).then((resp) => {
-                            if (resp) {
-                                expect(resp).to.not.be.undefined;
-                                expect(resp[0].tag_name).to.not.be.undefined;
-                                expect(resp[0].tag_name).to.equal("TAG-10");
-                            }
-                        });
-                    });
-                });
-                it("should return undefined if a nonexistent tag is passed in", () => {
-                    const tags = ["THE GRAND TAG OF MONOLITHIC EXCELLENCE"];
-                    return dao.addPackage(deplKey, pkg).then((updated) => {
-                        const id = updated.id;
-                        return dao.getMatchingTagsForPackage(id, tags).then((resp) => {
-                            expect(resp).to.be.undefined;
-                        });
-                    });
-                });
-                it("should return undefined if no tags are passed in", () => {
-                    const tags : any[] = [];
-                    return dao.addPackage(deplKey, pkg).then((updated) => {
-                        const id = updated.id;
-                        return dao.getMatchingTagsForPackage(id, tags).then((resp) => {
-                            expect(resp).to.be.undefined;
                         });
                     });
                 });

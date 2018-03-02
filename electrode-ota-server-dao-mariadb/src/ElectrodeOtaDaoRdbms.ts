@@ -203,16 +203,10 @@ export default class ElectrodeOtaDaoRdbms implements IElectrodeOtaDao {
         });
     }
 
-    public async getNewestApplicablePackage(deploymentId: number,
+    public async getNewestApplicablePackage(deploymentKey: string,
                                             tags: string[] | undefined): Promise<PackageDTO | void> {
         return this.connectAndExecute<PackageDTO | void>((conection) => {
-            return PackageDAO.getNewestApplicablePackage(conection, deploymentId, tags);
-        });
-    }
-
-    public async getMatchingTagsForPackage(pkgId: number, tags: string[]): Promise<any[] | undefined> {
-        return this.connectAndExecute((connection) => {
-            return PackageDAO.getMatchingTagsForPackage(connection, pkgId, tags);
+            return PackageDAO.getNewestApplicablePackage(conection, deploymentKey, tags);
         });
     }
 
