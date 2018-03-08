@@ -34,7 +34,7 @@ const testDBConfig = {
     }],
     encryptionConfig: {
         keyfile: "./test/sample_encryption.key",
-        fields: ["user.name", "user.email"]
+        fields: ["user.name", "user.email", "package.released_by"]
     }
 };
 
@@ -1611,6 +1611,42 @@ describe("Data Access via RDBMS", function () {
                     });
                 });
             });
+        });
+
+        it("Save package with encrypted email", () => {
+            const pkg = new PackageDTO();
+            pkg.appVersion = "0.0.1";
+            pkg.blobUrl = "http://example.com/encrypt";
+            pkg.description = "Encrypt package description";
+            pkg.isDisabled = pkg.isMandatory = false;
+            pkg.label = "v1";
+            pkg.manifestBlobUrl = "http://example.com/manifest";
+            pkg.packageHash = "hash";
+            pkg.releasedBy = "secret_user@walmart.com";
+            pkg.releaseMethod = "download";
+            pkg.rollout = 100;
+            pkg.size = 1001;
+
+            expect(Encryptor.instance.encrypt("package.released_by", pkg.releasedBy)).to.not.eq(pkg.releasedBy);
+
+            return encryptedDao.addDeployment(appId, STAGING, { key: stageDeploymentKey })
+                .then(() => encryptedDao.addPackage(stageDeploymentKey, pkg))
+                .then(updated => {
+                    expect(updated.releasedBy).to.eql(pkg.releasedBy);
+                    return encryptedDao.getConnection().then(conn => {
+                        return new Promise((resolve, reject) => {
+                            conn.query(`SELECT released_by FROM package where id=?`, [updated.id], (err, results) => {
+                                if (err) {
+                                    reject(err);
+                                } else {
+                                    expect(results.length).to.eq(1);
+                                    expect(Encryptor.instance.decrypt("package.released_by", results[0].released_by)).to.eq(updated.releasedBy);
+                                    resolve();
+                                }
+                            })
+                        })
+                    });
+                });
         });
     });
 });

@@ -1,6 +1,7 @@
 import { aes256Encrypt, aes256Decrypt } from "electrode-ota-server-util";
 import { readFile } from "fs";
 import {
+    PackageDTO,
     UserDTO
 } from "./dto"
 
@@ -22,6 +23,7 @@ export default class Encryptor {
      *  "fields": List of fields to encrypt.  Supported fields are.
      *      "user.name" - User's name
      *      "user.email" - User's email
+     *      "package.released_by" - Package's released by field
      *
      * ie.
      * {
@@ -64,12 +66,16 @@ export default class Encryptor {
         if (dto instanceof UserDTO) {
             dto.email = this.encrypt("user.email", dto.email);
             dto.name = this.encrypt("user.name", dto.name);
+        } else if (dto instanceof PackageDTO) {
+            dto.releasedBy = this.encrypt("package.released_by", dto.releasedBy);
         }
     }
     decryptDTO(dto: any) {
         if (dto instanceof UserDTO) {
             dto.email = this.decrypt("user.email", dto.email);
             dto.name = this.decrypt("user.name", dto.name);
+        } else if (dto instanceof PackageDTO) {
+            dto.releasedBy = this.decrypt("package.released_by", dto.releasedBy);
         }
     }
 }
