@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-model-weighted",
-  "version": "4.1.0-0",
+  "version": "4.2.0-0",
   "description": "OTA Weighting Service",
   "main": "lib/index.js",
   "scripts": {
@@ -10,10 +10,10 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-diregister": "^4.1.0-0",
-    "electrode-ota-server-util": "^4.1.0-0"
+    "electrode-ota-server-diregister": "^4.2.0-0",
+    "electrode-ota-server-util": "^4.2.0-0"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^4.1.0-0"
+    "electrode-ota-server-util-dev": "^4.2.0-0"
   }
 }
