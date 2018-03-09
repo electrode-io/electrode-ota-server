@@ -1,5 +1,6 @@
 import diregister from "electrode-ota-server-diregister";
 import ElectrodeOtaDaoRdbms from "./ElectrodeOtaDaoRdbms";
+import Encryptor from "./Encryptor";
 
 export const register = diregister({
     connections: false,
@@ -8,7 +9,10 @@ export const register = diregister({
     name: "ota!dao",
 }, (options: any) => {
     const dao = new ElectrodeOtaDaoRdbms();
-    return dao.connect(options).then(() => dao);
+
+    return Encryptor.instance.initialize(options.encryptionConfig || {})
+        .then(() => dao.connect(options))
+        .then(() => dao);
 });
 
 process.on("unhandledRejection", (error) => {

@@ -18,6 +18,8 @@ import {
 import { difference, find } from "lodash";
 import { connect } from "net";
 
+import Encryptor from "../Encryptor";
+
 export default class PackageDAO extends BaseDAO {
     public static async packageById(connection: IConnection, packageId: number): Promise<PackageDTO> {
         const results = await PackageDAO.query(connection, PackageQueries.getPackageById, [packageId]);
@@ -46,9 +48,10 @@ export default class PackageDAO extends BaseDAO {
         pkg.rollout = result.rollout;
         pkg.size = result.size;
         pkg.uploadTime = result.upload_time;
+        Encryptor.instance.decryptDTO(pkg);
 
         pkg.diffPackageMap = await PackageDAO.getPackageDiffs(connection, pkg.id)
-                                        .then(PackageDAO.transformOutgoingPackageDiffs);
+            .then(PackageDAO.transformOutgoingPackageDiffs);
 
         const tagResults = await PackageDAO.getPackageTags(connection, pkg.id);
         if (tagResults && tagResults.length > 0) {
@@ -59,13 +62,13 @@ export default class PackageDAO extends BaseDAO {
     }
 
     public static async getNewestApplicablePackage(connection: IConnection, deploymentKey: string,
-                                                   tags: string[] | undefined): Promise<PackageDTO | void> {
+        tags: string[] | undefined): Promise<PackageDTO | void> {
 
         const deployment = await DeploymentDAO.deploymentForKey(connection, deploymentKey);
         const deploymentId = deployment.id;
 
         const query = (tags && tags.length > 0) ? PackageQueries.getMostRecentPackageIdByDeploymentAndTags :
-                                                  PackageQueries.getMostRecentPackageIdByDeploymentNoTags;
+            PackageQueries.getMostRecentPackageIdByDeploymentNoTags;
 
         const params = (tags && tags.length > 0) ? [deploymentId, tags, deploymentId] : [deploymentId];
 
@@ -78,7 +81,7 @@ export default class PackageDAO extends BaseDAO {
     }
 
     public static async addPackage(connection: IConnection, deploymentKey: string,
-                                   packageInfo: PackageDTO): Promise<PackageDTO> {
+        packageInfo: PackageDTO): Promise<PackageDTO> {
         const deployment = await DeploymentDAO.deploymentForKey(connection, deploymentKey);
 
         await PackageDAO.beginTransaction(connection);
@@ -98,7 +101,7 @@ export default class PackageDAO extends BaseDAO {
     }
 
     public static async updatePackage(connection: IConnection, deploymentKey: string,
-                                      packageInfo: any, label: string): Promise<PackageDTO> {
+        packageInfo: any, label: string): Promise<PackageDTO> {
         const deployment = await DeploymentDAO.deploymentForKey(connection, deploymentKey);
 
         const history = await HistoryDAO.historyForDeployment(connection, deployment.id);
@@ -123,13 +126,13 @@ export default class PackageDAO extends BaseDAO {
         if (packageInfo.diffPackageMap) {
             // newDiffKeys will be a list of packageHash's for diffs that need to be added
             const newDiffKeys = difference(Object.keys(packageInfo.diffPackageMap),
-                                            Object.keys(existing.diffPackageMap));
+                Object.keys(existing.diffPackageMap));
             if (newDiffKeys.length > 0) {
                 const newDiffs = newDiffKeys.map((packageHash) => {
                     return {
                         packageHash,
-                        size : packageInfo.diffPackageMap[packageHash].size,
-                        url : packageInfo.diffPackageMap[packageHash].url,
+                        size: packageInfo.diffPackageMap[packageHash].size,
+                        url: packageInfo.diffPackageMap[packageHash].url,
                     };
                 });
 
@@ -138,7 +141,7 @@ export default class PackageDAO extends BaseDAO {
 
             // remDiffKeys will be a list of packageHash's that need to be removed
             const remDiffKeys = difference(Object.keys(existing.diffPackageMap),
-                                            Object.keys(packageInfo.diffPackageMap));
+                Object.keys(packageInfo.diffPackageMap));
             if (remDiffKeys.length > 0) {
                 await PackageDAO.removePackageDiffs(connection, pkgId, remDiffKeys);
             }
@@ -168,8 +171,8 @@ export default class PackageDAO extends BaseDAO {
             if (packageInfo[prop] !== undefined &&
                 packageInfo[prop] !== null &&
                 packageInfo[prop] !== existingVal) {
-            // if the value is different from what is in the db, mark changed as true
-            // and update the property on existing.  Will use "existing" as data when passing to update function
+                // if the value is different from what is in the db, mark changed as true
+                // and update the property on existing.  Will use "existing" as data when passing to update function
                 changed = true;
                 (existing as any)[prop] = packageInfo[prop];
             }
@@ -184,7 +187,7 @@ export default class PackageDAO extends BaseDAO {
     }
 
     public static async savePackageContent(connection: IConnection, packageHash: string,
-                                           content: Buffer): Promise<void> {
+        content: Buffer): Promise<void> {
         return PackageDAO.insertPackageContent(connection, packageHash, content);
     }
 
@@ -225,7 +228,7 @@ export default class PackageDAO extends BaseDAO {
 
     // only used in DAO
     public static async getLatestPackageForDeployment(connection: IConnection,
-                                                      deploymentId: number): Promise<PackageDTO | undefined> {
+        deploymentId: number): Promise<PackageDTO | undefined> {
         const results = await PackageDAO.query(connection, DeploymentPackageQueries.getHistoryByDeploymentId,
             [deploymentId]);
 
@@ -253,12 +256,12 @@ export default class PackageDAO extends BaseDAO {
             [pkg.appVersion, pkg.blobUrl, pkg.description,
             pkg.isDisabled, pkg.isMandatory, pkg.label,
             pkg.manifestBlobUrl, pkg.originalDeployment, pkg.originalLabel,
-            pkg.packageHash, pkg.releaseMethod, pkg.releasedBy,
+            pkg.packageHash, pkg.releaseMethod, Encryptor.instance.encrypt("package.released_by", pkg.releasedBy),
             pkg.rollout, pkg.size]);
     }
 
     private static async updatePackageDB(connection: IConnection, pkgId: number,
-                                         updateInfo: PackageDTO): Promise<any> {
+        updateInfo: PackageDTO): Promise<any> {
         /*
             SET is_disabled = ?,
             is_mandatory = ?,
@@ -307,13 +310,13 @@ export default class PackageDAO extends BaseDAO {
     }
 
     private static async insertPackageDiff(connection: IConnection, leftPkgId: number,
-                                           rightPkgId: number, size: number, url: string): Promise<any> {
+        rightPkgId: number, size: number, url: string): Promise<any> {
         return PackageDAO.query(connection, PackageDiffQueries.insertPackageDiff,
             [leftPkgId, rightPkgId, size, url]);
     }
 
     private static async deletePackageDiff(connection: IConnection, leftPkgId: number,
-                                           rightPkgId: number): Promise<any> {
+        rightPkgId: number): Promise<any> {
         return PackageDAO.query(connection, PackageDiffQueries.deletePackageDiff, [leftPkgId, rightPkgId]);
     }
 
@@ -344,8 +347,8 @@ export default class PackageDAO extends BaseDAO {
     private static transformOutgoingPackageDiffs(pkgDiffs: any[]): any {
         return pkgDiffs.reduce((obj, pkgDiff) => {
             obj[pkgDiff.package_hash] = {
-                size : pkgDiff.size,
-                url : pkgDiff.url,
+                size: pkgDiff.size,
+                url: pkgDiff.url,
             };
             return obj;
         }, {} as any);
