@@ -51,7 +51,7 @@ export const register = diregister({
                     logger.info(reqFields(request), "download request");
                     download(request.params.packageHash, (e, o) => {
                         if (e) return reply(e);
-                        reply(o);
+                        reply(o).type("application/octet-stream");
                     })
                 },
                 tags : ["api"]
