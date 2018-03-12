@@ -1,7 +1,7 @@
 import randomstring from "randomstring";
 import crypto from 'crypto';
 
-export const genString = (length = 40) => randomstring.generate({length, charset: 'alphabetic'});
+export const genString = (length = 40) => randomstring.generate({ length, charset: 'alphabetic' });
 
 export const id = (length = 8) => genString(length);
 
@@ -75,14 +75,14 @@ export const promisify = (fn, scope) => function (...args) {
 
 /**
  * Used with the logger to reduce the number of properties in a request object that are getting logged
- * 
+ *
  * @param {*} req a Hapi Request object
- * 
+ *
  * returns a new object with just the properties we are interested in
  */
-export const reqFields = function(req) {
+export const reqFields = function (req) {
     return {
-        requestId : req.id,
+        requestId: req.id,
         method: req.method,
         url: req.url,
         headers: req.headers,
@@ -91,7 +91,23 @@ export const reqFields = function(req) {
     };
 }
 
-export default({
+export const aes256Encrypt = function (passkey, data) {
+    const aes = crypto.createCipher("aes256", passkey);
+    let encrypted = aes.update(data, "utf8", "hex");
+    encrypted += aes.final('hex');
+    return encrypted;
+}
+
+export const aes256Decrypt = function (passkey, encrypted) {
+    const aes = crypto.createDecipher("aes256", passkey);
+    let decrypted = aes.update(encrypted, "hex", "utf8");
+    decrypted += aes.final("utf8");
+    return decrypted;
+}
+
+export default ({
+    aes256Decrypt,
+    aes256Encrypt,
     toJSON,
     promisify,
     waitFor,

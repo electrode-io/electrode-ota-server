@@ -14,6 +14,7 @@ import HistoryDAO from "./HistoryDAO";
 import PackageDAO from "./PackageDAO";
 
 import { AppDTO } from "../dto";
+import Encryptor from "../Encryptor";
 
 import { difference, findKey } from "lodash";
 
@@ -35,7 +36,7 @@ export default class AppDAO extends BaseDAO {
                 outgoing.collaborators = await AppDAO.createAppPermissions(connection, appId, app.collaborators);
             } catch (err) {
                 AppDAO.rollback(connection);
-                throw(err);
+                throw (err);
             }
         } else {
             AppDAO.rollback(connection);
@@ -45,7 +46,7 @@ export default class AppDAO extends BaseDAO {
         if (app.deployments && Object.keys(app.deployments).length > 0) {
             await Promise.all(Object.keys(app.deployments).map((deploymentName) => {
                 return DeploymentDAO.addDeployment(connection, appId, app.deployments[deploymentName].name, {
-                    key : app.deployments[deploymentName].key,
+                    key: app.deployments[deploymentName].key,
                 });
             }));
             const deployments = await DeploymentDAO.getDeploymentsByApp(connection, appId);
@@ -69,7 +70,7 @@ export default class AppDAO extends BaseDAO {
     }
 
     public static async appsForCollaborator(connection: IConnection, email: string): Promise<AppDTO[]> {
-        const appResults = await AppDAO.query(connection, AppPermissionQueries.getAppPermissionsByUserEmail, [email]);
+        const appResults = await AppDAO.query(connection, AppPermissionQueries.getAppPermissionsByUserEmail, [Encryptor.instance.encrypt("user.email", email)]);
         const apps = new Array<AppDTO>();
         let prevAppId;
         let appDTO = new AppDTO();
@@ -84,7 +85,7 @@ export default class AppDAO extends BaseDAO {
             }
 
             appDTO.collaborators[appResult.sub_email] = {
-                permission : appResult.sub_permission,
+                permission: appResult.sub_permission,
             };
             prevAppId = appResult.app_id;
         }
@@ -96,9 +97,9 @@ export default class AppDAO extends BaseDAO {
     }
 
     public static async appForCollaborator(connection: IConnection, email: string,
-                                           name: string): Promise<AppDTO | undefined> {
+        name: string): Promise<AppDTO | undefined> {
         const appResults = await AppDAO.query(connection,
-                                            AppQueries.getAppByAppNameAndCollaboratorEmail, [email, name]);
+            AppQueries.getAppByAppNameAndCollaboratorEmail, [Encryptor.instance.encrypt("user.email", email), name]);
         if (!appResults || appResults.length === 0) {
             return undefined;
         }
@@ -150,19 +151,19 @@ export default class AppDAO extends BaseDAO {
         }
 
         // is the app transferring ownership
-        const currentOwnerEmail = findKey(existing.collaborators, { permission : OWNER });
-        const updatedOwnerEmail = findKey(updateInfo.collaborators, { permission : OWNER });
+        const currentOwnerEmail = findKey(existing.collaborators, { permission: OWNER });
+        const updatedOwnerEmail = findKey(updateInfo.collaborators, { permission: OWNER });
 
         if (currentOwnerEmail && updatedOwnerEmail && currentOwnerEmail !== updatedOwnerEmail) {
             const currentOwnerUser = await AppDAO.getUserByEmail(connection, currentOwnerEmail);
             const updateOwnerUser = await AppDAO.getUserByEmail(connection, updatedOwnerEmail);
 
             const updatePermissions = [{
-                permission : COLLAB,
-                userId : currentOwnerUser[0].id,
+                permission: COLLAB,
+                userId: currentOwnerUser[0].id,
             }, {
-                permission : OWNER,
-                userId : updateOwnerUser[0].id,
+                permission: OWNER,
+                userId: updateOwnerUser[0].id,
             }];
 
             existing.collaborators = await AppDAO.updateAppPermissions(connection, appId, updatePermissions);
@@ -171,12 +172,12 @@ export default class AppDAO extends BaseDAO {
 
         // is a collaborator being added
         const newCollaboratorsEmails = difference(Object.keys(updateInfo.collaborators),
-                                                Object.keys(existing.collaborators));
+            Object.keys(existing.collaborators));
         if (newCollaboratorsEmails.length > 0) {
             const newPermissions = newCollaboratorsEmails.map((email: string) => {
                 return {
                     email,
-                    permission : COLLAB,
+                    permission: COLLAB,
                 };
             });
             existing.collaborators = await AppDAO.insertAppPermissions(connection, appId, newPermissions);
@@ -185,7 +186,7 @@ export default class AppDAO extends BaseDAO {
 
         // is a collaborator being removed
         const remCollaboratorEmails = difference(Object.keys(existing.collaborators),
-                                                Object.keys(updateInfo.collaborators));
+            Object.keys(updateInfo.collaborators));
         if (remCollaboratorEmails.length > 0) {
             existing.collaborators = await AppDAO.removeAppPermissionsForUsers(connection, appId,
                 remCollaboratorEmails);
@@ -237,7 +238,7 @@ export default class AppDAO extends BaseDAO {
     }
 
     private static async createAppPermissions(connection: IConnection, appId: number,
-                                              collaborators: any): Promise<any> {
+        collaborators: any): Promise<any> {
         return Promise.all(Object.keys(collaborators).map(async (collaboratorEmail) => {
             const userResults = await AppDAO.getUserByEmail(connection, collaboratorEmail);
             if (!userResults || userResults.length === 0) {
@@ -257,11 +258,11 @@ export default class AppDAO extends BaseDAO {
     */
 
     private static async getUserByEmail(connection: IConnection, email: string): Promise<any> {
-        return AppDAO.query(connection, UserQueries.getUserByEmail, [email]);
+        return AppDAO.query(connection, UserQueries.getUserByEmail, [Encryptor.instance.encrypt("user.email", email)]);
     }
 
     private static async insertAppPermissions(connection: IConnection, appId: number,
-                                              appPermissions: any[]): Promise<any> {
+        appPermissions: any[]): Promise<any> {
         return Promise.all(appPermissions.map((appPermission) => {
             return AppDAO.insertAppPermissionWithEmail(connection, appId, appPermission.email,
                 appPermission.permission);
@@ -269,12 +270,12 @@ export default class AppDAO extends BaseDAO {
     }
 
     private static async insertAppPermissionWithEmail(connection: IConnection,
-                                                      appId: number, email: string, permission: string): Promise<any> {
-        return AppDAO.query(connection, AppPermissionQueries.insertAppPermissionWithEmail, [appId, email, permission]);
+        appId: number, email: string, permission: string): Promise<any> {
+        return AppDAO.query(connection, AppPermissionQueries.insertAppPermissionWithEmail, [appId, Encryptor.instance.encrypt("user.email", email), permission]);
     }
 
     private static async insertAppPermission(connection: IConnection, appId: number,
-                                             userId: number, permission: string): Promise<any> {
+        userId: number, permission: string): Promise<any> {
         return AppDAO.query(connection, AppPermissionQueries.insertAppPermission, [appId, userId, permission]);
     }
 
@@ -285,8 +286,8 @@ export default class AppDAO extends BaseDAO {
     private static transformOutgoingAppPermissions(permissions: any[]): any {
         // convert array to object with email as the key
         return permissions.reduce((obj, permission) => {
-            obj[permission.email] = {
-                permission : permission.permission,
+            obj[Encryptor.instance.decrypt("user.email", permission.email)] = {
+                permission: permission.permission,
             };
             return obj;
         }, {});
@@ -297,7 +298,7 @@ export default class AppDAO extends BaseDAO {
     }
 
     private static async updateAppPermissions(connection: IConnection, appId: number,
-                                              appPermissions: any[]): Promise<any> {
+        appPermissions: any[]): Promise<any> {
         return Promise.all(appPermissions.map((appPermission) => {
             return AppDAO.updateAppPermission(connection, appId,
                 appPermission.userId, appPermission.permission).then((updateResults) => {
@@ -310,20 +311,20 @@ export default class AppDAO extends BaseDAO {
     }
 
     private static async updateAppPermission(connection: IConnection, appId: number, userId: number,
-                                             permission: string): Promise<any> {
+        permission: string): Promise<any> {
         return AppDAO.query(connection, AppPermissionQueries.updateAppPermission, [permission, appId, userId]);
     }
 
     private static async removeAppPermissionsForUsers(connection: IConnection, appId: number,
-                                                      emails: string[]): Promise<any> {
+        emails: string[]): Promise<any> {
         return Promise.all(emails.map((email) => {
             return AppDAO.removeAppPermissionByEmail(connection, appId, email);
         })).then(() => AppDAO.getAppPermissionsByAppId(connection, appId).then(AppDAO.transformOutgoingAppPermissions));
     }
 
     private static async removeAppPermissionByEmail(connection: IConnection, appId: number,
-                                                    email: string): Promise<any> {
-        return AppDAO.query(connection, AppPermissionQueries.deleteAppPermissionByUserEmail, [appId, email]);
+        email: string): Promise<any> {
+        return AppDAO.query(connection, AppPermissionQueries.deleteAppPermissionByUserEmail, [appId, Encryptor.instance.encrypt("user.email", email)]);
     }
 
     private static async deleteAppRelated(connection: IConnection, appId: number): Promise<void> {
