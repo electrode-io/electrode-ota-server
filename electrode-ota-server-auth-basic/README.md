@@ -130,5 +130,26 @@ Then, in the config, use this validate method.  Note the `ldap` name matches tho
         },
     }
 }
-
 ```
+
+-------
+After one of the above changes, you also need to update "electrode-ota-server-routes-auth" to point to your new authentication method.
+```json
+"electrode-ota-server-routes-auth": {
+    "options": {
+        "providers": [
+            {
+                "name": "basic",
+                "auth": "basic",
+                "label": "Basic Authentication",
+                "icon": {
+                    "src": "https://examples.com/myLogo.png",
+                    "height": 50,
+                    "width": 50
+                }
+            }
+        ]
+    }
+},
+```
+Here, we add a "Basic Authentication" link to the homepage.  This link will authenticate using "basic" strategy defined above.
