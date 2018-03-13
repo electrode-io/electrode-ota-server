@@ -19,7 +19,6 @@ https://github.com/hapijs/bell
 You can define your authentication strategy with the electrode-ota-server-auth module.  In this example, we define a validateFunc within the options of the the basic auth.  Note you will need to convert your config json file to a js file.
 ```json
 "plugins": {
-   ...
    "electrode-ota-server-auth": {
       "options": {
          "strategy": {
@@ -48,7 +47,7 @@ Note the credentials matches what BellJS returns.
 Another method to do the same thing is by overriding electrode-ota-server-validate.
 Copy electrode-ota-server-validate to a new file "my-custom-auth-validate.js", add another validation method.
 In this example, we added the `ldap` validation function.
-```json
+```javascript
 const register = diregister.default({
     name: 'ota!validate',
     dependencies: ['ota!account'],
@@ -91,16 +90,16 @@ module.exports = {register};
 ```
 
 In the config, override electrode-ota-server-validate with your custom validate.  Provide options if desired.
-```json
+```javascript
 const root = path.join.bind(path, __dirname, "..");
 
 module.exports = {
-....
+
    "electrode-ota-server-auth-validate": {
         "module": root("lib/my-custom-auth-validate"),
         "options": {}
    }
-...
+
 }
 ```
 
@@ -109,7 +108,7 @@ Then, in the config, use this validate method.  Note the `ldap` name matches tho
 {
  
  "plugins":{
-             ...
+
            "electrode-ota-server-auth": {
             "options": {
                 "strategy": {
