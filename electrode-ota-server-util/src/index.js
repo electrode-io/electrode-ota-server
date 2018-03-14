@@ -1,5 +1,6 @@
 import randomstring from "randomstring";
 import crypto from 'crypto';
+import { Stream } from 'stream';
 
 export const genString = (length = 40) => randomstring.generate({ length, charset: 'alphabetic' });
 
