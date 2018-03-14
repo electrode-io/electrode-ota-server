@@ -28,18 +28,17 @@ export const register = diregister({
             path: "/updateCheck",
             config: {
                 auth: false,
-                handler(request, reply)
-                {
+                handler(request, reply) {
                     logger.info(reqFields(request), "updateCheck request");
                     updateCheck(request.query, (e, updateInfo) => {
                         if (e) {
                             console.log('error making update check ', request.query, e.message);
                             return reply(e);
                         }
-                        reply({updateInfo});
+                        reply({ updateInfo });
                     });
                 },
-                tags : ["api"]
+                tags: ["api"]
             }
         },
         {
@@ -47,14 +46,14 @@ export const register = diregister({
             method: "GET",
             config: {
                 auth: false,
-                handler(request, reply){
+                handler(request, reply) {
                     logger.info(reqFields(request), "download request");
                     download(request.params.packageHash, (e, o) => {
                         if (e) return reply(e);
-                        reply(o).type("application/octet-stream");
-                    })
+                        reply(o).type("application/octet-stream").bytes(o.length);
+                    });
                 },
-                tags : ["api"]
+                tags: ["api"]
             }
         },
         {
@@ -62,11 +61,11 @@ export const register = diregister({
             method: 'POST',
             config: {
                 auth: false,
-                handler(request, reply){
+                handler(request, reply) {
                     logger.info(reqFields(request), "report deployment status request");
                     deployReportStatus(request.payload, ok(reply));
                 },
-                tags : ["api"]
+                tags: ["api"]
             }
         },
         {
@@ -74,14 +73,14 @@ export const register = diregister({
             method: 'POST',
             config: {
                 auth: false,
-                handler(request, reply){
+                handler(request, reply) {
                     logger.info(reqFields(request), "report download status request");
                     downloadReportStatus(request.payload, ok(reply));
                 },
-                tags : ["api"]
+                tags: ["api"]
             }
         }
     ]);
 });
 
-export default {register};
+export default { register };
