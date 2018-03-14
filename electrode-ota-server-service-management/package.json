@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-service-management",
-  "version": "4.2.2-0",
+  "version": "4.2.3-0",
   "description": "OTA Management Service",
   "main": "lib/index.js",
   "scripts": {
@@ -10,10 +10,10 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-diregister": "^4.2.2-0",
-    "electrode-ota-server-util": "^4.2.2-0"
+    "electrode-ota-server-diregister": "^4.2.3-0",
+    "electrode-ota-server-util": "^4.2.3-0"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^4.2.2-0"
+    "electrode-ota-server-util-dev": "^4.2.3-0"
   }
 }
