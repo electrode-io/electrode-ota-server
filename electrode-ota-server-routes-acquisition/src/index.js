@@ -1,4 +1,4 @@
-import { wrap, reqFields } from 'electrode-ota-server-util';
+import { wrap, reqFields, streamToBuf } from 'electrode-ota-server-util';
 import diregister from "electrode-ota-server-diregister";
 const noContent = (reply) => (e) => {
     if (e) return reply(e);
@@ -50,7 +50,9 @@ export const register = diregister({
                     logger.info(reqFields(request), "download request");
                     download(request.params.packageHash, (e, o) => {
                         if (e) return reply(e);
-                        reply(o).type("application/octet-stream").bytes(o.length);
+                        streamToBuf(o).then((buf) => {
+                            reply(buf).type("application/octet-stream").bytes(buf.length);
+                        });
                     });
                 },
                 tags: ["api"]

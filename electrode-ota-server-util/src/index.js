@@ -105,7 +105,32 @@ export const aes256Decrypt = function (passkey, encrypted) {
     return decrypted;
 }
 
+export const toBuf = stream => new Promise((resolve, reject) => {
+    const bufs = [];
+    stream.on('data', function (d) {
+        bufs.push(d);
+    });
+    stream.on('error', reject);
+    stream.on('end', function () {
+        resolve(Buffer.concat(bufs));
+    });
+});
+
+export const streamToBuf = (stream) => {
+    if (stream instanceof Buffer) {
+        return Promise.resolve(stream);
+    }
+    if (stream instanceof Uint8Array) {
+        return Promise.resolve(Buffer.from(stream));
+    }
+    if (stream instanceof Stream) {
+        return toBuf(stream);
+    }
+};
+
 export default ({
+    toBuf,
+    streamToBuf,
     aes256Decrypt,
     aes256Encrypt,
     toJSON,
