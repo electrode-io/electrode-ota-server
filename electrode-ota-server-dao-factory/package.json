@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-dao-factory",
-  "version": "4.2.1-0",
+  "version": "4.2.2-0",
   "description": "Electrode OTA Server - DAO Factory",
   "author": "Dat Vong <Dat.Vong@walmartlabs.com>",
   "license": "Apache-2.0",
@@ -24,12 +24,12 @@
     "cordova"
   ],
   "dependencies": {
-    "electrode-ota-server-diregister": "^4.2.1-0",
-    "electrode-ota-server-errors": "^4.2.1-0",
-    "electrode-ota-server-util": "^4.2.1-0"
+    "electrode-ota-server-diregister": "^4.2.2-0",
+    "electrode-ota-server-errors": "^4.2.2-0",
+    "electrode-ota-server-util": "^4.2.2-0"
   },
   "devDependencies": {
     "bluebird": "^3.5.1",
-    "electrode-ota-server-util-dev": "^4.2.1-0"
+    "electrode-ota-server-util-dev": "^4.2.2-0"
   }
 }
