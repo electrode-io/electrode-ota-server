@@ -1,11 +1,11 @@
-import initDao, {shutdown} from 'electrode-ota-server-test-support/lib/init-dao';
+import initDao, { shutdown } from 'electrode-ota-server-test-support/lib/init-dao';
 import acquisition from 'electrode-ota-server-model-acquisition/lib/acquisition';
-import {loggerFactory} from 'electrode-ota-server-logger';
-import {fileservice as uploadFactory} from 'electrode-ota-server-fileservice-upload';
-import {fileservice as downloadFactory} from 'electrode-ota-server-fileservice-download';
-import {diffPackageMapCurrent} from 'electrode-ota-server-model-manifest/lib/manifest';
+import { loggerFactory } from 'electrode-ota-server-logger';
+import { fileservice as uploadFactory } from 'electrode-ota-server-fileservice-upload';
+import { fileservice as downloadFactory } from 'electrode-ota-server-fileservice-download';
+import { diffPackageMapCurrent } from 'electrode-ota-server-model-manifest/lib/manifest';
 import appFactory from 'electrode-ota-server-model-app/lib/app';
-import {expect} from 'chai';
+import { expect } from 'chai';
 
 describe('model/acquisition', function () {
     let ac;
@@ -25,7 +25,7 @@ describe('model/acquisition', function () {
         const logger = loggerFactory({});
         const manifest = diffPackageMapCurrent.bind(null, download, upload);
         ac = acquisition({}, dao, genRatio, download, manifest, logger);
-        appBL = appFactory({}, dao, upload, download, logger)
+        appBL = appFactory({}, dao, upload, logger);
     });
     after(shutdown);
 
@@ -33,8 +33,8 @@ describe('model/acquisition', function () {
         it('should be 50% rollout', () => {
             const result = [];
             const update = (uniqueClientId = 'uniqueClientId',
-                            packageHash = 'packageHash',
-                            ratio = 50) => () => ac.isUpdateAble(uniqueClientId, packageHash, ratio).then(r => result.push(r));
+                packageHash = 'packageHash',
+                ratio = 50) => () => ac.isUpdateAble(uniqueClientId, packageHash, ratio).then(r => result.push(r));
             const first = update();
             return first().then(first).then(first).then(_ => {
                 const [r0, r1, r2] = result;
@@ -83,16 +83,16 @@ describe('model/acquisition', function () {
                 package: 'stuff-stuff-stuff-stuff-stuff',
                 deployment: 'Staging',
                 packageInfo: {
-                  description: 'release without tags initially',
-                  rollout: 100
+                    description: 'release without tags initially',
+                    rollout: 100
                 }
             }).then(() => {
                 return ac.updateCheck({
-                    deploymentKey : stagingKey,
-                    appVersion : '1.0.0',
-                    packageHash : 'junk',
-                    isCompanion : false,
-                    label : 'v0',
+                    deploymentKey: stagingKey,
+                    appVersion: '1.0.0',
+                    packageHash: 'junk',
+                    isCompanion: false,
+                    label: 'v0',
                     clientUniqueId
                 }).then((result) => {
                     expect(result).not.to.be.undefined;
@@ -132,7 +132,7 @@ describe('model/acquisition', function () {
                 email,
                 package: 'even-more-stuff-stuff-stuff-stuff-stuff',
                 deployment: 'Staging',
-                packageInfo : {
+                packageInfo: {
                     description: 'Got some tags',
                     tags: ['TAG-1', 'TAG-2']
                 }

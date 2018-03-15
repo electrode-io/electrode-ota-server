@@ -10,7 +10,7 @@ const DS_STORE = ".DS_Store";
 const CODEPUSH_METAFILE = ".codepushrelease";
 
 const MTIME = new Date(0);
-const all = (arr, fn)=>Promise.all(arr.map(fn));
+const all = (arr, fn) => Promise.all(arr.map(fn));
 
 const isIgnoredFile = (fn) => fn.startsWith(MACOSX_DIR)
     || fn === DS_STORE
@@ -19,7 +19,7 @@ const isIgnoredFile = (fn) => fn.startsWith(MACOSX_DIR)
     || fn === CODEPUSH_METAFILE
     || fn.endsWith("/" + CODEPUSH_METAFILE);
 
-export const isZip = (fileName, content)=> {
+export const isZip = (fileName, content) => {
     if (typeof content === 'string') {
         content = new Buffer(content);
     }
@@ -28,7 +28,7 @@ export const isZip = (fileName, content)=> {
 };
 
 
-export const toBuf = stream => new Promise((resolve, reject)=> {
+export const toBuf = stream => new Promise((resolve, reject) => {
     const bufs = [];
     stream.on('data', function (d) {
         bufs.push(d);
@@ -39,9 +39,9 @@ export const toBuf = stream => new Promise((resolve, reject)=> {
     });
 });
 
-export const zipToBuf = zip=> toBuf(zip.outputStream);
+export const zipToBuf = zip => toBuf(zip.outputStream);
 
-export const streamHash = (stream, hashType = 'sha256', digestType = 'hex')=> {
+export const streamHash = (stream, hashType = 'sha256', digestType = 'hex') => {
     return new Promise(function (resolve, reject) {
         const hash = crypto.createHash(hashType);
         stream.on('data', function (data) {
@@ -98,7 +98,7 @@ export const manifestHash = (manifest) => {
  *
  * @param {input buffer} buffer
  */
-export const generate = (buffer)=> new Promise(function (resolve, reject) {
+export const generate = (buffer) => new Promise(function (resolve, reject) {
     if (buffer instanceof Uint8Array) {
         buffer = Buffer.from(buffer);
     }
@@ -107,7 +107,7 @@ export const generate = (buffer)=> new Promise(function (resolve, reject) {
         return Promise.reject(new Error('Unhandled type ' + buffer));
     }
     const manifest = {};
-    yauzl[method](buffer, {lazyEntries: true}, function (err, zipfile) {
+    yauzl[method](buffer, { lazyEntries: true }, function (err, zipfile) {
         if (err) return reject(err);
         zipfile.readEntry();
         zipfile.on("entry", function (entry) {
@@ -118,7 +118,7 @@ export const generate = (buffer)=> new Promise(function (resolve, reject) {
             // file entry
             zipfile.openReadStream(entry, function (err, readStream) {
                 if (err) throw err;
-                streamHash(readStream).then(hash=> {
+                streamHash(readStream).then(hash => {
                     manifest[entry.fileName] = hash;
                     zipfile.readEntry();
 
@@ -142,7 +142,7 @@ export const generate = (buffer)=> new Promise(function (resolve, reject) {
  * @param {zipped file as buffer} buffer   : new package to check manifest against
  * @returns zip file of missing files, plus optional `hotcodepush.json` file
  */
-export const delta = (manifest, buffer)=> {
+export const delta = (manifest, buffer) => {
     if (manifest instanceof Buffer) {
         manifest = JSON.parse(manifest.toString());
     }
@@ -156,8 +156,8 @@ export const delta = (manifest, buffer)=> {
         return Promise.reject(new Error('Unhandled type ' + buffer));
     }
 
-    return new Promise((resolve, reject)=> {
-        yauzl[method](buffer, {lazyEntries: true}, function (err, zipfile) {
+    return new Promise((resolve, reject) => {
+        yauzl[method](buffer, { lazyEntries: true }, function (err, zipfile) {
             const seen = [];
             // this is to make react native code push work right
             if (err) return reject(err);
@@ -172,12 +172,12 @@ export const delta = (manifest, buffer)=> {
                 // file entry
                 zipfile.openReadStream(entry, function (err, readStream) {
                     if (err) throw err;
-                    streamHash(readStream).then(hash=> {
+                    streamHash(readStream).then(hash => {
                         seen.push(entry.fileName);
                         if (hash !== manifest[entry.fileName]) {
-                            zipfile.openReadStream(entry, (e, readFromStream)=> {
+                            zipfile.openReadStream(entry, (e, readFromStream) => {
                                 const mtime = entry.getLastModDate();
-                                retFile.addReadStream(readFromStream, entry.fileName, {mtime});
+                                retFile.addReadStream(readFromStream, entry.fileName, { mtime });
                             });
                         }
                         zipfile.readEntry();
@@ -187,13 +187,13 @@ export const delta = (manifest, buffer)=> {
             });
 
             zipfile.once("end", function () {
-                const deletedFiles = Object.keys(manifest).filter(v=>seen.indexOf(v) == -1).sort();
-                const jsonContent = JSON.stringify({deletedFiles});
-                retFile.addBuffer(new Buffer(jsonContent), "hotcodepush.json", {mtime: MTIME});
+                const deletedFiles = Object.keys(manifest).filter(v => seen.indexOf(v) == -1).sort();
+                const jsonContent = JSON.stringify({ deletedFiles });
+                retFile.addBuffer(new Buffer(jsonContent), "hotcodepush.json", { mtime: MTIME });
                 zipfile.close();
-                retFile.end({}, (totalSize)=> {
+                retFile.end({}, (totalSize) => {
                     resolve({
-                        zipFile : retFile
+                        zipFile: retFile
                     });
                 });
 
@@ -214,35 +214,36 @@ export const delta = (manifest, buffer)=> {
  */
 
 
-export const downloadOrGenerateManifest = (download, upload, current)=> {
+export const downloadOrGenerateManifest = (download, upload, current) => {
     if (current.manifestBlobUrl) {
-        return download(null, current.manifestBlobUrl, 'application/json');
+        return download(null, current.manifestBlobUrl, 'application/json')
+            .then(({ content, length }) => content);
     }
     return download(current.packageHash, current.blobUrl)
-        .then(generate)
-        .then((manifest)=> {
+        .then(({ content, length }) => generate(content))
+        .then((manifest) => {
             return upload(JSON.stringify(manifest), manifestHash(manifest))
-                .then(({blobUrl})=>current.manifestBlobUrl = blobUrl)
-                .then(()=>manifest);
+                .then(({ blobUrl }) => current.manifestBlobUrl = blobUrl)
+                .then(() => manifest);
         });
 
 };
 
 
-export const genDiffPackageMap = (download, upload, current, histories = [])=> {
+export const genDiffPackageMap = (download, upload, current, histories = []) => {
     return downloadOrGenerateManifest(download, upload, current)
-        .then(manifest=> {
+        .then(manifest => {
             return all(histories, function genDiffPackageMap$all(history) {
                 //For history in the histories, get its package,
                 // and generate a delta between what was in it
                 // and what the current one is.
                 return download(history.packageHash, history.blobUrl)
-                    .then(pkg=> delta(manifest, pkg))
+                    .then(({ content, length }) => delta(manifest, content))
                     .then(zipToBuf)
                     .then(upload)
-                    .then(({blobUrl, size})=> {
+                    .then(({ blobUrl, size }) => {
                         const diffPackageMap = current.diffPackageMap || (current.diffPackageMap = {});
-                        diffPackageMap[history.packageHash] = {url: blobUrl, size};
+                        diffPackageMap[history.packageHash] = { url: blobUrl, size };
                     });
             });
         });
@@ -253,7 +254,7 @@ export const genDiffPackageMap = (download, upload, current, histories = [])=> {
  * to the latest available package.  It calls delta() to figure out which files in the latest package zip are
  * different from what is in the manifest for the device-installed package.  It builds a new zip with
  * just the changed files and uses upload to save it.
- * 
+ *
  * @param {*} download injected class for downloading zips, manifests, and other blob content
  * @param {*} upload injected class for uploading zips, manifests, and other blob content
  * @param {*} latestPackage the newest package from the data store; what the device will upgrade to
@@ -263,7 +264,7 @@ export const generateDiffPackage = (download, upload, latestPackage, installedPa
     return downloadOrGenerateManifest(download, upload, installedPackage)
         .then((installedPkgManifest) => {
             return download(latestPackage.packageHash, latestPackage.blobUrl)
-                .then((latestPkgContent) => streamToBuf(latestPkgContent))
+                .then(({ content, length }) => streamToBuf(content))
                 .then((latestPkgContent) => delta(installedPkgManifest, latestPkgContent))
                 .then((deltaResults) => {
                     return zipToBuf(deltaResults.zipFile);
@@ -272,7 +273,7 @@ export const generateDiffPackage = (download, upload, latestPackage, installedPa
                 .then(({ blobUrl, size }) => {
                     const diffPackageMap = latestPackage.diffPackageMap || (latestPackage.diffPackageMap = {});
                     diffPackageMap[installedPackage.packageHash] = {
-                        url : blobUrl,
+                        url: blobUrl,
                         size
                     };
                 });
@@ -282,22 +283,22 @@ export const generateDiffPackage = (download, upload, latestPackage, installedPa
 
 /**
  * Retro generates diffPackageMap
- * @param download - (packageHash, url) return blob;
+ * @param download - (packageHash, url) return {content, length};
  * @param upload - (file) returns {size,url}
  * @param history - (history array)
  * @returns {Promise.<[{history}>}
  */
 
 
-export const diffPackageMap = (download, upload, histories)=> {
+export const diffPackageMap = (download, upload, histories) => {
     const promises = [];
     for (let i = histories.length - 1; i > -1; i--) {
         promises.push(genDiffPackageMap(download, upload, histories[i], histories.slice(0, i)));
     }
-    return Promise.all(promises).then(()=>histories);
+    return Promise.all(promises).then(() => histories);
 };
 
-export const diffPackageMapCurrent = (download, upload, current)=> {
+export const diffPackageMapCurrent = (download, upload, current) => {
     const last = current.length - 1;
     return generateDiffPackage(download, upload, current[last], current[0]).then(() => current);
 };
