@@ -21,9 +21,11 @@ export default class UserDAO extends BaseDAO {
             const userMatches = await UserDAO.getUserById(connection, userId);
 
             const outgoing = new UserDTO();
+            outgoing.id = userId;
             outgoing.email = userMatches[0].email;
             outgoing.createdTime = userMatches[0].created_time;
             outgoing.name = userMatches[0].name;
+
             Encryptor.instance.decryptDTO(outgoing);
 
             if (user.linkedProviders) {
@@ -223,9 +225,12 @@ export default class UserDAO extends BaseDAO {
 
     private static async insertAccessKey(connection: IConnection, userId: number, accessKey: any): Promise<any> {
         const expires = (typeof accessKey.expires === "number") ? new Date(accessKey.expires) : accessKey.expires;
+        const friendly_name = Encryptor.instance.encrypt("access_key.friendly_name", accessKey.friendlyName);
+        const description = Encryptor.instance.encrypt("access_key.description", accessKey.description);
+
         return UserDAO.query(connection, AccessKeyQueries.insertAccessKey,
             [userId, accessKey.name, accessKey.createdBy,
-                expires, accessKey.friendlyName, accessKey.description]);
+                expires, friendly_name, description]);
     }
 
     private static async updateAccessKey(connection: IConnection, accessKey: any): Promise<any> {
@@ -233,8 +238,10 @@ export default class UserDAO extends BaseDAO {
         const lastAccess = (typeof accessKey.lastAccess === "number") ?
             new Date(accessKey.lastAccess) : accessKey.lastAccess;
 
+        const friendly_name = Encryptor.instance.encrypt("access_key.friendly_name", accessKey.friendlyName);
+
         return UserDAO.query(connection, AccessKeyQueries.updateAccessKey,
-            [lastAccess, accessKey.friendlyName, expires, accessKey.id]);
+            [lastAccess, friendly_name, expires, accessKey.id]);
     }
 
     private static async getAccessKeysByUserId(connection: IConnection, userId: number): Promise<any> {
@@ -247,12 +254,14 @@ export default class UserDAO extends BaseDAO {
 
     private static transformOutgoingAccessKeys(accessKeys: any[]): any {
         return accessKeys.reduce((obj: any, accessKey: any) => {
+            const friendlyName = Encryptor.instance.decrypt("access_key.friendly_name", accessKey.friendly_name);
+            const description = Encryptor.instance.decrypt("access_key.description", accessKey.description);
             obj[accessKey.name] = {
                 createdTime: accessKey.created_time,
-                description: accessKey.description,
+                description,
                 email: accessKey.email,
                 expires: accessKey.expires,
-                friendlyName: accessKey.friendly_name,
+                friendlyName,
                 id: accessKey.id,
                 lastAccess: accessKey.last_access,
                 name: accessKey.name,

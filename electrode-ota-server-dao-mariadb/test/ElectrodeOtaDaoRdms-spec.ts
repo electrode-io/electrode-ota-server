@@ -34,7 +34,7 @@ const testDBConfig = {
     }],
     encryptionConfig: {
         keyfile: "./test/sample_encryption.key",
-        fields: ["user.name", "user.email", "package.released_by"]
+        fields: ["user.name", "user.email", "package.released_by", "access_key.friendly_name", "access_key.description"]
     }
 };
 
@@ -1571,10 +1571,24 @@ describe("Data Access via RDBMS", function () {
     });
 
     describe("encrypted fields", () => {
+        const createdTime = Date.now();
+        const expires = createdTime + (60 * 24 * 3600 * 1000);
         const encryptedDao = new ElectrodeOtaDaoRdbms();
         const userDTO = new UserDTO();
+        const keyName = "2903j09fj920j10jf";
         userDTO.email = "encrypt_me@walmart.com";
         userDTO.name = "Encrypt Me";
+        userDTO.accessKeys = {};
+        userDTO.accessKeys[keyName] = {
+            createdBy: undefined,
+            createdTime,
+            description: "better encrypt me too",
+            email: userDTO.email,
+            expires,
+            friendlyName: "A name that should be encrypted",
+            id: "some junk",
+            name: keyName,
+        }
 
         before(() => {
             return Encryptor.instance.initialize(testDBConfig.encryptionConfig)
@@ -1590,13 +1604,20 @@ describe("Data Access via RDBMS", function () {
         it("User saved with encrypted email", () => {
             // Test encryption is enabled
             expect(Encryptor.instance.encrypt("user.email", userDTO.email)).to.not.eq(userDTO.email);
+            expect(Encryptor.instance.encrypt("access_key.friendly_name", userDTO.accessKeys[keyName].friendlyName)).to.not.eq(userDTO.accessKeys[keyName].friendlyName);
+            expect(Encryptor.instance.encrypt("access_key.description", userDTO.accessKeys[keyName].description)).to.not.eq(userDTO.accessKeys[keyName].description);
 
             // Test email and name stored encrypted
             return encryptedDao.createUser(userDTO).then(createdUser => {
                 expect(createdUser.email).to.eq(userDTO.email);
                 expect(createdUser.name).to.eq(userDTO.name);
+                expect(createdUser.accessKeys).not.to.be.undefined;
+                expect(createdUser.accessKeys[keyName]).not.to.be.undefined;
+                expect(createdUser.accessKeys[keyName].friendlyName).to.eq(userDTO.accessKeys[keyName].friendlyName);
+                expect(createdUser.accessKeys[keyName].description).to.eq(userDTO.accessKeys[keyName].description);
                 return createdUser;
             }).then((createdUser) => {
+                console.log("createdUser", createdUser);
                 return encryptedDao.getConnection().then(conn => {
                     return new Promise((resolve, reject) => {
                         conn.query(`SELECT email, name FROM user WHERE email = ?`, [Encryptor.instance.encrypt("user.email", createdUser.email)], (err, results) => {
@@ -1605,7 +1626,18 @@ describe("Data Access via RDBMS", function () {
                             } else {
                                 expect(results.length).to.eq(1);
                                 expect(Encryptor.instance.decrypt("user.email", results[0].name)).to.eq(userDTO.name);
-                                resolve();
+
+                                conn.query("SELECT name, friendly_name, description FROM access_key WHERE user_id = ?", [createdUser.id], (err, accessKeyResults) => {
+                                    if (err) {
+                                        reject(err);
+                                    } else {
+                                        expect(accessKeyResults.length).to.eq(1);
+                                        expect(accessKeyResults[0].name).to.eq(keyName);
+                                        expect(Encryptor.instance.decrypt("access_key.friendly_name", accessKeyResults[0].friendly_name)).to.eq(userDTO.accessKeys[keyName].friendlyName);
+                                        expect(Encryptor.instance.decrypt("access_key.description", accessKeyResults[0].description)).to.eq(userDTO.accessKeys[keyName].description);
+                                        resolve();
+                                    }
+                                });
                             }
                         });
                     });
@@ -1647,6 +1679,106 @@ describe("Data Access via RDBMS", function () {
                         })
                     });
                 });
+        });
+
+        describe("encryptDTO", () => {
+            it("can encrypt certain fields in a UserDTO", () => {
+                const email = "encrypt_me@walmart.com";
+                const name = "Encrypt Me";
+                const userDTO = new UserDTO();
+                userDTO.email = email;
+                userDTO.name = name;
+
+                Encryptor.instance.encryptDTO(userDTO);
+
+                expect(userDTO.email).not.to.eq(email);
+                expect(userDTO.name).not.to.eq(name);
+            });
+
+            it("can encrypt certain fields in a PackageDTO", () => {
+                const releasedBy = "secret_user@walmart.com";
+                const appVersion = "0.0.1";
+                const blobUrl = "http://example.com/encrypt";
+                const description = "Encrypt package description";
+                const label = "v1";
+                const manifestBlobUrl = "http://example.com/manifest";
+                const packageHash = "hash";
+                const releaseMethod = "upload";
+                const rollout = 100;
+                const size = 1001;
+
+                const pkg = new PackageDTO();
+                pkg.appVersion = appVersion;
+                pkg.blobUrl = blobUrl;
+                pkg.description = description;
+                pkg.isDisabled = pkg.isMandatory = false;
+                pkg.label = label;
+                pkg.manifestBlobUrl = manifestBlobUrl;
+                pkg.packageHash = packageHash;
+                pkg.releasedBy = releasedBy;
+                pkg.releaseMethod = releaseMethod;
+                pkg.rollout = rollout;
+                pkg.size = size;
+
+                Encryptor.instance.encryptDTO(pkg);
+                expect(pkg.releasedBy).not.to.eq(releasedBy);
+
+                expect(pkg.appVersion).to.eq(appVersion);
+                expect(pkg.blobUrl).to.eq(blobUrl);
+                expect(pkg.description).to.eq(description);
+                expect(pkg.label).to.eq(label);
+                expect(pkg.manifestBlobUrl).to.eq(manifestBlobUrl);
+                expect(pkg.releaseMethod).to.eq(releaseMethod);
+                expect(pkg.rollout).to.eq(rollout);
+                expect(pkg.size).to.eq(size);
+
+            });
+
+            it("will only encrypt certain DTOs", () => {
+                const appDTO = new AppDTO();
+                const appName = "My Cool App";
+                appDTO.name = appName;
+
+                Encryptor.instance.encryptDTO(appDTO);
+                expect(appDTO.name).to.eq(appName);
+                Encryptor.instance.decryptDTO(appDTO);
+                expect(appDTO.name).to.eq(appName);
+            });
+        });
+
+        describe("Encryptor init", () => {
+            it("will fail if the key file is specified but does not exist", () => {
+                const badConfig = {
+                    keyfile: "./test/missing.key"
+                };
+
+                const local = new Encryptor();
+                local.initialize(badConfig).then(() => {
+                    // should not come here
+                    expect(true).to.eq(false);
+                }).catch((err) => {
+                    expect(err).not.to.be.undefined;
+                });
+            });
+
+            it("will not do anything if there is no key file", () => {
+                const local = new Encryptor();
+                const noKeyConfig = {
+                    fields: ["user.name", "user.email", "package.released_by", "access_key.friendly_name", "access_key.description"]
+                };
+                local.initialize(noKeyConfig).then(() => {
+                    const email = "encrypt_me@walmart.com";
+                    const name = "Encrypt Me";
+                    const userDTO = new UserDTO();
+                    userDTO.email = email;
+                    userDTO.name = name;
+    
+                    local.encryptDTO(userDTO);
+
+                    expect(userDTO.email).to.eq(email);
+                    expect(userDTO.name).to.eq(name);
+                });
+            });
         });
     });
 });
