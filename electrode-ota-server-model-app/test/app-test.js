@@ -7,7 +7,6 @@ import fs from "fs";
 import appFactory from "electrode-ota-server-model-app/lib/app";
 import accountFactory from "electrode-ota-server-model-account/lib/account";
 import { fileservice as upload } from "electrode-ota-server-fileservice-upload";
-import { fileservice as download } from "electrode-ota-server-fileservice-download";
 import { manifestHash } from "electrode-ota-server-model-manifest/lib/manifest";
 import { shasum } from "electrode-ota-server-util";
 import { expect } from "chai";
@@ -24,20 +23,18 @@ const APP = {
   app: "super"
 };
 
-describe("model/app", function() {
+describe("model/app", function () {
   this.timeout(50000);
   let account, ac;
   before(async () => {
     const dao = await initDao();
     let w = 0;
     account = accountFactory({}, dao, console);
-    const up = upload({}, dao),
-      down = download({}, dao);
+    const up = upload({}, dao);
     ac = appFactory(
       {},
       dao,
       up,
-      history => diffPackageMap(down, up, history),
       console
     );
   });
@@ -728,8 +725,8 @@ describe("model/app", function() {
           email,
           package: readFixture("step.0.blob.zip"),
           deployment: "Staging",
-          packageInfo : {
-            description : "release with tags",
+          packageInfo: {
+            description: "release with tags",
             tags,
           }
         }).then((newPkg) => {
@@ -750,14 +747,14 @@ describe("model/app", function() {
     return ac
       .createApp({ email, name: appName })
       .then(() => ac.upload({
-          app: appName,
-          email,
-          package: readFixture("step.0.blob.zip"),
-          deployment: "Staging",
-          packageInfo: {
-            description: "release without tags"
-          }
-        }))
+        app: appName,
+        email,
+        package: readFixture("step.0.blob.zip"),
+        deployment: "Staging",
+        packageInfo: {
+          description: "release without tags"
+        }
+      }))
       .then(() => ac.promoteDeployment({
         app: appName,
         email,
@@ -800,7 +797,7 @@ describe("model/app", function() {
         expect(updated.tags).not.to.be.undefined;
         expect(updated.tags.length).to.eq(tags.length);
         expect(updated.tags.indexOf(tags[0])).to.be.gte(0);
-        expect(updated.tags.indexOf(tags[1])).to.be.gte(0);      
+        expect(updated.tags.indexOf(tags[1])).to.be.gte(0);
       });
   });
 });

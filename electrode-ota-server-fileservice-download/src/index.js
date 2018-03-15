@@ -14,12 +14,19 @@ export const fileservice = (options, dao) => {
             || url.split('/').pop();
         const p = dao.download(hash);
 
-        if (type == 'application/json') {
-            p.then((resp) => {
-                return JSON.parse(resp + '')
-            });
-        }
-        return p;
+        return p.then((resp) => {
+            if (type == 'application/json') {
+                return {
+                    content: JSON.parse(resp + ''),
+                    length: resp.length
+                };
+            } else {
+                return {
+                    content: resp,
+                    length: resp.length
+                };
+            }
+        });
     };
 };
 export const register = diregister({
@@ -28,4 +35,3 @@ export const register = diregister({
     connections: false,
     dependencies: ['ota!dao']
 }, fileservice);
-

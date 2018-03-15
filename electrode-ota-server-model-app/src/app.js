@@ -78,7 +78,7 @@ const notAuthorizedPerm = (app, email, perm, message) => {
   return notAuthorized(false, message);
 };
 
-export default (options, dao, upload, download, logger) => {
+export default (options, dao, upload, logger) => {
   const api = {};
   return Object.assign(api, {
     findApp({ email, app }) {
@@ -265,7 +265,7 @@ export default (options, dao, upload, download, logger) => {
               notFound(
                 pkg,
                 `Deployment "${params.deployment}" has no package with label "${
-                  params.label
+                params.label
                 }"`
               );
             }
@@ -277,9 +277,9 @@ export default (options, dao, upload, download, logger) => {
               alreadyExistsMsg(
                 existingPackage.packageHash !== pkg.packageHash,
                 `Deployment ${params.deployment}:${
-                  pkg.label
+                pkg.label
                 } has already been promoted to ${params.to}:${
-                  existingPackage.label
+                existingPackage.label
                 }.`
               );
             }
