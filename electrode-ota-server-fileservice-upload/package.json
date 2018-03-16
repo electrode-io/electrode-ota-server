@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-fileservice-upload",
-  "version": "4.3.0-0",
+  "version": "4.4.0-0",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "electrode-ota-server-diregister": "^4.3.0-0",
-    "electrode-ota-server-util": "^4.3.0-0"
+    "electrode-ota-server-util": "^4.4.0-0"
   },
   "devDependencies": {
     "bluebird": "^3.5.1",
