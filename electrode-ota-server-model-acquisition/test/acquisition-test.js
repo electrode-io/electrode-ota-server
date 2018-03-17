@@ -26,7 +26,7 @@ describe('model/acquisition', function () {
         const logger = loggerFactory({});
         const manifest = diffPackageMapCurrent.bind(null, download, upload);
         ac = acquisition({}, dao, genRatio, download, manifest, logger);
-        appBL = appFactory({}, dao, upload, logger)
+        appBL = appFactory({}, dao, upload, logger);
     });
     after(shutdown);
 
