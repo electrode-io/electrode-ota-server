@@ -56,7 +56,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         "shouldRunBinaryVersion": false
                     };
                     if (isAvailable) {
-                        if (pkg.manifestBlobUrl) {
+                        if (pkg.manifestBlobUrl && params.packageHash) {
                             const diffPackageMap = pkg.diffPackageMap || {};
                             const partial = diffPackageMap[params.packageHash];
                             if (partial) {
