@@ -6,6 +6,7 @@ import { fileservice as downloadFactory } from 'electrode-ota-server-fileservice
 import { diffPackageMapCurrent } from 'electrode-ota-server-model-manifest/lib/manifest';
 import appFactory from 'electrode-ota-server-model-app/lib/app';
 import { expect } from 'chai';
+import fs from 'fs';
 
 describe('model/acquisition', function () {
     let ac;
@@ -25,7 +26,7 @@ describe('model/acquisition', function () {
         const logger = loggerFactory({});
         const manifest = diffPackageMapCurrent.bind(null, download, upload);
         ac = acquisition({}, dao, genRatio, download, manifest, logger);
-        appBL = appFactory({}, dao, upload, logger);
+        appBL = appFactory({}, dao, upload, logger)
     });
     after(shutdown);
 
@@ -169,6 +170,30 @@ describe('model/acquisition', function () {
             }).then((result) => {
                 expect(result).not.to.be.undefined;
                 expect(result.isAvailable).to.eq(false);
+            });
+        });
+
+        it('will return package not available if packageHash is unknown', () => {
+            return appBL.upload({
+                app: name,
+                email,
+                package: fs.readFileSync(__dirname + "/fixture/package.0.zip"),
+                deployment: 'Staging',
+                packageInfo: {
+                    description: 'Some zipped package',
+                }
+            }).then((pkg) => {
+                expect(pkg).not.to.be.undefined;
+                expect(pkg.packageHash).not.to.be.undefined;
+                return ac.updateCheck({
+                    deploymentKey: stagingKey,
+                    appVersion: '1.0.0',
+                    packageHash: 'packageThatDoesNotExist',
+                    clientUniqueId
+                }).then((result) => {
+                    expect(result).not.to.be.undefined;
+                    expect(result.isAvailable).to.eq(false);
+                });
             });
         });
     });
