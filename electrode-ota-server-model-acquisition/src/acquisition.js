@@ -1,10 +1,10 @@
-import {missingParameter} from 'electrode-ota-server-errors';
+import { missingParameter } from 'electrode-ota-server-errors';
 import version from 'semver';
 const fixver = (ver) => ver ? ('' + ver).replace(/^(\d+?)$/, '$1.0.0') : '0.0.0';
 
 export default (options, dao, weighted, _download, manifest, logger) => {
     const api = {
-        download(hash){
+        download(hash) {
             return _download(hash);
         },
 
@@ -17,8 +17,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
          * param label
          * param clientUniqueId
          */
-        updateCheck(params)
-        {
+        updateCheck(params) {
 
             missingParameter(params.deploymentKey, `Deployment key missing`);
             missingParameter(params.appVersion, `appVersion missing`);
@@ -57,7 +56,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         "shouldRunBinaryVersion": false
                     };
                     if (isAvailable) {
-                        if (pkg.manifestBlobUrl) {
+                        if (pkg.manifestBlobUrl && params.packageHash) {
                             const diffPackageMap = pkg.diffPackageMap || {};
                             const partial = diffPackageMap[params.packageHash];
                             if (partial) {
@@ -67,18 +66,26 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                             } else {
                                 return dao.historyByIds(deployment.history_)
                                     .then(history => history.filter(v => v.packageHash == params.packageHash))
-                                    .then(matches => manifest(matches.concat(pkg)).then(v => {
-                                        const newPackage = v[v.length - 1];
-                                        return dao.updatePackage(deployment.key, newPackage).then((pkgLast) => {
-                                            const p2 = newPackage.diffPackageMap && newPackage.diffPackageMap[params.packageHash];
-                                            if (p2) {
-                                                ret.downloadURL = p2.url;
-                                                ret.packageSize = p2.size;
-                                                // Note: Diff uses the packageHash of the latest package
-                                            }
+                                    .then(matches => {
+                                        if (matches.length == 0) {
+                                            // No history of packages matching this hash.  Return no update.
+                                            logger.warn("No history of package: ", params.packageHash);
+                                            ret.isAvailable = false;
                                             return ret;
-                                        })
-                                    }));
+                                        }
+                                        return manifest(matches.concat(pkg)).then(v => {
+                                            const newPackage = v[v.length - 1];
+                                            return dao.updatePackage(deployment.key, newPackage).then((pkgLast) => {
+                                                const p2 = newPackage.diffPackageMap && newPackage.diffPackageMap[params.packageHash];
+                                                if (p2) {
+                                                    ret.downloadURL = p2.url;
+                                                    ret.packageSize = p2.size;
+                                                    // Note: Diff uses the packageHash of the latest package
+                                                }
+                                                return ret;
+                                            });
+                                        });
+                                    });
 
                             }
                         }
@@ -87,19 +94,19 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                     return ret;
                 }
 
-                return isNotAvailable ? 
-                    makeReturn(!isNotAvailable) : 
+                return isNotAvailable ?
+                    makeReturn(!isNotAvailable) :
                     api.isUpdateAble(params.clientUniqueId, pkg.packageHash, pkg.rollout, pkg.tags).then(makeReturn);
 
             }).tap((res) => {
                 logger.info({
-                    event : {
-                        name : "checkedForUpdate",
-                        deploymentKey : params.deploymentKey,
-                        clientUniqueId : params.clientUniqueId,
-                        available : res.isAvailable
+                    event: {
+                        name: "checkedForUpdate",
+                        deploymentKey: params.deploymentKey,
+                        clientUniqueId: params.clientUniqueId,
+                        available: res.isAvailable
                     }
-                }); 
+                });
             });
         },
 
@@ -107,11 +114,10 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                               clientUniqueId,
                               deploymentKey,
                               label
-                              }*/ metric)
-        {
+                              }*/ metric) {
             metric.status = 'Downloaded';
             return dao.insertMetric(metric)
-                .tap(() => logger.info({ depoymentKey : metric.deploymentKey, label : metric.label }, "recorded download success"));
+                .tap(() => logger.info({ depoymentKey: metric.deploymentKey, label: metric.label }, "recorded download success"));
         }
         ,
         /**
@@ -134,9 +140,9 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                             status,
                             previousLabelOrAppVersion,
                             previousDeploymentKey
-                            }*/ metric){
+                            }*/ metric) {
             return dao.insertMetric(metric)
-                .tap(() => logger.info({ depoymentKey : metric.deploymentKey, label : metric.label, status : metric.status }, "recorded deployment status"));
+                .tap(() => logger.info({ depoymentKey: metric.deploymentKey, label: metric.label, status: metric.status }, "recorded deployment status"));
         },
         /**
          * So this keeps track of what the client got last time.
