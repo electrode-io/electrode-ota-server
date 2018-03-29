@@ -196,5 +196,27 @@ describe('model/acquisition', function () {
                 });
             });
         });
+
+        it('no update if package version is greater than latest package', () => {
+            return appBL.upload({
+                app: name,
+                email,
+                package: 'Some awesome package content',
+                deployment: 'Staging',
+                packageInfo: {
+                    description: 'Some content'
+                }
+            }).then((pkg) => {
+                expect(pkg.appVersion).to.eql('1.0.0');
+                return ac.updateCheck({
+                    deploymentKey: stagingKey,
+                    appVersion: '1.0.1',
+                    packageHash: 'ABCD',
+                    clientUniqueId
+                }).then((result) => {
+                    expect(result.isAvailable).to.eq(false);
+                });
+            });
+        });
     });
 });
