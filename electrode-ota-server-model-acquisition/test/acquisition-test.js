@@ -218,5 +218,29 @@ describe('model/acquisition', function () {
                 });
             });
         });
+
+        it('no update if package is disabled', () => {
+            return appBL.upload({
+                app:name,
+                email,
+                package: 'Some disabled package',
+                deployment: 'Staging',
+                packageInfo: {
+                    isDisabled: true,
+                    description: 'Some disabled package'
+                }
+            }).then((pkg) => {
+                expect(pkg.isDisabled).to.be.true;
+                return ac.updateCheck({
+                    deploymentKey: stagingKey,
+                    appVersion: '1.0.0',
+                    packageHash: 'ABCD',
+                    clientUniqueId
+                }).then((result) => {
+                    console.log(result);
+                    expect(result.isAvailable).to.be.false;
+                })
+            })
+        })
     });
 });

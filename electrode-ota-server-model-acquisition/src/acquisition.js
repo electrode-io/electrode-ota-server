@@ -37,7 +37,8 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                 pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags);
 
                 let isNotAvailable = pkg.packageHash == params.packageHash || !('clientUniqueId' in params)
-                        || version.gt(params.appVersion, pkg.appVersion);
+                        || version.gt(params.appVersion, pkg.appVersion)
+                        || pkg.isDisabled;
 
                 const appVersion = fixver(pkg.appVersion);
 
@@ -53,7 +54,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         packageHash: pkg.packageHash,
                         description: pkg.description,
                         // true == there is an update but it requires a newer binary version.
-                        "updateAppVersion": version.lt(fixver(params.appVersion), appVersion),
+                        "updateAppVersion": isAvailable && version.lt(fixver(params.appVersion), appVersion),
                         //TODO - find out what this should be
                         "shouldRunBinaryVersion": false
                     };
