@@ -17,7 +17,8 @@ const authentication = function (server, options) {
 
             const authorization = request.headers && request.headers.authorization;
             if (realm && authorization == null) {
-                return reply(notAuthorized(false, 'No Credentials Given', 'Basic', unauthorizedAttributes));
+                reply.setHeader('WWW-Authenticate', `Basic realm="${realm}"`);
+                return reply.code(402);
             }
 
             const [authType, authValue] = authorization.split(/\s+/, 2);
@@ -66,4 +67,3 @@ register.attributes = {
     name: 'http-basic',
     description: 'super basic auth mechanism'
 };
-

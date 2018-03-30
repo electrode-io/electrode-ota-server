@@ -21,7 +21,7 @@ export const alreadyExistsMsg = (check, message) => {
 };
 
 export const notAuthorized = (check, message, data) => {
-    if (!check) throw Boom.unauthorized(message);
+    if (!check) throw Boom.unauthorized(message, data);
     return check;
 };
 
