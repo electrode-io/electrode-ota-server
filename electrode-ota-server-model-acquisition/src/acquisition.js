@@ -54,7 +54,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         packageHash: pkg.packageHash,
                         description: pkg.description,
                         // true == there is an update but it requires a newer binary version.
-                        "updateAppVersion": isAvailable && version.lt(fixver(params.appVersion), appVersion),
+                        "updateAppVersion": version.lt(fixver(params.appVersion), appVersion),
                         //TODO - find out what this should be
                         "shouldRunBinaryVersion": false
                     };
