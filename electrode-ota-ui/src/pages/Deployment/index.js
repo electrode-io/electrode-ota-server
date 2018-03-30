@@ -71,8 +71,8 @@ const mapDispatchToProps = (dispatch, pps) => {
 		onClearDeploymentHistory(){
 			return _dispatch(clearDeploymentHistory, this);
 		},
-		onGetDeploymentMetrics(){
-			return _dispatch(getDeploymentMetrics, this);
+		onGetDeploymentMetrics(value){
+			return _dispatch(getDeploymentMetrics, this, value);
 		},
 		onGetDeploymentHistory(value){
 			return _dispatch(getDeploymentHistory, this, value);
