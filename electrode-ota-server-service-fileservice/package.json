@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-service-fileservice",
-  "version": "4.4.3",
+  "version": "4.4.4",
   "description": "OTA File Service",
   "main": "lib/index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "electrode-ota-server-diregister": "^4.4.3",
-    "electrode-ota-server-util": "^4.4.3"
+    "electrode-ota-server-util": "^4.4.4"
   },
   "devDependencies": {
     "electrode-ota-server-util-dev": "^4.4.3"
