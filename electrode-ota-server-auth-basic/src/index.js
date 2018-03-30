@@ -17,8 +17,7 @@ const authentication = function (server, options) {
 
             const authorization = request.headers && request.headers.authorization;
             if (realm && authorization == null) {
-                reply.setHeader('WWW-Authenticate', `Basic realm="${realm}"`);
-                return reply.code(402);
+                return reply(notAuthorized(null, 'Basic', `Basic realm="${realm}"`));
             }
 
             const [authType, authValue] = authorization.split(/\s+/, 2);
