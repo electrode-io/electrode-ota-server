@@ -92,14 +92,16 @@ For configuration instructions visit the [electrode.io](http://www.electrode.io/
  npm i electrode-ota-server
 ```
 
-## Upload Size
+## Upload Size and Timeout
 To increase the max upload size, add this to your configuration:
+Likewise, you can set the timeout if upload is timing out.
 ```json
 
 "electrode-ota-server-routes-apps" : {
             options : {
                 payload : {
-                    maxBytes : 94371840
+                    maxBytes : 94371840,
+                    timeout: 119999
                 }                
             }
         }
