@@ -7,7 +7,10 @@ is API compatible with [code-push-cli](https://microsoft.github.io/code-push/doc
 
 ## Upgrade
 
-### Version 3.3.0
+### Version 4.3.0
+Various bug fixes.
+
+### Version 4.0.0
 Rewrite of mariadb module; simplify needed configuration to use the mariadb module.
 
 ```json
@@ -26,7 +29,7 @@ Rewrite of mariadb module; simplify needed configuration to use the mariadb modu
                     "password": "ota",
                     "port": 33060,
                     "user": "ota",
-                }],  
+                }],
             }
         },
 ```
@@ -36,32 +39,7 @@ The underlying implementation uses the npm module [mysql](https://www.npmjs.com/
 The schema for mariadb is in the [electrode-ota-mariadb-schema folder](./electrode-ota-mariadb-schema/README.md).  The module does not use sequelize anymore, and the schema is created separately using liquibase.
 
 ### Version 3.2.1
-Version 3.2.1 adds support for MySQL/MariaDB.  To use, enable `logger`, `dao-factory`, `dao-mariadb`, and disable `dao-plugin` and `dao-cassandra`.  Connection settings can be specified under `dao-mariadb`.
-```json
-    "electrode-ota-server-logger": {
-      priority: 1
-    },
-    "electrode-ota-server-dao-factory": {
-      priority: 5
-    },
-    "electrode-ota-server-dao-mariadb": {
-      priority: 4,
-      options: {
-        host: "127.0.0.1",
-        port: 3306,
-        dialect: "mysql",
-        db: "ota_db",
-        user: "root",
-        password: ""
-      }
-    },
-    "electrode-ota-server-dao-plugin": {
-      enable: false
-    },
-    "electrode-ota-server-dao-cassandra": {
-      enable: false
-    },
-```
+Version 3.2.1 is deprecated.  Please use Version 3.3.0 instead.
 
 ### Version 2
 Version 2 adds partial update support.  To do this it requires some alterations to the cassandra database.  This
@@ -102,7 +80,7 @@ Likewise, you can set the timeout if upload is timing out.
                 payload : {
                     maxBytes : 94371840,
                     timeout: 119999
-                }                
+                }
             }
         }
 
