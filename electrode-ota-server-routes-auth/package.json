@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-routes-auth",
-  "version": "4.4.4",
+  "version": "4.4.5",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -11,7 +11,7 @@
   "dependencies": {
     "ejs": "^2.5.2",
     "electrode-ota-server-diregister": "^4.4.3",
-    "electrode-ota-server-util": "^4.4.4",
+    "electrode-ota-server-util": "^4.4.5",
     "vision": "^4.1.0"
   },
   "devDependencies": {

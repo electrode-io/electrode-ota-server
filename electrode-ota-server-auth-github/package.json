@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-auth-github",
-  "version": "4.4.4",
+  "version": "4.4.5",
   "description": "OTA Github Authentication Provider",
   "main": "lib/index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "electrode-ota-server-diregister": "^4.4.3",
-    "electrode-ota-server-util": "^4.4.4"
+    "electrode-ota-server-util": "^4.4.5"
   },
   "devDependencies": {
     "electrode-ota-server-util-dev": "^4.4.3"

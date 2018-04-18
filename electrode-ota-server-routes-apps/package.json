@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-routes-apps",
-  "version": "4.4.4",
+  "version": "4.4.5",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "electrode-ota-server-diregister": "^4.4.3",
-    "electrode-ota-server-util": "^4.4.4",
+    "electrode-ota-server-util": "^4.4.5",
     "joi": "^10.4.1"
   },
   "devDependencies": {
