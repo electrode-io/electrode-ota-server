@@ -1,6 +1,7 @@
 import {promiseMap, reducer, remove, toJSON} from 'electrode-ota-server-util';
 import {alreadyExistsMsg} from 'electrode-ota-server-errors';
 import UDTS from './models/UDTS.json';
+import {find} from "lodash";
 
 const historySort = history => history && history.sort((a, b) => b.created_.getTime() - a.created_.getTime());
 
@@ -283,9 +284,15 @@ export default class DaoExpressCassandra {
         let rpkg;
 
         if (label) {
-            rpkg = await this.Package.findOneAsync({id_: within(history_), label});
+            rpkg = await this.Package.findAsync({id_: within(history_)}).then((results) => {
+                const filtered_results = find(results, (o) => o.label === label);
+                if (!filtered_results) {
+                    throw new Error(`Label ${label} not found`);
+                }
+                return filtered_results;
+            });
         } else {
-            rpkg = await this.Package.findOneAsync({id_: within(history_)});
+            rpkg = await this.Package.findOneAsync({id_: history_[0]});
         }
         apply(rpkg, pkg);
         rpkg.lastUpdated = Date.now();
@@ -297,7 +304,7 @@ export default class DaoExpressCassandra {
     /**
      * For a given deployment, it gets the latest available release package
      * that matches the passed in tags.
-     * 
+     *
      * @param {*} deploymentKey string - the deployment key of the app on the device
      * @param {*} tags string[] - the list of tags the device has sent
      */
