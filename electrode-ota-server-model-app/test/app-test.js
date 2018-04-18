@@ -800,4 +800,68 @@ describe("model/app", function () {
         expect(updated.tags.indexOf(tags[1])).to.be.gte(0);
       });
   });
+
+  it("should updateDeployment for a label", () => {
+    const email = "label@walmart.com";
+    const appName = "updateDeploymentWithLabel";
+    return ac.createApp({email, name: appName })
+    .then(() => ac.upload({
+      app:appName,
+      email,
+      package: "Package for v1",
+      deployment: "Staging",
+      packageInfo: {
+        description: "v1 description",
+        label: "v1",
+        rollout: 10,
+        isDisabled: false
+      }
+    }))
+    .then(() => ac.upload({
+      app: appName,
+      email,
+      package: "Package v2",
+      deployment: "Staging",
+      packageInfo: {
+        description: "v2 description",
+        label: "v2",
+        isDisabled: false,
+        rollout: 11
+      }
+    }))
+    .then(() => ac.updateDeployment({
+      app:appName,
+      email,
+      description: "v1 new description",
+      deployment: "Staging",
+      label: "v1",
+      rollout: 99,
+      isDisabled: true
+    }))
+    .then((updated) => {
+      expect(updated).not.to.be.undefined;
+      expect(updated.label).to.eq("v1");
+      expect(updated.isDisabled).to.be.true;
+      expect(updated.rollout).to.eq(99);
+      expect(updated.description).to.eq("v1 new description");
+    })
+    .then(() => ac.historyDeployment({
+      app: appName,
+      email,
+      deployment: "Staging"
+    }))
+    .then((history) => {
+      expect(history.length).to.eq(2);
+      const v1 = history[1];
+      expect(v1.label).to.eq("v1");
+      expect(v1.isDisabled).to.be.true;
+      expect(v1.rollout).to.eq(99);
+      expect(v1.description).to.eq("v1 new description");
+      const v2 = history[0];
+      expect(v2.label).to.eq("v2");
+      expect(v2.isDisabled).to.be.false;
+      expect(v2.rollout).to.eq(11);
+      expect(v2.description).to.eq("v2 description");
+    })
+  });
 });

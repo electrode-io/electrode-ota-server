@@ -378,7 +378,7 @@ export default (options, dao, upload, logger) => {
             };
 
             return dao
-              .updatePackage(deployment.key, npkg)
+              .updatePackage(deployment.key, npkg, params.label)
               .tap(() =>
                 logger.info(
                   { appId: app.id, deployment: params.deployment },
