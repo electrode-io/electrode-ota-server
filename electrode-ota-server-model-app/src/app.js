@@ -342,50 +342,51 @@ export default (options, dao, upload, logger) => {
       return map;
     },
 
-    updateDeployment(params) {
-      return api
-        .findApp(params)
-        .then(app =>
-          dao.deploymentByApp(app.id, params.deployment).then(deployment => {
-            notFound(deployment, `Deployment not found '${params.deployment}'`);
-            notFound(deployment.package, `Deployment has no releases.`);
+    async updateDeployment(params) {
+      const app = await api.findApp(params);
+      const deployment = await dao.deploymentByApp(app.id, params.deployment);
 
-            const pkg = deployment.package;
-            const {
-              isDisabled = pkg.isDisabled,
-              isMandatory = pkg.isMandatory,
-              rollout = pkg.rollout,
-              appVersion = pkg.appVersion,
-              description = pkg.description,
-              tags = pkg.tags,
-            } = excludeNull(params);
+      notFound(deployment, `Deployment not found '${params.deployment}'`);
+      notFound(deployment.package, `Deployment has no releases.`);
 
-            invalidRequest(
-              !(
-                params.rollout != null &&
-                (pkg.rollout != null && params.rollout < pkg.rollout)
-              ),
-              `Can not set rollout below existing rollout ${pkg.rollout}`
-            );
+      let pkg = deployment.package;
+      if (params.label && params.label !== pkg.label) {
+        pkg = await dao.historyLabel(app.id, params.deployment, params.label);
+        notFound(pkg, `Package for '${params.label}' not found.`);
+      }
+      const {
+        isDisabled = pkg.isDisabled,
+        isMandatory = pkg.isMandatory,
+        rollout = pkg.rollout,
+        appVersion = pkg.appVersion,
+        description = pkg.description,
+        tags = pkg.tags,
+      } = excludeNull(params);
 
-            const npkg = {
-              isDisabled,
-              isMandatory,
-              rollout,
-              appVersion,
-              description,
-              tags,
-            };
+      invalidRequest(
+        !(
+          params.rollout != null &&
+          (pkg.rollout != null && params.rollout < pkg.rollout)
+        ),
+        `Can not set rollout below existing rollout ${pkg.rollout}`
+      );
 
-            return dao
-              .updatePackage(deployment.key, npkg, params.label)
-              .tap(() =>
-                logger.info(
-                  { appId: app.id, deployment: params.deployment },
-                  "updated deployment"
-                )
-              );
-          })
+      const npkg = {
+        isDisabled,
+        isMandatory,
+        rollout,
+        appVersion,
+        description,
+        tags,
+      };
+
+      return dao
+        .updatePackage(deployment.key, npkg, params.label)
+        .tap(() =>
+          logger.info(
+            { appId: app.id, deployment: params.deployment },
+            "updated deployment"
+          )
         )
         .then(toJSON);
     },
