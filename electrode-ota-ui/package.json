@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-ui",
-  "version": "4.4.3",
+  "version": "4.4.6",
   "description": "Electrode OTA User Interface",
   "main": "dist/index",
   "electron": "dist/electron",

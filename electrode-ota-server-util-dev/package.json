@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-util-dev",
-  "version": "4.4.3",
+  "version": "4.4.6",
   "description": "",
   "main": "lib/index.js",
   "dependencies": {
