@@ -173,30 +173,6 @@ describe('model/acquisition', function () {
             });
         });
 
-        it('will return package not available if packageHash is unknown', () => {
-            return appBL.upload({
-                app: name,
-                email,
-                package: fs.readFileSync(__dirname + "/fixture/package.0.zip"),
-                deployment: 'Staging',
-                packageInfo: {
-                    description: 'Some zipped package',
-                }
-            }).then((pkg) => {
-                expect(pkg).not.to.be.undefined;
-                expect(pkg.packageHash).not.to.be.undefined;
-                return ac.updateCheck({
-                    deploymentKey: stagingKey,
-                    appVersion: '1.0.0',
-                    packageHash: 'packageThatDoesNotExist',
-                    clientUniqueId
-                }).then((result) => {
-                    expect(result).not.to.be.undefined;
-                    expect(result.isAvailable).to.eq(false);
-                });
-            });
-        });
-
         it('no update if package version is greater than latest package', () => {
             return appBL.upload({
                 app: name,
@@ -221,7 +197,7 @@ describe('model/acquisition', function () {
 
         it('no update if package is disabled', () => {
             return appBL.upload({
-                app:name,
+                app: name,
                 email,
                 package: 'Some disabled package',
                 deployment: 'Staging',

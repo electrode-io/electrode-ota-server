@@ -37,8 +37,8 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                 pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags);
 
                 let isNotAvailable = pkg.packageHash == params.packageHash || !('clientUniqueId' in params)
-                        || version.gt(params.appVersion, pkg.appVersion)
-                        || pkg.isDisabled;
+                    || version.gt(params.appVersion, pkg.appVersion)
+                    || pkg.isDisabled;
 
                 const appVersion = fixver(pkg.appVersion);
 
@@ -59,7 +59,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         "shouldRunBinaryVersion": false
                     };
                     if (isAvailable) {
-                        if (pkg.manifestBlobUrl && params.packageHash) {
+                        if (pkg.manifestBlobUrl) {
                             const diffPackageMap = pkg.diffPackageMap || {};
                             const partial = diffPackageMap[params.packageHash];
                             if (partial) {
@@ -70,12 +70,6 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                                 return dao.historyByIds(deployment.history_)
                                     .then(history => history.filter(v => v.packageHash == params.packageHash))
                                     .then(matches => {
-                                        if (matches.length == 0) {
-                                            // No history of packages matching this hash.  Return no update.
-                                            logger.warn("No history of package: ", params.packageHash);
-                                            ret.isAvailable = false;
-                                            return ret;
-                                        }
                                         return manifest(matches.concat(pkg)).then(v => {
                                             const newPackage = v[v.length - 1];
                                             return dao.updatePackage(deployment.key, newPackage).then((pkgLast) => {
