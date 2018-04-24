@@ -3,6 +3,9 @@
 CLEANUP=/tests/cleanup.sql
 TESTS=/tests/tests.sql
 
+echo "sleeping for 5 sec while seeding database"
+sleep 5s
+
 echo "executing cleanup sql"
 mysql --user=${MYSQL_USER} --password=${MYSQL_PASSWORD} ${MYSQL_DATABASE} < ${CLEANUP}
 rc=$?
