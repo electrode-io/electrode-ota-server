@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-errors",
-  "version": "4.4.10",
+  "version": "4.4.11",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -10,10 +10,10 @@
   },
   "dependencies": {
     "boom": "^4.3.1",
-    "electrode-ota-server-diregister": "^4.4.8",
-    "electrode-ota-server-util": "^4.4.10"
+    "electrode-ota-server-diregister": "^4.4.11",
+    "electrode-ota-server-util": "^4.4.11"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^4.4.8"
+    "electrode-ota-server-util-dev": "^4.4.11"
   }
 }
