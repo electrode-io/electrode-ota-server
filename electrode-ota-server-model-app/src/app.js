@@ -37,13 +37,20 @@ const hasDeploymentName = ({ deployments }, deployment) => {
   return deployment in deployments;
 };
 
-const packageContainsChanges = (deploymentInDb, uploadedContentPackageHash) => {
+const packageContainsChanges = (
+  deploymentInDb,
+  uploadedContentPackageHash,
+  appVersion
+) => {
   if (
     deploymentInDb &&
     deploymentInDb.package &&
     deploymentInDb.package.packageHash
   ) {
-    return uploadedContentPackageHash !== deploymentInDb.package.packageHash;
+    return (
+      uploadedContentPackageHash !== deploymentInDb.package.packageHash ||
+      appVersion !== deploymentInDb.package.appVersion
+    );
   }
   return true;
 };
@@ -265,7 +272,7 @@ export default (options, dao, upload, logger) => {
               notFound(
                 pkg,
                 `Deployment "${params.deployment}" has no package with label "${
-                params.label
+                  params.label
                 }"`
               );
             }
@@ -277,9 +284,9 @@ export default (options, dao, upload, logger) => {
               alreadyExistsMsg(
                 existingPackage.packageHash !== pkg.packageHash,
                 `Deployment ${params.deployment}:${
-                pkg.label
+                  pkg.label
                 } has already been promoted to ${params.to}:${
-                existingPackage.label
+                  existingPackage.label
                 }.`
               );
             }
@@ -310,7 +317,7 @@ export default (options, dao, upload, logger) => {
                 manifestBlobUrl: pkg.manifestBlobUrl,
                 size: pkg.size,
                 label: "v" + (t.history_ ? t.history_.length + 1 : 1),
-                tags: params.tags,
+                tags: params.tags
               })
               .tap(() => {
                 logger.info(
@@ -360,7 +367,7 @@ export default (options, dao, upload, logger) => {
         rollout = pkg.rollout,
         appVersion = pkg.appVersion,
         description = pkg.description,
-        tags = pkg.tags,
+        tags = pkg.tags
       } = excludeNull(params);
 
       invalidRequest(
@@ -377,7 +384,7 @@ export default (options, dao, upload, logger) => {
         rollout,
         appVersion,
         description,
-        tags,
+        tags
       };
 
       return dao
@@ -511,7 +518,7 @@ export default (options, dao, upload, logger) => {
           isMandatory = false,
           rollout = 100,
           appVersion = "1.0.0",
-          tags,
+          tags
         }
       } = vals;
 
@@ -533,7 +540,7 @@ export default (options, dao, upload, logger) => {
 
       const deployments = await dao.deploymentByApp(_app.id, deployment);
       alreadyExistsMsg(
-        packageContainsChanges(deployments, packageHash),
+        packageContainsChanges(deployments, packageHash, appVersion),
         "No changes detected in uploaded content for this deployment."
       );
 
