@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server",
-  "version": "4.4.8",
+  "version": "4.4.9",
   "main": "index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -12,7 +12,7 @@
     "babel-polyfill": "^6.23.0",
     "bluebird": "^3.5.1",
     "electrode-ota-server-boot": "^4.4.8",
-    "electrode-ota-server-default-config": "^4.4.8",
+    "electrode-ota-server-default-config": "^4.4.9",
     "electrode-server": "^1.2.2",
     "hapi": "^15.1.1"
   },

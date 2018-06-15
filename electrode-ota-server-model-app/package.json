@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-model-app",
-  "version": "4.4.8",
+  "version": "4.4.9",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
