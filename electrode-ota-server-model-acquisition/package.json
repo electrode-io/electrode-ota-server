@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-model-acquisition",
-  "version": "4.4.11",
+  "version": "4.4.12",
   "description": "OTA Acquistion Service",
   "main": "lib/index.js",
   "scripts": {
@@ -11,13 +11,13 @@
   },
   "dependencies": {
     "bluebird": "^3.5.1",
-    "electrode-ota-server-diregister": "^4.4.11",
-    "electrode-ota-server-util": "^4.4.11",
+    "electrode-ota-server-diregister": "^4.4.12",
+    "electrode-ota-server-util": "^4.4.12",
     "semver": "^5.3.0"
   },
   "devDependencies": {
-    "electrode-ota-server-dao-cassandra": "^4.4.11",
-    "electrode-ota-server-test-support": "^4.4.11",
-    "electrode-ota-server-util-dev": "^4.4.11"
+    "electrode-ota-server-dao-cassandra": "^4.4.12",
+    "electrode-ota-server-test-support": "^4.4.12",
+    "electrode-ota-server-util-dev": "^4.4.12"
   }
 }
