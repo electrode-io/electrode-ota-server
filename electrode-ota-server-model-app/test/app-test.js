@@ -264,6 +264,107 @@ describe("model/app", function() {
         })
       );
   });
+
+  it("disallow promote of same bundle", () => {
+    const email = "swaggychamp@gmail.com";
+    const appName = "disallowSameBundle";
+
+    return ac
+      .createApp({ email, name: appName })
+      .then(() =>
+        ac.upload({
+          app: appName,
+          email,
+          package: readFixture("step.0.blob.zip"),
+          deployment: "Staging",
+          packageInfo: {
+            description: "release me"
+          }
+        })
+      )
+      .then(() =>
+        ac.promoteDeployment({
+          app: appName,
+          email,
+          deployment: "Staging",
+          to: "Production"
+        })
+      )
+      .then(() =>
+        ac.promoteDeployment({
+          app: appName,
+          email,
+          deployment: "Staging",
+          to: "Production"
+        })
+      )
+      .then(
+        () => expect.fail("Should have failed"),
+        err =>
+          expect(err).to.have.property(
+            "message",
+            "Deployment Staging:v1 has already been promoted to Production:v1."
+          )
+      );
+  });
+
+  it("allow promote of same bundle for different app versions", () => {
+    const email = "swaggychamp@gmail.com";
+    const appName = "allowSameBundleDifferentAppVersion";
+    let firstLabel = "",
+      secondLabel = "";
+    return ac
+      .createApp({ email, name: appName })
+      .then(() =>
+        ac.upload({
+          app: appName,
+          email,
+          package: readFixture("step.0.blob.zip"),
+          deployment: "Staging",
+          packageInfo: {
+            description: "version 1",
+            appVersion: "1.0.0"
+          }
+        })
+      )
+      .then(dep => {
+        firstLabel = dep.label;
+      })
+      .then(() =>
+        ac.upload({
+          app: appName,
+          email,
+          package: readFixture("step.0.blob.zip"),
+          deployment: "Staging",
+          packageInfo: {
+            description: "version 2",
+            appVersion: "2.0.0"
+          }
+        })
+      )
+      .then(dep => {
+        secondLabel = dep.label;
+      })
+      .then(() =>
+        ac.promoteDeployment({
+          app: appName,
+          email,
+          deployment: "Staging",
+          to: "Production",
+          label: firstLabel
+        })
+      )
+      .then(() =>
+        ac.promoteDeployment({
+          app: appName,
+          email,
+          deployment: "Staging",
+          to: "Production",
+          label: secondLabel
+        })
+      );
+  });
+
   it("should rollback to last", () => {
     const email = "test@p.com";
     return ac

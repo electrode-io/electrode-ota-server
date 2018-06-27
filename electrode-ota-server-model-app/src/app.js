@@ -282,7 +282,8 @@ export default (options, dao, upload, logger) => {
             // check to make sure that it is not already promoted
             if (existingPackage) {
               alreadyExistsMsg(
-                existingPackage.packageHash !== pkg.packageHash,
+                existingPackage.packageHash !== pkg.packageHash ||
+                  existingPackage.appVersion !== pkg.appVersion,
                 `Deployment ${params.deployment}:${
                   pkg.label
                 } has already been promoted to ${params.to}:${
