@@ -93,7 +93,7 @@ const mapDispatchToProps = (dispatch, pps) => {
 			if (updateMetadata.isMandatory == null) {
 				updateMetadata.isMandatory = false;
 			}
-			if (updateMetadata.rollout >= 100 || current && current.label === label && current.rollout == updateMetadata.rollout) {
+			if (updateMetadata.rollout > 100 || current && current.label === label && current.rollout == updateMetadata.rollout) {
 				delete updateMetadata.rollout;
 			}
 			return _dispatch(patchRelease, this, {label, updateMetadata});
