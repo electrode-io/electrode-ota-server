@@ -371,6 +371,91 @@ describe('dao/cassandra', function () {
                 });
             });
         });
+        it("will return a release matching specified appVersion", () => {
+            const versionToCheck = "1.1.0";
+            const v1pkg = Object.assign({}, pkg1, {
+              appVersion: versionToCheck,
+              packageHash: "2930fj2j923892f9h9f831899182889hf",
+              label: "v1"
+            });
+            const v2pkg = Object.assign({}, v1pkg, {
+              appVersion: "1.2.0",
+              packageHash: "ABCDEFG",
+              label: "v2"
+            });
+            return dao
+              .addPackage(stagingKey, v1pkg)
+              .then(() => {
+                return dao.addPackage(stagingKey, v2pkg);
+              })
+              .then(() => {
+                return dao
+                  .getNewestApplicablePackage(stagingKey, [], versionToCheck)
+                  .then(release => {
+                    expect(release).not.be.undefined;
+                    expect(release.packageHash).to.eq(v1pkg.packageHash);
+                  });
+              });
+        });
+        it("will return latest release matching specified appVersion", () => {
+            const versionToCheck = "1.3.0";
+            const v1apkg = Object.assign({}, pkg1, {
+              appVersion: versionToCheck,
+              packageHash: "ABCDEF1234",
+              label: "v1"
+            });
+            const v1bpkg = Object.assign({}, v1apkg, {
+              appVersion: versionToCheck,
+              packageHash: "ABCDEF7890",
+              label: "v2"
+            });
+            const v2pkg = Object.assign({}, v1apkg, {
+              appVersion: "1.4.0",
+              packageHash: "EDCBA44321",
+              label: "v3"
+            });
+            return dao
+              .addPackage(stagingKey, v1apkg)
+              .then(() => {
+                return dao.addPackage(stagingKey, v1bpkg);
+              })
+              .then(() => {
+                return dao.addPackage(stagingKey, v2pkg);
+              })
+              .then(() => {
+                return dao
+                  .getNewestApplicablePackage(stagingKey, [], versionToCheck)
+                  .then(release => {
+                    expect(release).not.be.undefined;
+                    expect(release.packageHash).to.eq(v1bpkg.packageHash);
+                  });
+              });
+        });
+        it("will return undefined for unmatched appVersion", () => {
+            const versionToCheck = "1.8.0";
+            const v1pkg = Object.assign({}, pkg1, {
+              appVersion: "1.7.0",
+              packageHash: "ACEBDF135246",
+              label: "v1"
+            });
+            const v2pkg = Object.assign({}, pkg1, {
+              appVersion: "1.9.0",
+              packageHash: "A1C3E5B2D4F6",
+              label: "v2"
+            });
+            return dao
+              .addPackage(stagingKey, v1pkg)
+              .then(() => {
+                return dao.addPackage(stagingKey, v2pkg);
+              })
+              .then(() => {
+                return dao
+                  .getNewestApplicablePackage(stagingKey, [], versionToCheck)
+                  .then(release => {
+                    expect(release).to.be.undefined;
+                  });
+              });
+        });
     });
 });
 

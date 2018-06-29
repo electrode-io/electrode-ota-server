@@ -1069,7 +1069,7 @@ describe("Data Access via RDBMS", function () {
                 });
 
                 it("will return no package if there are no matching releases", () => {
-                    return dao.getNewestApplicablePackage(deplKey, undefined).then((newest) => {
+                    return dao.getNewestApplicablePackage(deplKey, undefined, undefined).then((newest) => {
                         expect(newest).to.be.undefined;
                     });
                 });
@@ -1091,7 +1091,7 @@ describe("Data Access via RDBMS", function () {
                     return dao.addPackage(deplKey, pkg1DTO).then((updated) => {
                         pkg1DTO.id = updated.id;
 
-                        return dao.getNewestApplicablePackage(deplKey, undefined).then((newest) => {
+                        return dao.getNewestApplicablePackage(deplKey, undefined, undefined).then((newest) => {
                             expect(newest).not.to.be.undefined;
                             if (newest) {
                                 expect(newest.id).to.eq(pkg1DTO.id);
@@ -1118,13 +1118,13 @@ describe("Data Access via RDBMS", function () {
 
                     return dao.addPackage(deplKey, pkg2DTO).then((updated) => {
                         pkg2DTO.id = updated.id;
-                        return dao.getNewestApplicablePackage(deplKey, undefined).then((newest) => {
+                        return dao.getNewestApplicablePackage(deplKey, undefined, undefined).then((newest) => {
                             expect(newest).not.to.be.undefined;
                             if (newest) {
                                 expect(newest.id).to.eq(pkg1DTO.id);
                             }
                         }).then(() => {
-                            return dao.getNewestApplicablePackage(deplKey, ["TAG-3"]).then((newest) => {
+                            return dao.getNewestApplicablePackage(deplKey, ["TAG-3"], undefined).then((newest) => {
                                 expect(newest).not.to.be.undefined;
                                 if (newest) {
                                     expect(newest.id).to.eq(pkg1DTO.id);
@@ -1135,7 +1135,7 @@ describe("Data Access via RDBMS", function () {
                 });
 
                 it("will return a release with tags if at least one incoming tag matches", () => {
-                    return dao.getNewestApplicablePackage(deplKey, ["TAG-1", "TAG-3"]).then((newest) => {
+                    return dao.getNewestApplicablePackage(deplKey, ["TAG-1", "TAG-3"], undefined).then((newest) => {
                         expect(newest).not.to.be.undefined;
                         if (newest) {
                             expect(newest.id).to.eq(pkg2DTO.id);
@@ -1166,7 +1166,7 @@ describe("Data Access via RDBMS", function () {
 
                         */
 
-                        return dao.getNewestApplicablePackage(deplKey, ["TAG-2"]).then((newest) => {
+                        return dao.getNewestApplicablePackage(deplKey, ["TAG-2"], undefined).then((newest) => {
                             expect(newest).not.to.be.undefined;
                             if (newest) {
                                 expect(newest.id).to.eq(pkg2DTO.id);
@@ -1212,7 +1212,7 @@ describe("Data Access via RDBMS", function () {
 
                             */
 
-                            return dao.getNewestApplicablePackage(deplKey, []).then((newest) => {
+                            return dao.getNewestApplicablePackage(deplKey, [], undefined).then((newest) => {
                                 expect(newest).not.to.be.undefined;
                                 if (newest) {
                                     expect(newest.id).to.eq(pkg4DTO.id);
@@ -1221,6 +1221,102 @@ describe("Data Access via RDBMS", function () {
                         });
                     });
                 });
+                it('will return release matching specified appVersion', () => {
+                    const versionToCheck = "1.1.0";
+                    let v1pkg = new PackageDTO();
+                    Object.assign(v1pkg, pkg1DTO, {
+                      appVersion: versionToCheck,
+                      packageHash: "2930fj2j923892f9h9f831899182889hf",
+                      label: "v1"
+                    });
+                    let v2pkg = new PackageDTO();
+                    Object.assign(v2pkg, v1pkg, {
+                      appVersion: "1.2.0",
+                      packageHash: "ABCDEFG",
+                      label: "v2"
+                    });
+                    return dao
+                      .addPackage(deplKey, v1pkg)
+                      .then(() => {
+                        return dao.addPackage(deplKey, v2pkg);
+                      })
+                      .then(() => {
+                        return dao
+                          .getNewestApplicablePackage(deplKey, [], versionToCheck)
+                          .then(release => {
+                            expect(release).not.be.undefined;
+                            if (release) {
+                                expect(release.packageHash).to.eq(v1pkg.packageHash);
+                            }
+                          });
+                      });
+                });
+                it('will return latest release matching specified appVersion', () => {
+                    const versionToCheck = "1.3.0";
+                    let v1apkg = new PackageDTO();
+                    Object.assign(v1apkg, pkg1DTO, {
+                      appVersion: versionToCheck,
+                      packageHash: "ABCDEF1234",
+                      label: "v1"
+                    });
+                    let v1bpkg = new PackageDTO();
+                    Object.assign(v1bpkg, v1apkg, {
+                      appVersion: versionToCheck,
+                      packageHash: "ABCDEF7890",
+                      label: "v2"
+                    });
+                    let v2pkg = new PackageDTO();
+                    Object.assign(v2pkg, v1apkg, {
+                      appVersion: "1.4.0",
+                      packageHash: "EDCBA44321",
+                      label: "v3"
+                    });
+                    return dao
+                      .addPackage(deplKey, v1apkg)
+                      .then(() => {
+                        return dao.addPackage(deplKey, v1bpkg);
+                      })
+                      .then(() => {
+                        return dao.addPackage(deplKey, v2pkg);
+                      })
+                      .then(() => {
+                        return dao
+                          .getNewestApplicablePackage(deplKey, [], versionToCheck)
+                          .then(release => {
+                            expect(release).not.be.undefined;
+                            if (release) {
+                                expect(release.packageHash).to.eq(v1bpkg.packageHash);
+                            }
+                          });
+                      });
+                });
+                it('will return undefined for unmatched appVersion', () => {
+                    const versionToCheck = "1.8.0";
+                    let v1pkg = new PackageDTO();
+                    Object.assign(v1pkg, pkg1DTO, {
+                      appVersion: "1.7.0",
+                      packageHash: "ACEBDF135246",
+                      label: "v1"
+                    });
+                    let v2pkg = new PackageDTO();
+                    Object.assign(v2pkg, pkg1DTO, {
+                      appVersion: "1.9.0",
+                      packageHash: "A1C3E5B2D4F6",
+                      label: "v2"
+                    });
+                    return dao
+                      .addPackage(deplKey, v1pkg)
+                      .then(() => {
+                        return dao.addPackage(deplKey, v2pkg);
+                      })
+                      .then(() => {
+                        return dao
+                          .getNewestApplicablePackage(deplKey, [], versionToCheck)
+                          .then(release => {
+                            expect(release).is.undefined;
+                          });
+                      });
+                })
             });
         });
 

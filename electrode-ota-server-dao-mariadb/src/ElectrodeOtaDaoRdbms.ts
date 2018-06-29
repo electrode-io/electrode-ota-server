@@ -204,9 +204,10 @@ export default class ElectrodeOtaDaoRdbms implements IElectrodeOtaDao {
     }
 
     public async getNewestApplicablePackage(deploymentKey: string,
-                                            tags: string[] | undefined): Promise<PackageDTO | void> {
+                                            tags: string[] | undefined,
+                                            appVersion: string | undefined): Promise<PackageDTO | void> {
         return this.connectAndExecute<PackageDTO | void>((conection) => {
-            return PackageDAO.getNewestApplicablePackage(conection, deploymentKey, tags);
+            return PackageDAO.getNewestApplicablePackage(conection, deploymentKey, tags, appVersion);
         });
     }
 

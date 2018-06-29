@@ -86,6 +86,27 @@ const Mock = {
 
 const ifExists = (result) => result.first().get('[applied]') != false;
 
+const matchTags = (desiredTags, currentTags) => {
+  if (!desiredTags || !desiredTags.length === 0) {
+    // no desired tags, tags match if existing has no tags as well
+    return !currentTags || currentTags.length === 0;
+  } else {
+    if (currentTags) {
+      // matches if a desired tag is in the current tags
+      for (let j = 0; j < desiredTags.length; j++) {
+        if (currentTags.indexOf(desiredTags[j]) >= 0) return true;
+      }
+    } else {
+      // no current tags, matches everyone
+      return true;
+    }
+  }
+  return false;
+};
+
+const matchVersions = (wantVersion, existingVersion) =>
+  !wantVersion || wantVersion === existingVersion;
+
 
 export default class DaoExpressCassandra {
     //these are just here for autocomplete.
@@ -307,37 +328,25 @@ export default class DaoExpressCassandra {
      *
      * @param {*} deploymentKey string - the deployment key of the app on the device
      * @param {*} tags string[] - the list of tags the device has sent
+     * @param {*} appVersion string - appVersion of package to match
      */
-    async getNewestApplicablePackage(deploymentKey, tags) {
+    async getNewestApplicablePackage(deploymentKey, tags, appVersion) {
         const packageHashes = await this._historyForDeployment(deploymentKey);
         if (packageHashes && packageHashes.length > 0) {
             let packages = await this.Package.findAsync({ id_: within(packageHashes) });
             packages = historySort(packages);
 
-            if (!tags || tags.length === 0) {
-                // if the caller does not pass in tags, give back the
-                // newest release that has no tags
-                for (let i = 0; i < packages.length; i++) {
-                    let pkg = packages[i];
-                    if (!pkg.tags || pkg.tags.length === 0) {
-                        return pkg;
-                    }
+            for (let i = 0; i < packages.length; i++) {
+                let pkg = packages[i];
+                let tagsDoMatch = matchTags(tags, pkg.tags);
+                let versionsDoMatch = matchVersions(appVersion, pkg.appVersion);
+                if (tagsDoMatch && versionsDoMatch) {
+                    return pkg;
                 }
-            } else {
-                // caller passed in tags
-                for (let i = 0; i < packages.length; i++) {
-                    let pkg = packages[i];
-                    if (pkg.tags) {
-                        for (let j = 0; j < tags.length; j++) {
-                            if (pkg.tags.indexOf(tags[j]) >= 0) {
-                                return pkg;
-                            }
-                        }
-                    } else {
-                        // if there are no tags on a package, then it is available for everyone
-                        return pkg;
-                    }
-                }
+            }
+            if ((!tags || tags.length === 0) && (!appVersion)) {
+                // if no tag or version, return latest
+                return packages[0];
             }
         }
     }
