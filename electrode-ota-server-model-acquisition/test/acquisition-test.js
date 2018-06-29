@@ -195,6 +195,43 @@ describe('model/acquisition', function () {
             });
         });
 
+        it('pick the appropriate package for the given appversion', () => {
+            let pkg1_1, pkg1_2;
+            return appBL.upload({
+                app: name,
+                email,
+                package: 'Package Content v1.0.0 goes here',
+                deployment: 'Staging',
+                packageInfo: {
+                    description: 'Content for v1.0.0',
+                    appVersion: '1.0.0'
+                }
+            }).then((pkg) => {
+                pkg1_1 = pkg;
+                return appBL.upload({
+                    app: name,
+                    email,
+                    package: 'Package Content v1.2.0 goes here',
+                    deployment: 'Staging',
+                    packageInfo: {
+                        description: 'Content for v1.2.0',
+                        appVersion: '1.2.0'
+                    }
+                })
+            }).then((pkg) => {
+                pkg1_2 = pkg;
+                return ac.updateCheck({
+                    deploymentKey: stagingKey,
+                    appVersion: '1.0.0',
+                    packageHash: 'ABCD',
+                    clientUniqueId
+                });
+            }).then((result) => {
+                expect(result.isAvailable).to.be.true;
+                expect(result.packageHash).to.eq(pkg1_1.packageHash);
+            })
+        });
+
         it('no update if package is disabled', () => {
             return appBL.upload({
                 app: name,

@@ -34,7 +34,19 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                     }
                 }
 
-                pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags);
+                pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags, params.appVersion);
+
+                if(!pkg) {
+                    // no package match, use latest version that matches tag
+                    pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags);
+                    if (!pkg) {
+                        // no package matching tag
+                        return {
+                            isAvailable: false,
+                            shouldRunBinaryVersion: false
+                        }
+                    }
+                }
 
                 let isNotAvailable = pkg.packageHash == params.packageHash || !('clientUniqueId' in params)
                     || version.gt(params.appVersion, pkg.appVersion)

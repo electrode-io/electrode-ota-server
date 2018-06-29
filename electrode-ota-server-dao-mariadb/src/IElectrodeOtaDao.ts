@@ -35,7 +35,7 @@ export interface IElectrodeOtaDao {
     packageById(packageId: number): Promise<PackageDTO>;
     addPackage(deploymentKey: string, packageInfo: PackageDTO): Promise<PackageDTO>;
     updatePackage(deploymentKey: string, packageInfo: any, label: string): Promise<PackageDTO>;
-    getNewestApplicablePackage(deploymentKey: string, tags: string[] | undefined): Promise<PackageDTO | void>;
+    getNewestApplicablePackage(deploymentKey: string, tags: string[] | undefined, appVersion: string | undefined): Promise<PackageDTO | void>;
 
     history(appId: number, deploymentName: string): Promise<PackageDTO[]>;
     historyByIds(historyIds: number[]): Promise<PackageDTO[]>;

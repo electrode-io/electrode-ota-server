@@ -38,11 +38,41 @@ export const PackageQueries = {
                                     WHERE dph.package_id = pt.package_id)
 
                                     ORDER BY 2 DESC`,
+    getMostRecentPackageIdByDeploymentAndTagsAndVersion : `SELECT dph.package_id, p.create_time
+                                    FROM deployment_package_history dph, package_tag pt, package p
+                                    WHERE dph.deployment_id = ?
+                                    AND p.id = dph.package_id
+                                    AND p.app_version = ?
+                                    AND dph.package_id = pt.package_id
+                                    AND pt.tag_name IN (?)
 
+                                    UNION
+
+                                    SELECT dph.package_id, p.create_time
+                                    FROM deployment_package_history dph, package p
+                                    WHERE dph.deployment_id = ?
+                                    AND dph.package_id = p.id
+                                    AND NOT EXISTS
+                                    (SELECT 1
+                                    FROM package_tag pt
+                                    WHERE dph.package_id = pt.package_id)
+
+                                    ORDER BY 2 DESC`,
     getMostRecentPackageIdByDeploymentNoTags : `SELECT dph.package_id, p.create_time
                                                 FROM deployment_package_history dph, package p
                                                 WHERE dph.deployment_id = ?
                                                 AND dph.package_id = p.id
+                                                AND NOT EXISTS
+                                                (SELECT 1
+                                                FROM package_tag pt
+                                                WHERE dph.package_id = pt.package_id)
+
+                                                ORDER BY 2 DESC`,
+    getMostRecentPackageIdByDeploymentNoTagsAndVersion : `SELECT dph.package_id, p.create_time
+                                                FROM deployment_package_history dph, package p
+                                                WHERE dph.deployment_id = ?
+                                                AND dph.package_id = p.id
+                                                AND p.app_version = ?
                                                 AND NOT EXISTS
                                                 (SELECT 1
                                                 FROM package_tag pt
