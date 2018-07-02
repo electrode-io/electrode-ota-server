@@ -20,3 +20,5 @@ ALTER TABLE metric ADD INDEX idx_metric_create_time (create_time);
 --changeset awhelms:electrode_ota_db_0_0_8 dbms:mysql
 ALTER TABLE metric MODIFY COLUMN app_version VARCHAR(64);
 ALTER TABLE metric MODIFY COLUMN label VARCHAR(64);
+
+ALTER TABLE metric ADD INDEX idx_metric_status (status);

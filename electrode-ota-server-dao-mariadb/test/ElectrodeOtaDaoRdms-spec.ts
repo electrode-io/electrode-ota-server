@@ -9,7 +9,7 @@ import MyDAO from "./MyDAO";
 
 import { clearTables } from "./ClearTables";
 
-import { AppDTO, MetricInDTO, MetricOutDTO, PackageDTO, UserDTO } from "../src/dto";
+import { AppDTO, MetricInDTO, MetricOutDTO, MetricByStatusOutDTO, PackageDTO, UserDTO } from "../src/dto";
 
 import Encryptor from "../src/Encryptor";
 
@@ -1553,6 +1553,73 @@ describe("Data Access via RDBMS", function () {
                         }
                     });
                 });
+            });
+
+            describe("metrics summary", () => {
+                const appVersion = "0.0.1";
+                const clientUniqueId = "1290jf02f20j032j92f9n39238929212c2c2";
+                const label = "v1";
+                const status = "DeploymentSucceeded";
+
+                before(() => {
+                    const metricData = [
+                        {label: "v1", appVersion: "1.0.0", status: "DeploymentSucceeded"},
+                        {label: "v1", appVersion: "1.0.0", status: "DeploymentSucceeded"},
+                        {label: "v1", appVersion: "1.0.0", status: "DeploymentFailed"},
+                        {label: "v1", appVersion: "1.1.0", status: "DeploymentFailed"},
+                        {label: "v2", appVersion: "1.0.0", status: "Downloaded"},
+                        {label: "v2", appVersion: "1.0.0", status: "Downloaded"},
+                        {label: "v2", appVersion: "1.2.0", status: "DeploymentSucceeded"},
+                        {label: "v3", appVersion: "1.2.0", status: "DeploymentFailed"},
+                        {label: "v3", appVersion: "1.1.0", status: "DeploymentSucceeded"},
+                        {label: "v2", appVersion: "1.0.0", status: "Downloaded"},
+                        {label: "v3", appVersion: "1.1.0", status: "DeploymentSucceeded"},
+                        {label: "v3", appVersion: "1.2.0", status: "DeploymentFailed"},
+
+                    ]
+                    let p = [];
+                    for(let i=0; i<metricData.length; i++) {
+                        const metricIn = new MetricInDTO();
+                        metricIn.label = metricData[i].label;
+                        metricIn.appVersion = metricData[i].appVersion;
+                        metricIn.status = metricData[i].status;
+
+                        metricIn.deploymentKey = prodDeploymentKey;
+                        metricIn.clientUniqueId = clientUniqueId;
+                        p.push(dao.insertMetric(metricIn));
+                    }
+                    return Promise.all(p);
+                });
+                it("will throw an error if the deployment key is not found", () => {
+                    return dao.metricsByStatus("SomeJunkKey").catch((err) => {
+                        expect(err).not.to.be.undefined;
+                        expect(err.toString()).to.contain("Not found");
+                    });
+                });
+                it("fetch summary of metrics for a deployment", () => {
+                    const assertCount = (list:MetricByStatusOutDTO[], label:string, version:string, status:string, total:number) => {
+                        const found = list.find((item) => {
+                            return item.label.toString() === label &&
+                                item.appversion.toString() === version &&
+                                item.status.toString() === status;
+                        });
+                        console.log(found);
+                        expect(found).not.to.be.undefined;
+                        if (found)
+                            expect(found.total).to.eq(total);
+                    }
+                    return dao.metricsByStatus(prodDeploymentKey).then((metrics) => {
+                        expect(metrics).not.to.be.undefined;
+                        expect(metrics.length).to.be.eq(7);
+                        assertCount(metrics, "v1", "1.0.0", "DeploymentSucceeded", 2);
+                        assertCount(metrics, "v1", "1.0.0", "DeploymentFailed", 1);
+                        assertCount(metrics, "v1", "1.1.0", "DeploymentFailed", 1);
+                        assertCount(metrics, "v2", "1.0.0", "Downloaded", 3);
+                        assertCount(metrics, "v2", "1.2.0", "DeploymentSucceeded", 1);
+                        assertCount(metrics, "v3", "1.1.0", "DeploymentSucceeded", 2);
+                        assertCount(metrics, "v3", "1.2.0", "DeploymentFailed", 2);
+                    })
+                })
             });
         });
 

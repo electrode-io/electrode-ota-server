@@ -1,6 +1,6 @@
 import { IConnection } from "mysql";
 
-import { MetricInDTO, MetricOutDTO } from "../dto";
+import { MetricInDTO, MetricOutDTO, MetricByStatusOutDTO } from "../dto";
 
 import { DeploymentQueries, MetricQueries } from "../queries";
 
@@ -38,6 +38,27 @@ export default class MetricDAO extends BaseDAO {
             dto.status = result.status;
             dto.previousdeploymentkey = result.previous_deployment_key;
             dto.previouslabelorappversion = result.previous_label_or_app_version;
+            return dto;
+        });
+    }
+
+    public static async metricsByStatus(connection: IConnection, deploymentKey: string): Promise<MetricByStatusOutDTO[]> {
+        const depResults = await MetricDAO.query(connection, DeploymentQueries.getDeploymentByKey, [deploymentKey]);
+
+        if (!depResults || depResults.length === 0) {
+            throw new Error("Not found. no deployment found for key [" + deploymentKey + "]");
+        }
+        const metricResults = await MetricDAO.query(connection, MetricQueries.getMetricsForDeploymentByStatus,
+            [depResults[0].id]);
+        return metricResults.map((result: any) => {
+            const dto = new MetricByStatusOutDTO();
+            dto.deploymentkey = deploymentKey;
+            dto.appversion = result.app_version;
+            dto.label = result.label;
+            dto.status = result.status;
+            dto.previousdeploymentkey = result.previous_deployment_key;
+            dto.previouslabelorappversion = result.previous_label_or_app_version;
+            dto.total = result.total;
             return dto;
         });
     }
