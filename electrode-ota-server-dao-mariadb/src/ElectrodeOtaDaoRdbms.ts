@@ -14,7 +14,8 @@ import { AppDTO,
          MetricInDTO,
          MetricOutDTO,
          PackageDTO,
-         UserDTO } from "./dto";
+         UserDTO,
+         MetricByStatusOutDTO} from "./dto";
 import { IElectrodeOtaDao } from "./IElectrodeOtaDao";
 import { AccessKeyQueries, UserQueries } from "./queries";
 
@@ -265,6 +266,12 @@ export default class ElectrodeOtaDaoRdbms implements IElectrodeOtaDao {
         return this.connectAndExecute((connection) => {
             return MetricDAO.metrics(connection, deploymentKey);
         });
+    }
+
+    public async metricsByStatus(deploymentKey: string): Promise<MetricByStatusOutDTO[]> {
+        return this.connectAndExecute((connection) => {
+            return MetricDAO.metricsByStatus(connection, deploymentKey);
+        })
     }
 
     // UPLOAD / DOWNLOAD functions ===========

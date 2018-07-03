@@ -25,9 +25,9 @@ const APP = {
 
 describe("model/app", function() {
   this.timeout(50000);
-  let account, ac;
+  let account, ac, dao;
   before(async () => {
-    const dao = await initDao();
+    dao = await initDao();
     let w = 0;
     account = accountFactory({}, dao, console);
     const up = upload({}, dao);
@@ -1089,6 +1089,53 @@ describe("model/app", function() {
         expect(v1.isMandatory).to.be.true;
         expect(v1.appVersion).to.eq("1.0.0");
         expect(v1.tags).to.have.members(["blue"]);
+      });
+  });
+
+  it("retrieve metrics", () => {
+    const appName = "metricsApp";
+    const email = "metricsApp@walmart.com";
+    const deployment = "Staging";
+    let deploymentKey;
+    return ac
+      .createApp({ email, name: appName })
+      .then(app => dao.deploymentByApp(app.id, "Staging"))
+      .then(deployment => {
+        deploymentKey = deployment.key;
+      })
+      .then(() => {
+        const data = [
+          { label: "v1", appversion: "1.0.0", status: "Downloaded" },
+          { label: "v1", appversion: "1.0.0", status: "DeploymentSucceeded" },
+          { label: "v1", appversion: "1.0.0", status: "DeploymentSucceeded" },
+          { label: "v1", appversion: "1.0.0", status: "Downloaded" },
+          { label: "v1", appversion: "1.0.0", status: "DeploymentFailed" }
+        ];
+        return Promise.all(
+          data.map(d =>
+            dao.insertMetric({
+              clientUniqueId: "ABC",
+              deploymentKey,
+              status: d.status,
+              label: d.label,
+              appversion: d.appversion
+            })
+          )
+        );
+      })
+      .then(() =>
+        ac.metrics({
+          email,
+          app: appName,
+          deployment
+        })
+      )
+      .then(metrics => {
+        console.log(metrics);
+        expect(metrics["v1"].active).to.eq(2);
+        expect(metrics["v1"].downloaded).to.eq(2);
+        expect(metrics["v1"].installed).to.eq(2);
+        expect(metrics["v1"].failed).to.eq(1);
       });
   });
 });

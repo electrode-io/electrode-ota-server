@@ -3,6 +3,7 @@ import ClientRatioDTO from "./ClientRatioDTO";
 import DeploymentDTO from "./DeploymentDTO";
 import MetricInDTO from "./MetricInDTO";
 import MetricOutDTO from "./MetricOutDTO";
+import MetricByStatusOutDTO from "./MetricByStatusOutDTO";
 import PackageDTO from "./PackageDTO";
 import UserDTO from "./UserDTO";
 
@@ -12,6 +13,7 @@ export {
     DeploymentDTO,
     MetricInDTO,
     MetricOutDTO,
+    MetricByStatusOutDTO,
     PackageDTO,
     UserDTO,
 };

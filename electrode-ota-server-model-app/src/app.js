@@ -611,46 +611,40 @@ export default (options, dao, upload, logger) => {
           "deployment"
         );
         return dao.deploymentByApp(app.id, params.deployment).then(deployment =>
-          dao.metrics(deployment.key).then((metrics = []) => {
+          dao.metricsByStatus(deployment.key).then((metrics = []) => {
             const { label } = deployment.package || {};
             //    "DeploymentSucceeded" |  "DeploymentFailed" |  "Downloaded";
 
-            logger.info({ deployment: params.deployment }, "fetched metrics");
+            logger.info({ deployment: params.deployment }, "fetched metrics by status");
 
-            return metrics.reduce((obj, val) => {
+            return metrics.reduce((accumulator, val) => {
               const key = val.label || val.appversion;
-              const ret =
-                obj[key] ||
-                (obj[key] = {
-                  active: 0,
-                  downloaded: 0,
-                  installed: 0,
-                  failed: 0
-                });
+              const ret = accumulator[key] || (accumulator[key] = {
+                active: 0,
+                downloaded: 0,
+                installed: 0,
+                failed: 0
+              });
               switch (val.status) {
                 case "DeploymentSucceeded":
-                  ret.active++;
+                  ret.active += val.total;
                   if (label === val.label) {
                     //pervious deployment is no longer active.
-                    /*                                    obj[val.previouslabelorappversion] || (obj[val.previouslabelorappversion] = {
-                                     active: 0,
-                                     downloaded: 0,
-                                     installed: 0,
-                                     failed: 0
-                                     });*/
-                    if (obj[val.previouslabelorappversion])
-                      obj[val.previouslabelorappversion].active--;
+                    if (accumulator[val.previouslabelorappversion])
+                    {
+                      accumulator[val.previouslabelorappversion].active -= val.total;
+                    }
                   }
-                  ret.installed++;
+                  ret.installed += val.total;
                   break;
                 case "DeploymentFailed":
-                  ret.failed++;
+                  ret.failed += val.total;
                   break;
                 case "Downloaded":
-                  ret.downloaded++;
+                  ret.downloaded += val.total;
                   break;
               }
-              return obj;
+              return accumulator;
             }, {});
           })
         );
