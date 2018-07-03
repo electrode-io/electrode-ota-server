@@ -1131,11 +1131,87 @@ describe("model/app", function() {
         })
       )
       .then(metrics => {
-        console.log(metrics);
         expect(metrics["v1"].active).to.eq(2);
         expect(metrics["v1"].downloaded).to.eq(2);
         expect(metrics["v1"].installed).to.eq(2);
         expect(metrics["v1"].failed).to.eq(1);
+      });
+  });
+
+  it("metrics should not have negative active count", () => {
+    const appName = "negativeMetrics";
+    const email = "negativeMetrics@walmart.com";
+    const deployment = "Staging";
+    let deploymentKey;
+    return ac
+      .createApp({ email, name: appName })
+      .then(app => dao.deploymentByApp(app.id, deployment))
+      .then(deployment => {
+        deploymentKey = deployment.key;
+        return ac.upload({
+          app: appName,
+          email,
+          package: "Package of v1",
+          deployment: "Staging",
+          packageInfo: {
+            label: "v1"
+          }
+        });
+      })
+      .then(() => {
+        const data = [
+          {
+            status: "DeploymentSucceeded",
+            label: "v1",
+            appversion: "1.0.0",
+            previouslabelorappversion: "1.0.0"
+          },
+          {
+            status: "DeploymentSucceeded",
+            label: "v1",
+            appversion: "1.0.0",
+            previouslabelorappversion: "1.0.0"
+          },
+          {
+            status: "DeploymentSucceeded",
+            label: "v1",
+            appversion: "1.0.0",
+            previouslabelorappversion: "1.0.0"
+          },
+          {
+            status: "DeploymentSucceeded",
+            label: "1.0.0",
+            appversion: "1.0.0",
+            previouslabelorappversion: "0.0.0"
+          }
+        ];
+        return Promise.all(
+          data.map(d =>
+            dao.insertMetric({
+              clientUniqueId: "DEF",
+              deploymentKey,
+              status: d.status,
+              label: d.label,
+              appversion: d.appversion,
+              previouslabelorappversion: d.previouslabelorappversion
+            })
+          )
+        );
+      })
+      .then(() =>
+        ac.metrics({
+          email,
+          app: appName,
+          deployment
+        })
+      )
+      .then(metrics => {
+        expect(metrics["v1"].active).to.eq(3);
+        // active should not go negative
+        expect(metrics["1.0.0"].active).to.eq(0);
+        expect(metrics["1.0.0"].downloaded).to.eq(0);
+        expect(metrics["1.0.0"].installed).to.eq(1);
+        expect(metrics["1.0.0"].failed).to.eq(0);
       });
   });
 });

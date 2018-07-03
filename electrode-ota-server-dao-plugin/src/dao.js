@@ -559,16 +559,16 @@ export default class DaoExpressCassandra {
       let grouped = metrics.reduce((accumulator, val) => {
         // group by status, label, appversion, previouslydeploymentkey, previouslabeyorappversion
         const key = `${val.status}:${val.label}:${val.appversion}:${
-          val.previousDeploymentKey
-        }:${val.previousLabelOrAppVersion}`;
+          val.previousdeploymentkey
+        }:${val.previouslabelorappversion}`;
         const match =
           accumulator[key] ||
           (accumulator[key] = {
             status: val.status,
             label: val.label,
             appversion: val.appversion,
-            previousDeploymentKey: val.previousDeploymentKey,
-            previousLabelOrAppVersion: val.previousLabelOrAppVersion,
+            previousdeploymentkey: val.previousdeploymentkey,
+            previouslabelorappversion: val.previouslabelorappversion,
             total: 0
           });
         match.total++;
