@@ -52,6 +52,7 @@ export const PackageQueries = {
                                     FROM deployment_package_history dph, package p
                                     WHERE dph.deployment_id = ?
                                     AND dph.package_id = p.id
+                                    AND p.app_version = ?
                                     AND NOT EXISTS
                                     (SELECT 1
                                     FROM package_tag pt
