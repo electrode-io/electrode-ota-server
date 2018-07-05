@@ -1,7 +1,7 @@
-import manage from '../util/manage';
-import {replace} from '../history';
+import manage from "../util/manage";
+import { replace } from "../history";
 
-export default function sdkAction({dispatch, getState}) {
+export default function sdkAction({ dispatch, getState }) {
 	return next => action => {
 		const {
 			type,
@@ -16,7 +16,7 @@ export default function sdkAction({dispatch, getState}) {
 
 		if (exec == true || !(method && receiveType)) {
 			// Normal action: pass it on
-			return next(action)
+			return next(action);
 		}
 
 		dispatch({
@@ -24,27 +24,34 @@ export default function sdkAction({dispatch, getState}) {
 			value
 		});
 
-		const m = manage(authorization.host && authorization.host.replace(/\/+?$/, ''), authorization.token);
+		const m = manage(
+			authorization.host && authorization.host.replace(/\/+?$/, ""),
+			authorization.token
+		);
 
 		const resp = m[method].apply(m, value || []).then(
-			resolve => dispatch(({
-				...payload,
-				value: resolve,
-				type: receiveType
-			})),
-			reject => dispatch(({
-				...payload,
-				error: reject || {message: 'An Error Occurred'},
-				isError: true,
-				type: receiveType
-			}))
+			resolve =>
+				dispatch({
+					...payload,
+					request: value,
+					value: resolve,
+					type: receiveType
+				}),
+			reject =>
+				dispatch({
+					...payload,
+					error: reject || { message: "An Error Occurred" },
+					isError: true,
+					request: value,
+					type: receiveType
+				})
 		);
 		if (navigateTo) {
 			resp.then(resp => {
 				if (!(resp && resp.isError)) replace(navigateTo);
 				return resp;
-			})
+			});
 		}
 		return resp;
-	}
+	};
 }

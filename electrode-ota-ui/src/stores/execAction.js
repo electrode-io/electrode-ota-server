@@ -1,4 +1,4 @@
-export default (executor)=>({dispatch, getState})=> next => action => {
+export default executor => ({ dispatch, getState }) => next => action => {
 	const {
 		type,
 		method,
@@ -13,7 +13,7 @@ export default (executor)=>({dispatch, getState})=> next => action => {
 
 	if (exec !== true) {
 		// Normal action: pass it on
-		return next(action)
+		return next(action);
 	}
 
 	dispatch({
@@ -21,28 +21,31 @@ export default (executor)=>({dispatch, getState})=> next => action => {
 		value
 	});
 
-
 	const resp = executor[method](authorization, releaseDir, value || [], {
-		log(...args){
+		log(...args) {
 			console.log(...args);
-			dispatch({type: notifyType, message: args.join(' ')})
+			dispatch({ type: notifyType, message: args.join(" ") });
 		},
-		error(...args){
+		error(...args) {
 			console.error(...args);
-			dispatch({type: notifyType, isError: true, error: args.join(' ')})
+			dispatch({ type: notifyType, isError: true, error: args.join(" ") });
 		}
 	}).then(
-		value => dispatch(({
-			...payload,
-			value,
-			type: receiveType
-		})),
-		error => dispatch(({
-			...payload,
-			error,
-			isError: true,
-			type: receiveType
-		}))
+		responseValue =>
+			dispatch({
+				...payload,
+				request: value,
+				value: responseValue,
+				type: receiveType
+			}),
+		error =>
+			dispatch({
+				...payload,
+				error,
+				isError: true,
+				request: value,
+				type: receiveType
+			})
 	);
 	return resp;
-}
+};
