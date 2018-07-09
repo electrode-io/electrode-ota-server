@@ -391,14 +391,15 @@ describe('managment-sdk', function () {
                         (e, o) => e ? reject(e) : resolve(o)
                     )))
                     .then(_ => am.getDeploymentMetrics(name, 'Staging'))
-                    .then(expected({
-                        "v1": {
+                    .then(r => {
+                      expect(r["v1"]).to.eql({
                             "active": 1,
                             "downloaded": 1,
                             "failed": 0,
                             "installed": 1
-                        }
-                    })));
+                        });
+                    })
+                );
         });
 
 

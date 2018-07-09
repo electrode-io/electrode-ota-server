@@ -615,24 +615,37 @@ export default (options, dao, upload, logger) => {
             const { label } = deployment.package || {};
             //    "DeploymentSucceeded" |  "DeploymentFailed" |  "Downloaded";
 
-            logger.info({ deployment: params.deployment }, "fetched metrics by status");
+            logger.info(
+              { deployment: params.deployment },
+              "fetched metrics by status"
+            );
 
-            return metrics.reduce((accumulator, val) => {
+            let summary = metrics.reduce((accumulator, val) => {
               const key = val.label || val.appversion;
-              const ret = accumulator[key] || (accumulator[key] = {
-                active: 0,
-                downloaded: 0,
-                installed: 0,
-                failed: 0
-              });
+              const ret =
+                accumulator[key] ||
+                (accumulator[key] = {
+                  active: 0,
+                  downloaded: 0,
+                  installed: 0,
+                  failed: 0
+                });
               switch (val.status) {
                 case "DeploymentSucceeded":
                   ret.active += val.total;
                   if (label === val.label) {
-                    //pervious deployment is no longer active.
-                    if (accumulator[val.previouslabelorappversion])
-                    {
-                      accumulator[val.previouslabelorappversion].active -= val.total;
+                    //previous deployment is no longer active.
+                    if (accumulator[val.previouslabelorappversion]) {
+                      accumulator[val.previouslabelorappversion].active -=
+                        val.total;
+                    } else {
+                      // metrics is not ordered, so previous label not necessary in accumulator yet
+                      accumulator[val.previouslabelorappversion] = {
+                        active: -val.total,
+                        downloaded: 0,
+                        installed: 0,
+                        failed: 0
+                      };
                     }
                   }
                   ret.installed += val.total;
@@ -646,6 +659,12 @@ export default (options, dao, upload, logger) => {
               }
               return accumulator;
             }, {});
+            for (let k in summary) {
+              // Zero out negative active counts.
+              // Negative counts can occur if the previous active < current active
+              summary[k].active = summary[k].active > 0 ? summary[k].active : 0;
+            }
+            return summary;
           })
         );
       });
