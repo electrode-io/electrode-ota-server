@@ -78,7 +78,7 @@ export default class PackageDAO extends BaseDAO {
         const allParams:{[key:string]:any} = {
             "tags-noversion": [deploymentId, tags, deploymentId],
             "notags-noversion": [deploymentId],
-            "tags-version": [deploymentId, appVersion, tags, deploymentId],
+            "tags-version": [deploymentId, appVersion, tags, deploymentId, appVersion],
             "notags-version": [deploymentId, appVersion]
         }
         const key = `${useTags}-${useVersion}`;
