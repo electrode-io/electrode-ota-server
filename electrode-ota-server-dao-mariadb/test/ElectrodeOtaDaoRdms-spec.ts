@@ -54,8 +54,10 @@ const testDBConfig = {
 };
 
 const stageDeploymentKey = "qjPVRyntQQrKJhkkNbVJeULhAIfVtHaBDfCFggzL";
+const intlStageDeploymentKey = "aoh0u3u9u0uoihaoshdfhh9842234Fdkap30";
 const prodDeploymentKey = "PutMeonDyCkrSQWnbOqFnawEAwRteuxCZPeGhshl";
 const STAGING = "Staging";
+const INTLSTAGING = "IntlStaging";
 const PROD = "Production";
 const packageHash =
   "0848a9900dc54d5e88c90d39a7454b1b64a3557b337b9dadf6c20de5ed305182";
@@ -1522,8 +1524,9 @@ describe("Data Access via RDBMS", function() {
       });
     });
 
-    describe("history-related metohds", () => {
+    describe("history-related methods", () => {
       describe("history", () => {
+        
         it("will throw an error if app not found", () => {
           return dao.history(-100, "stuff").catch(err => {
             expect(err).not.to.be.undefined;
@@ -1535,6 +1538,33 @@ describe("Data Access via RDBMS", function() {
           return dao.history(appId, "strange deployment name").catch(err => {
             expect(err).not.to.be.undefined;
             expect(err.toString()).to.contain("Not found");
+          });
+        });
+
+        it("will return the correct packages if deployment names are similar", () => {
+          return dao.addDeployment(appId, INTLSTAGING, { key : intlStageDeploymentKey }).then((dep) => {
+            const pkg6 = new PackageDTO();
+            pkg6.appVersion = "7.7.7";
+            pkg6.blobUrl = "http://stuff.com/pkg...";
+            pkg6.description = "Plus Ultra!";
+            pkg6.isDisabled = false;
+            pkg6.isMandatory = false;
+            pkg6.label = "v1";
+            pkg6.manifestBlobUrl = "http://stuff.com/manifest...";
+            pkg6.packageHash = packageHash;
+            pkg6.releasedBy = "testUser";
+            pkg6.releaseMethod = "Upload";
+            pkg6.rollout = 100;
+            pkg6.size = 12908201;
+            pkg6.tags = ["TAG-10", "TAG-11", "TAG-12", "TAG-13", "TAG-14"];
+            return dao.addPackage(intlStageDeploymentKey, pkg6).then(() => {
+              return dao.history(appId, INTLSTAGING).then((packages) => {
+                expect(packages).not.to.be.undefined;
+                expect(packages.length).to.be.eq(1);
+                expect(packages[0].description).to.equal("Plus Ultra!");
+                expect(packages[0].appVersion).to.equal("7.7.7");
+              });
+            });
           });
         });
 

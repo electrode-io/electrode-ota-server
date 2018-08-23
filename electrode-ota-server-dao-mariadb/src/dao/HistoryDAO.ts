@@ -73,7 +73,7 @@ export default class HistoryDAO extends BaseDAO {
     }
 
     private static async getDeploymentByAppAndName(connection: IConnection, appId: number,
-                                                   deploymentName: string): Promise<DeploymentDTO> {
+                                                   deploymentName: any): Promise<DeploymentDTO> {
         const appDeployments = await DeploymentDAO.getDeploymentsByApp(connection, appId);
         if (appDeployments.length === 0) {
             throw new Error("Not found. No deployments found for appId [" + appId + "]");
@@ -81,7 +81,8 @@ export default class HistoryDAO extends BaseDAO {
 
         const deployment = appDeployments.find((dep) => {
             // apparently sometimes he's gonna pass it in as an array with only one element. :-/
-            return dep.name === deploymentName || deploymentName.indexOf(dep.name) >= 0;
+            return dep.name === deploymentName || (deploymentName instanceof Array
+                && deploymentName.indexOf(dep.name) >= 0);
         });
 
         if (!deployment) {
