@@ -111,20 +111,23 @@ export default class PackageDAO extends BaseDAO {
     }
 
     public static async updatePackage(connection: IConnection, deploymentKey: string,
-        packageInfo: any, label: string): Promise<PackageDTO> {
+                                      packageInfo: any, label: string): Promise<PackageDTO> {
+
         const deployment = await DeploymentDAO.deploymentForKey(connection, deploymentKey);
+        let pkgId = packageInfo.id;
+        if (!pkgId) {
+            const history = await HistoryDAO.historyForDeployment(connection, deployment.id);
 
-        const history = await HistoryDAO.historyForDeployment(connection, deployment.id);
+            if (!history || history.length === 0) {
+                throw new Error("Not found. no deployment-package history for deployment key [" + deploymentKey + "]");
+            }
 
-        if (!history || history.length === 0) {
-            throw new Error("Not found. no deployment-package history for deployment key [" + deploymentKey + "]");
-        }
-
-        let pkgId = history[0].package_id;
-        if (label) {
-            const found = history.find((h: any) => h.label === label);
-            if (found) {
-                pkgId = found.package_id;
+            pkgId = history[0].package_id;
+            if (label) {
+                const found = history.find((h: any) => h.label === label);
+                if (found) {
+                    pkgId = found.package_id;
+                }
             }
         }
 

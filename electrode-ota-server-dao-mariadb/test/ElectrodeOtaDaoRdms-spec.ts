@@ -1059,6 +1059,37 @@ describe("Data Access via RDBMS", function() {
             });
         });
 
+        it("will update a specific package if the package id is in package info", () => {
+          return dao.deploymentForKey(stageDeploymentKey).then((dep) => {
+            // We assert that the latest package in the deployment has a version of 0.0.3
+            expect(dep.package).to.not.be.undefined;
+            expect(dep.package.appVersion).to.equal("0.0.3");
+            return dao.history(appId, STAGING).then((hist) => {
+              // We also assert that there are 2 packages in this deployment
+              // If we pass the id in the update info, it should update that package
+              // NOT the latest package in the deployment.
+              expect(hist.length).to.equal(2);
+              expect(hist[1].description).to.equal("my new uploaded package");
+              const updateInfo = {
+                appVersion: "0.0.1",
+                description: "One for All",
+                id: hist[1].id,
+                isDisabled: true,
+                isMandatory: true,
+                rollout: 94,
+              };
+              return dao.updatePackage(stageDeploymentKey, updateInfo, "").then((updated) => {
+                expect(updated).to.not.be.undefined;
+                return dao.history(appId, STAGING).then((updatedHist) => {
+                  expect(updatedHist[0].appVersion).to.equal("0.0.3");
+                  expect(updatedHist[1].appVersion).to.equal("0.0.1");
+                  expect(updatedHist[1].description).to.equal("One for All");
+                });
+              });
+            });
+          });
+        });
+
         it("will add and/or remove diffPackageMaps", () => {
           // create a new package
           const newPkgHash = "2390f29j2jf892hf92n289nc29";
