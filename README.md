@@ -117,6 +117,8 @@ To run a package test...
 > yarn test
 ```
 
+To run a sample app, check the example app in the example folder.
+
 Apache-2.0 © WalmartLabs
 <br>
 Built with :heart: by [Team Electrode](https://github.com/orgs/electrode-io/people) @WalmartLabs.
