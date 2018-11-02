@@ -2,14 +2,14 @@
   "lerna": "2.0.0-rc.3",
   "packages": [
     "electrode-ota-server*",
-    "example*",
-    "electrode-ota-ui*"
+    "electrode-ota-ui*",
+    "example*"
   ],
   "publish": {
     "ignore": [
       "example-*"
     ]
   },
-  "version": "4.4.17",
+  "version": "4.4.18",
   "npmClient": "yarn"
 }
