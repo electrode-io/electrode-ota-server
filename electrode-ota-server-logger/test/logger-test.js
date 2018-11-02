@@ -2,7 +2,6 @@ import { loggerFactory, noOp } from "../src";
 import { expect } from "chai";
 import intercept from "intercept-stdout";
 import Promise from "bluebird";
-import { executionAsyncId } from "async_hooks";
 
 describe("loggerFactory", function() {
   this.timeout(10000);
