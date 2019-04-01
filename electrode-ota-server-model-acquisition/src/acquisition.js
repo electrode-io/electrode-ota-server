@@ -21,6 +21,9 @@ export default (options, dao, weighted, _download, manifest, logger) => {
 
             missingParameter(params.deploymentKey, `Deployment key missing`);
             missingParameter(params.appVersion, `appVersion missing`);
+            if (!version.valid(params.appVersion, { loose: true })) {
+                params.appVersion = version.coerce(params.appVersion).toString();
+            }
 
             return dao.deploymentForKey(params.deploymentKey).then(async deployment => {
                 let pkg = deployment && deployment.package;
@@ -35,7 +38,6 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                 }
 
                 pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags, params.appVersion);
-
                 if(!pkg) {
                     // no package match, use latest version that matches tag
                     pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags);
@@ -47,7 +49,6 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         }
                     }
                 }
-
                 let isNotAvailable = pkg.packageHash == params.packageHash || !('clientUniqueId' in params)
                     || version.gt(params.appVersion, pkg.appVersion)
                     || pkg.isDisabled;

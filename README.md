@@ -97,6 +97,11 @@ Likewise, you can set the timeout if upload is timing out.
 To run tests, make sure you have `localhost.walmart.com` mapped to 127.0.0.1 loopback.
 Make sure you have cassandra installed. Cassandra is required for testings.
 
+```sh
+> docker pull cassandra
+> docker run -p 9042:9042 cassandra
+```
+
 To build..
 
 ```
