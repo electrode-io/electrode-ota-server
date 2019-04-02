@@ -254,6 +254,33 @@ describe('model/acquisition', function () {
                     expect(result.isAvailable).to.be.false;
                 })
             })
-        })
+        });
+
+        it("shortened appVersion is ok", () => {
+            return appBL
+              .upload({
+                app: name,
+                email,
+                package: "Some package content",
+                deployment: "Staging",
+                packageInfo: {
+                  description: "Some package",
+                  appVersion: "1.0.0"
+                }
+              })
+              .then((pkg) => {
+                return ac
+                  .updateCheck({
+                    deploymentKey: stagingKey,
+                    appVersion: "1.0",
+                    packageHash: "ABCD",
+                    clientUniqueId
+                  })
+                  .then((result) => {
+                    expect(result.isAvailable).true;
+                    expect(result.packageHash).eq(pkg.packageHash);
+                  });
+              });
+        });
     });
 });

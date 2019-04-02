@@ -265,6 +265,30 @@ describe("model/app", function() {
       );
   });
 
+  it("should upload with short version 2.0", () => {
+    const email = "test@short_version.com";
+    return ac.createApp({email, name: "short_version"})
+      .then(_ => ac.upload({
+        app: "short_version",
+        email,
+        package: `Some package content`,
+        packageInfo: {
+          appVersion: "2.0",
+          description: "Short app-version test"
+        }
+      }))
+      .then(_ => ac.historyDeployment({
+        app: "short_version",
+        deployment: "Staging",
+        email
+      }))
+      .then(pkg => {
+        expect(pkg.length).eq(1);
+        expect(pkg[0].appVersion).eq("2.0.0");
+        expect(pkg[0].description).eq("Short app-version test")
+      });
+  });
+
   it("disallow promote of same bundle", () => {
     const email = "swaggychamp@gmail.com";
     const appName = "disallowSameBundle";

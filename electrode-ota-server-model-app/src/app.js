@@ -6,6 +6,8 @@ import {
 } from "electrode-ota-server-model-manifest/lib/manifest";
 import { shasum } from "electrode-ota-server-util";
 
+import version from 'semver';
+
 import {
   alreadyExists,
   alreadyExistsMsg,
@@ -507,7 +509,7 @@ export default (options, dao, upload, logger) => {
          */
 
     async upload(vals) {
-      const {
+      let {
         app,
         email,
         deployment = "Staging",
@@ -522,6 +524,9 @@ export default (options, dao, upload, logger) => {
           tags
         }
       } = vals;
+      if (!version.valid(appVersion, { loose: true })) {
+        appVersion = version.coerce(appVersion).toString();
+      }
 
       const _app = await api.findApp({ email, app });
 

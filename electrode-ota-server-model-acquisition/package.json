@@ -14,7 +14,7 @@
     "electrode-ota-server-diregister": "^4.4.15",
     "electrode-ota-server-errors": "^4.4.17",
     "electrode-ota-server-util": "^4.4.17",
-    "semver": "^5.3.0"
+    "semver": "^5.6.0"
   },
   "devDependencies": {
     "electrode-ota-server-dao-cassandra": "^4.4.17",
