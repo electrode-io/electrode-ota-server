@@ -45,7 +45,7 @@
   ],
   "devDependencies": {
     "@types/chai": "^4.0.4",
-    "@types/lodash": "^4.14.76",
+    "@types/lodash": "4.14.108",
     "@types/mocha": "^2.2.42",
     "@types/mysql": "0.0.34",
     "chai": "^4.1.1",
@@ -62,7 +62,7 @@
     "bluebird": "^3.5.1",
     "electrode-ota-server-diregister": "^4.4.19",
     "electrode-ota-server-util": "^4.4.19",
-    "lodash": "^4.17.4",
+    "lodash": "4.17.5",
     "mysql": "^2.14.1"
   }
 }
