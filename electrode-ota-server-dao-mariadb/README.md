@@ -57,3 +57,8 @@ Run tests in this directory
 ```js
 % npm run test
 ```
+
+Run build (compiles typescript)
+```js
+% npm run build
+```
