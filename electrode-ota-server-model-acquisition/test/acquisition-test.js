@@ -282,5 +282,78 @@ describe('model/acquisition', function () {
                   });
               });
         });
+
+        it("test upload shortened appVersion", () => {
+            return appBL.upload({
+                app:name,
+                email,
+                package: "Pkkk",
+                deployment: "Staging",
+                packageInfo: {
+                    description: "Package info desc",
+                    appVersion: "19.14"
+                }
+            }).then((pkg) => {
+                return ac.updateCheck({
+                    deploymentKey: stagingKey,
+                    appVersion: "19.14",
+                    packageHash: "ABCD",
+                    clientUniqueId
+                })
+                .then((result) => {
+                    expect(result.isAvailable).true;
+                    expect(result.packageHash).eq(pkg.packageHash);
+                    expect(result.appVersion).eq("19.14.0");
+                })
+            })
+        })
+        it("appVersion with prerelease works", () => {
+            return appBL
+                .upload({
+                    app: name,
+                    email,
+                    package: "Some pkg content",
+                    deployment: "Staging",
+                    packageInfo: {
+                        description: "test qa-debug",
+                        appVersion: "3.2.0-qa-debug.2"
+                    }
+                })
+                .then((pkg) => {
+                    return ac.updateCheck({
+                        deploymentKey: stagingKey,
+                        appVersion: "3.2.0-qa-debug.1",
+                        packageHash: "ABCD",
+                        clientUniqueId
+                    })
+                    .then((result) => {
+                        expect(result.isAvailable).true;
+                        expect(result.packageHash).eq(pkg.packageHash);
+                        expect(result.appVersion).eq("3.2.0-qa-debug.2");
+                    })
+                    .then(() => {
+                        return ac.updateCheck({
+                            deploymentKey: stagingKey,
+                            appVersion: "3.2.1-qa-debug.1",
+                            packageHash: "ABZCD",
+                            clientUniqueId
+                        })
+                        .then(result => {
+                            expect(result.isAvailable).false;
+                        })
+                    })
+                    .then(() => {
+                        return ac.updateCheck({
+                            deploymentKey: stagingKey,
+                            appVersion: "3.2.0-qa-debug.3",
+                            packageHash: "OLSFE",
+                            clientUniqueId
+                        })
+                        .then(result => {
+                            expect(result.isAvailable).false;
+                        })
+                    })
+                });
+        })
     });
 });

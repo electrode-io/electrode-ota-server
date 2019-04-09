@@ -1,6 +1,6 @@
 import { missingParameter } from 'electrode-ota-server-errors';
 import version from 'semver';
-const fixver = (ver) => ver ? ('' + ver).replace(/^(\d+?)$/, '$1.0.0') : '0.0.0';
+const fixver = (ver) => ver ? ('' + ver).replace(/^(\d+).*$/, '$1.0.0') : '0.0.0';
 
 export default (options, dao, weighted, _download, manifest, logger) => {
     const api = {
@@ -61,7 +61,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         downloadURL: pkg.blobUrl,
                         isAvailable,
                         isMandatory: pkg.isMandatory,
-                        appVersion,
+                        appVersion: pkg.appVersion,
                         label: pkg.label,
                         packageSize,
                         packageHash: pkg.packageHash,
