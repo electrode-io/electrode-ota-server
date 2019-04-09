@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-dao-mariadb",
-  "version": "4.4.19",
+  "version": "4.4.20",
   "description": "Electrode OTA - MariaDB driver",
   "author": "Anthony Helms <awhelms@wal-mart.com>",
   "license": "Apache-2.0",
