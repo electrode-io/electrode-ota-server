@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset awhelms:electrode_ota_db_0_0_1 dbms:mysql
+--changeset awhelms:electrode_ota_db_0_0_1 dbms:mariadb
 CREATE TABLE client_ratio (
 	client_unique_id VARCHAR(128) NOT NULL,
 	package_id MEDIUMINT UNSIGNED NOT NULL,

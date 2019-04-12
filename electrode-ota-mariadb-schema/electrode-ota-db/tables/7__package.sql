@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset awhelms:electrode_ota_db_0_0_1 dbms:mysql
+--changeset awhelms:electrode_ota_db_0_0_1 dbms:mariadb
 CREATE TABLE package (
 	id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	app_version VARCHAR(64) NOT NULL,
@@ -23,13 +23,13 @@ CREATE TABLE package (
 	CONSTRAINT fk_orig_deployment_for_package FOREIGN KEY (original_deployment_key) REFERENCES deployment (deployment_key)
 );
 
---changeset awhelms:electrode_ota_db_0_0_3 dbms:mysql
+--changeset awhelms:electrode_ota_db_0_0_3 dbms:mariadb
 ALTER TABLE package MODIFY COLUMN size BIGINT UNSIGNED;
 
---changeset awhelms:electrode_ota_db_0_0_7 dbms:mysql
+--changeset awhelms:electrode_ota_db_0_0_7 dbms:mariadb
 ALTER TABLE package ADD INDEX idx_package_hash (package_hash);
 ALTER TABLE package DROP FOREIGN KEY fk_orig_deployment_for_package;
 ALTER TABLE package CHANGE COLUMN original_deployment_key original_deployment_name VARCHAR(128) NULL;
 
---changeset awhelms:electrode_ota_db_0_0_11 dbms:mysql
+--changeset awhelms:electrode_ota_db_0_0_11 dbms:mariadb
 ALTER TABLE package ADD COLUMN update_time DATETIME(3) DEFAULT CURRENT_TIMESTAMP;

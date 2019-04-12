@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset djergin:electrode_ota_db_0_0_1 dbms:mysql
+--changeset djergin:electrode_ota_db_0_0_1 dbms:mariadb
 CREATE TABLE package_tag (
     id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     tag_name VARCHAR(256) NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE package_tag (
     CONSTRAINT fk_package_id_pkg_tags FOREIGN KEY (package_id) REFERENCES package (id) 
 );
 
---changeset awhelms:electrode_ota_db_0_0_10 dbms:mysql
+--changeset awhelms:electrode_ota_db_0_0_10 dbms:mariadb
 ALTER TABLE package_tag DROP FOREIGN KEY fk_deployment_id_pkg_tags;
 ALTER TABLE package_tag DROP INDEX idx_deployment_package_tag;
 ALTER TABLE package_tag DROP COLUMN deployment_id;
