@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset awhelms:electrode_ota_db_0_0_1 dbms:mysql
+--changeset awhelms:electrode_ota_db_0_0_1 dbms:mariadb
 CREATE TABLE access_key (
 	id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	user_id MEDIUMINT UNSIGNED NOT NULL,

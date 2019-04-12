@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset awhelms:electrode_ota_db_0_0_1 dbms:mysql
+--changeset awhelms:electrode_ota_db_0_0_1 dbms:mariadb
 CREATE TABLE deployment_package_history (
 	deployment_id MEDIUMINT UNSIGNED NOT NULL,
 	package_id MEDIUMINT UNSIGNED NOT NULL,
@@ -10,5 +10,5 @@ CREATE TABLE deployment_package_history (
 	CONSTRAINT fk_package_id_dpl_hist FOREIGN KEY (package_id) REFERENCES package (id)
 );
 
---changeset awhelms:electrode_ota_db_0_0_4 dbms:mysql
+--changeset awhelms:electrode_ota_db_0_0_4 dbms:mariadb
 ALTER TABLE deployment_package_history ADD COLUMN create_time DATETIME DEFAULT CURRENT_TIMESTAMP;

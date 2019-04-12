@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset awhelms:electrode_ota_db_0_0_1 dbms:mysql
+--changeset awhelms:electrode_ota_db_0_0_1 dbms:mariadb
 CREATE TABLE app_permission (
 	app_id MEDIUMINT UNSIGNED,
 	user_id MEDIUMINT UNSIGNED,

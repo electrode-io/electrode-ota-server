@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset awhelms:electrode_ota_db_0_0_1 dbms:mysql
+--changeset awhelms:electrode_ota_db_0_0_1 dbms:mariadb
 CREATE TABLE metric (
 	deployment_id MEDIUMINT UNSIGNED NOT NULL,
 	app_version VARCHAR(64) NOT NULL,
@@ -13,11 +13,11 @@ CREATE TABLE metric (
 	INDEX idx_metric_deployment_id (deployment_id)
 );
 
---changeset awhelms:electrode_ota_db_0_0_6 dbms:mysql
+--changeset awhelms:electrode_ota_db_0_0_6 dbms:mariadb
 ALTER TABLE metric ADD COLUMN create_time DATETIME DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE metric ADD INDEX idx_metric_create_time (create_time);
 
---changeset awhelms:electrode_ota_db_0_0_8 dbms:mysql
+--changeset awhelms:electrode_ota_db_0_0_8 dbms:mariadb
 ALTER TABLE metric MODIFY COLUMN app_version VARCHAR(64);
 ALTER TABLE metric MODIFY COLUMN label VARCHAR(64);
 

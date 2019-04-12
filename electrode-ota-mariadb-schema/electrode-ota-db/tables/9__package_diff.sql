@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset awhelms:electrode_ota_db_0_0_1 dbms:mysql
+--changeset awhelms:electrode_ota_db_0_0_1 dbms:mariadb
 CREATE TABLE package_diff (
 	left_package_id MEDIUMINT UNSIGNED NOT NULL,
 	right_package_id MEDIUMINT UNSIGNED NOT NULL,
@@ -12,5 +12,5 @@ CREATE TABLE package_diff (
 	CONSTRAINT fk_right_package_idff FOREIGN KEY (left_package_id) REFERENCES package (id)
 );
 
---changeset awhelms:electrode_ota_db_0_0_5 dbms:mysql
+--changeset awhelms:electrode_ota_db_0_0_5 dbms:mariadb
 ALTER TABLE package_diff MODIFY COLUMN size BIGINT UNSIGNED;
