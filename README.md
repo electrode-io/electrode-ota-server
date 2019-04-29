@@ -29,13 +29,13 @@ Likewise, you can set the timeout if upload is timing out.
 
 ```json
 "electrode-ota-server-routes-apps" : {
-            options : {
-                payload : {
-                    maxBytes : 94371840,
-                    timeout: 119999
-                }
-            }
+    "options" : {
+        "payload" : {
+            "maxBytes" : 94371840,
+            "timeout": 119999
         }
+    }
+}
 ```
 
 ## Releases
