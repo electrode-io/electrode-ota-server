@@ -1,0 +1,10 @@
+version: '3'
+services:
+  ota-demo:
+    build: .
+    links:
+      - "cassandra-db"
+    ports:
+      - "9001:9001"
+  cassandra-db:
+    image: "cassandra:3.9"

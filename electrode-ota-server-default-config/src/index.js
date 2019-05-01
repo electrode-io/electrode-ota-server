@@ -136,7 +136,7 @@ export default function () {
                             "auth": "github-oauth",
                             "label": "GitHub",
                             "icon": {
-                                "src": "https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png",
+                                "src": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
                                 "height": 50,
                                 "width": 50
                             }

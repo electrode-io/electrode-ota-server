@@ -22,21 +22,10 @@ For configuration instructions visit the [electrode.io](http://www.electrode.io/
  npm i electrode-ota-server
 ```
 
-## Upload Size and Timeout
+## Example
 
-To increase the max upload size, add this to your configuration:
-Likewise, you can set the timeout if upload is timing out.
+Check the `example` folder.  See the [Readme](example/README.md)
 
-```json
-"electrode-ota-server-routes-apps" : {
-    "options" : {
-        "payload" : {
-            "maxBytes" : 94371840,
-            "timeout": 119999
-        }
-    }
-}
-```
 
 ## Releases
 ### Version 4.3.0
@@ -194,6 +183,40 @@ Package content is saved to the specified datastore (MariaDB or Cassandra).  If 
         "module": "my-object-store",
         "options": { "upload": false }
     }
+```
+
+
+## HowTos
+
+#### Upload Size and Timeout
+
+To increase the max upload size, add this to your configuration:
+Likewise, you can set the timeout if upload is timing out.
+
+```json
+"electrode-ota-server-routes-apps" : {
+    "options" : {
+        "payload" : {
+            "maxBytes" : 94371840,
+            "timeout": 119999
+        }
+    }
+}
+```
+
+#### Change log level
+Update the log level in the options of electrode-ota-server-logger
+
+```json
+{
+    "plugins": {
+        "electrode-ota-server-logger": {
+            "options": {
+                "level": "info"
+            }
+        }
+    }
+}
 ```
 
 Apache-2.0 © WalmartLabs
