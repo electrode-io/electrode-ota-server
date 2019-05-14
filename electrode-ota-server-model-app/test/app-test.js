@@ -1038,6 +1038,35 @@ describe("model/app", function() {
       });
   });
 
+  it("should updateDeployment short appVersion", () => {
+    const email = "short-version@walmart.com";
+    const appName = "updateDeploymentWithShortVersion";
+    return ac
+      .createApp({ email, name: appName })
+      .then(() =>
+        ac.upload({
+          app: appName,
+          email,
+          package: "Package for 19.18",
+          deployment: "Staging",
+          packageInfo: {
+            description: "v1 description",
+            appVersion: "19.18"
+          }
+        })
+      ).then(() => ac.updateDeployment({
+        app:appName,
+        email,
+        description: "v1 updated description",
+        deployment: "Staging",
+        appVersion: "19.18"
+      })).then(updated => {
+        expect(updated).not.undefined;
+        expect(updated.description).eq("v1 updated description");
+        expect(updated.appVersion).eq("19.18.0");
+      })
+  });
+
   it("updateDeployment should not copy from latest", () => {
     const email = "joesmoe@walmart.com";
     const appName = "updateDeployementDoesNotCopy";

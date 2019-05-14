@@ -151,6 +151,9 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                             previousLabelOrAppVersion,
                             previousDeploymentKey
                             }*/ metric) {
+            if (metric.appVersion && !version.valid(metric.appVersion, { loose: true })) {
+                metric.appVersion = version.coerce(metric.appVersion).toString();
+            }
             return dao.insertMetric(metric)
                 .tap(() => logger.info({ depoymentKey: metric.deploymentKey, label: metric.label, status: metric.status }, "recorded deployment status"));
         },
