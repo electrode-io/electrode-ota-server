@@ -356,4 +356,46 @@ describe('model/acquisition', function () {
                 });
         })
     });
+
+    describe("deployReportStatus", () => {
+        const email = 'test@unit-test.com';
+        const name = 'TestDeployStatusApp';
+        let stagingKey = '';
+        let clientUniqueId = '198u2irjwekhr1j901';
+
+        before(() => {
+            return appBL.createApp({ email, name }).then((a) => {
+                return dao.deploymentByApp(a.id, 'Staging').then((deployment) => {
+                    stagingKey = deployment.key;
+                });
+            });
+        });
+        it("report from shortened appVersion", () => {
+            return appBL.upload({
+                app: name,
+                email,
+                package: "Pkg appy",
+                deployment: "Staging",
+                packageInfo: {
+                    description: "Some shortened version",
+                    appVersion: "19.14"
+                }
+            }).then(pkg => {
+                const metric = {
+                    appVersion: "19.14",
+                    deploymentKey: stagingKey,
+                    clientUniqueId,
+                    label: "Blahblah",
+                    status: "good",
+                    previousLabelOrAppVersion: "19.13",
+                    previousDeploymentKey: stagingKey
+                };
+                return ac.deployReportStatus(metric);
+            }).then(() => dao.metrics(stagingKey))
+            .then(metrics => {
+                expect(metrics.length).eq(1);
+                expect(metrics[0].appversion).eq("19.14.0");
+            })
+        })
+    });
 });
