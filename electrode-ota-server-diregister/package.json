@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-diregister",
-  "version": "4.4.19",
+  "version": "4.4.21",
   "description": "Additional Dependency for Electrode OTA",
   "main": "lib/index.js",
   "author": "",
