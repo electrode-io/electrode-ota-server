@@ -1,6 +1,5 @@
 import { missingParameter } from 'electrode-ota-server-errors';
 import version from 'semver';
-const fixver = (ver) => ver ? ('' + ver).replace(/^(\d+).*$/, '$1.0.0') : '0.0.0';
 
 export default (options, dao, weighted, _download, manifest, logger) => {
     const api = {
@@ -21,9 +20,6 @@ export default (options, dao, weighted, _download, manifest, logger) => {
 
             missingParameter(params.deploymentKey, `Deployment key missing`);
             missingParameter(params.appVersion, `appVersion missing`);
-            if (!version.valid(params.appVersion, { loose: true })) {
-                params.appVersion = version.coerce(params.appVersion).toString();
-            }
 
             return dao.deploymentForKey(params.deploymentKey).then(async deployment => {
                 let pkg = deployment && deployment.package;
@@ -49,11 +45,12 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         }
                     }
                 }
-                let isNotAvailable = pkg.packageHash == params.packageHash || !('clientUniqueId' in params)
-                    || version.gt(params.appVersion, pkg.appVersion)
-                    || pkg.isDisabled;
+                const pkgAppVersion = version.coerce(pkg.appVersion, true).toString();
+                const paramAppVersion = version.coerce(params.appVersion, true).toString();
 
-                const appVersion = fixver(pkg.appVersion);
+                let isNotAvailable = pkg.packageHash == params.packageHash || !('clientUniqueId' in params)
+                    || version.gt(paramAppVersion, pkgAppVersion)
+                    || pkg.isDisabled;
 
                 function makeReturn(isAvailable) {
                     const packageSize = pkg && pkg.size && (pkg.size - 0) || 0;
@@ -67,7 +64,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         packageHash: pkg.packageHash,
                         description: pkg.description,
                         // true == there is an update but it requires a newer binary version.
-                        "updateAppVersion": version.lt(fixver(params.appVersion), appVersion),
+                        "updateAppVersion": version.lt(paramAppVersion, pkgAppVersion),
                         //TODO - find out what this should be
                         "shouldRunBinaryVersion": false
                     };
@@ -151,9 +148,6 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                             previousLabelOrAppVersion,
                             previousDeploymentKey
                             }*/ metric) {
-            if (metric.appVersion && !version.valid(metric.appVersion, { loose: true })) {
-                metric.appVersion = version.coerce(metric.appVersion).toString();
-            }
             return dao.insertMetric(metric)
                 .tap(() => logger.info({ depoymentKey: metric.deploymentKey, label: metric.label, status: metric.status }, "recorded deployment status"));
         },

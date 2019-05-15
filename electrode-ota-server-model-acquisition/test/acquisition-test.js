@@ -303,57 +303,32 @@ describe('model/acquisition', function () {
                 .then((result) => {
                     expect(result.isAvailable).true;
                     expect(result.packageHash).eq(pkg.packageHash);
-                    expect(result.appVersion).eq("19.14.0");
+                    expect(result.appVersion).eq("19.14");
                 })
             })
-        })
-        it("appVersion with prerelease works", () => {
-            return appBL
-                .upload({
-                    app: name,
-                    email,
-                    package: "Some pkg content",
-                    deployment: "Staging",
-                    packageInfo: {
-                        description: "test qa-debug",
-                        appVersion: "3.2.0-qa-debug.2"
-                    }
+        });
+
+        it("test updateAppVersion", () => {
+            return appBL.upload({
+                app: name,
+                email,
+                package: "Lower package",
+                deployment: "Staging",
+                packageInfo: {
+                    description: "Lower package description",
+                    appVersion: "20.2.1"
+                }
+            }).then(pkg => {
+                return ac.updateCheck({
+                    deploymentKey: stagingKey,
+                    appVersion: "18.1.1",
+                    packageHash: "ABCD",
+                    clientUniqueId
+                }).then(result => {
+                    expect(result.updateAppVersion).true;
+                    expect(result.appVersion).eq("20.2.1");
                 })
-                .then((pkg) => {
-                    return ac.updateCheck({
-                        deploymentKey: stagingKey,
-                        appVersion: "3.2.0-qa-debug.1",
-                        packageHash: "ABCD",
-                        clientUniqueId
-                    })
-                    .then((result) => {
-                        expect(result.isAvailable).true;
-                        expect(result.packageHash).eq(pkg.packageHash);
-                        expect(result.appVersion).eq("3.2.0-qa-debug.2");
-                    })
-                    .then(() => {
-                        return ac.updateCheck({
-                            deploymentKey: stagingKey,
-                            appVersion: "3.2.1-qa-debug.1",
-                            packageHash: "ABZCD",
-                            clientUniqueId
-                        })
-                        .then(result => {
-                            expect(result.isAvailable).false;
-                        })
-                    })
-                    .then(() => {
-                        return ac.updateCheck({
-                            deploymentKey: stagingKey,
-                            appVersion: "3.2.0-qa-debug.3",
-                            packageHash: "OLSFE",
-                            clientUniqueId
-                        })
-                        .then(result => {
-                            expect(result.isAvailable).false;
-                        })
-                    })
-                });
+            })
         })
     });
 
@@ -394,7 +369,7 @@ describe('model/acquisition', function () {
             }).then(() => dao.metrics(stagingKey))
             .then(metrics => {
                 expect(metrics.length).eq(1);
-                expect(metrics[0].appversion).eq("19.14.0");
+                expect(metrics[0].appversion).eq("19.14");
             })
         })
     });

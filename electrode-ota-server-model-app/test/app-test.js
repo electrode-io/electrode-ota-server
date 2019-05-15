@@ -284,7 +284,7 @@ describe("model/app", function() {
       }))
       .then(pkg => {
         expect(pkg.length).eq(1);
-        expect(pkg[0].appVersion).eq("2.0.0");
+        expect(pkg[0].appVersion).eq("2.0");
         expect(pkg[0].description).eq("Short app-version test")
       });
   });
@@ -1063,7 +1063,7 @@ describe("model/app", function() {
       })).then(updated => {
         expect(updated).not.undefined;
         expect(updated.description).eq("v1 updated description");
-        expect(updated.appVersion).eq("19.18.0");
+        expect(updated.appVersion).eq("19.18");
       })
   });
 
