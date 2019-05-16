@@ -364,9 +364,6 @@ export default (options, dao, upload, logger) => {
         pkg = await dao.historyLabel(app.id, params.deployment, params.label);
         notFound(pkg, `Package for '${params.label}' not found.`);
       }
-      if (params.appVersion && !version.valid(params.appVersion, { loose: true })) {
-        params.appVersion = version.coerce(params.appVersion).toString();
-      }
 
       const {
         isDisabled = pkg.isDisabled,
@@ -528,10 +525,6 @@ export default (options, dao, upload, logger) => {
           tags
         }
       } = vals;
-      if (!version.valid(appVersion, { loose: true })) {
-        appVersion = version.coerce(appVersion).toString();
-      }
-
       const _app = await api.findApp({ email, app });
 
       notFound(
