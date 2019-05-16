@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-model-acquisition",
-  "version": "4.4.21",
+  "version": "4.4.22",
   "description": "OTA Acquistion Service",
   "main": "lib/index.js",
   "scripts": {
