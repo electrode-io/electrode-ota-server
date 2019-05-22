@@ -19,6 +19,7 @@
   "devDependencies": {
     "electrode-ota-server-dao-cassandra": "^4.4.21",
     "electrode-ota-server-test-support": "^4.4.21",
-    "electrode-ota-server-util-dev": "^4.4.19"
+    "electrode-ota-server-util-dev": "^4.4.19",
+    "sinon": "^7.3.2"
   }
 }

@@ -1195,6 +1195,50 @@ describe("Data Access via RDBMS", function() {
         });
       });
 
+      describe("addPackageDiffMap", () => {
+        const appId = 432;
+        const deployKey = "qFOiefKJFOIJNkldsjfiuhgbojFIOWFBDfCFggzL"
+        const pkgOne = new PackageDTO();
+        pkgOne.appVersion = "1.0.0";
+        pkgOne.blobUrl = "http://stuff.com/package2/...";
+        pkgOne.manifestBlobUrl = "http://stuff.com/manifest2/..";
+        pkgOne.packageHash = "jnowfim20m3@@#%FMM@FK@K";
+        pkgOne.isDisabled = false;
+        pkgOne.isMandatory = false;
+        pkgOne.label = "v1";
+        pkgOne.rollout = 100;
+        pkgOne.size = 1600;
+        pkgOne.releaseMethod = "Upload";
+        pkgOne.releasedBy = email;
+        const pkgTwo = new PackageDTO();
+        Object.assign(pkgTwo, pkgOne);
+        pkgTwo.appVersion = "1.0.0";
+        pkgTwo.packageHash = "oiwjfriefjkjbgniohwef";
+        pkgTwo.label = "v2";
+
+        before(() => {
+          return dao.addDeployment(appId, STAGING, { key: deployKey })
+        })
+        it("adds package diff", () => {
+          let pkgId: number = 0;
+          const newDiff = {
+                size: 1838934,
+                url: "http://example.com/dowldkfj.."
+          }
+          return dao.addPackage(deployKey, pkgOne)
+            .then(() => dao.addPackage(deployKey, pkgTwo))
+            .then((savedPkg) => {
+              pkgId = savedPkg.id;
+              savedPkg.diffPackageMap = {[pkgOne.packageHash]:newDiff};
+              return dao.addPackageDiffMap(stageDeploymentKey, savedPkg, pkgOne.packageHash)
+            })
+            .then(() => dao.packageById(pkgId))
+            .then((pkg) => {
+              expect(pkg.diffPackageMap[pkgOne.packageHash]).deep.eq(newDiff);
+            });
+        });
+      });
+
       describe("getNewestApplicablePackage", () => {
         const deplKey: string = "3290fnf20jf02jfjwf0ij20fj209fj20j";
         let deplId: number = 0;

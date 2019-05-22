@@ -80,9 +80,16 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                                 return dao.historyByIds(deployment.history_)
                                     .then(history => history.filter(v => v.packageHash == params.packageHash))
                                     .then(matches => {
+                                        // No packages match params.packageHash;  return existing package
+                                        if(matches.length == 0) {
+                                            return ret;
+                                        }
+                                        // manifest generates the diff between latest package and client's package
                                         return manifest(matches.concat(pkg)).then(v => {
                                             const newPackage = v[v.length - 1];
-                                            return dao.updatePackage(deployment.key, newPackage).then((pkgLast) => {
+                                            // TODO: Offload generating a diff map to another process.
+                                            // Save package diff created from manifest
+                                            return dao.addPackageDiffMap(deployment.key, newPackage, params.packageHash).then(() => {
                                                 const p2 = newPackage.diffPackageMap && newPackage.diffPackageMap[params.packageHash];
                                                 if (p2) {
                                                     ret.downloadURL = p2.url;

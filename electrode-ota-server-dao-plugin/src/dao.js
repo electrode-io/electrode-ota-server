@@ -322,6 +322,10 @@ export default class DaoExpressCassandra {
     return rpkg;
   }
 
+  async addPackageDiffMap(deploymentKey, pkg, pkgHash) {
+    return this.updatePackage(deploymentKey, pkg, "");
+  }
+
   /**
    * For a given deployment, it gets the latest available release package
    * that matches the passed in tags.

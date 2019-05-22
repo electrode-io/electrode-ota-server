@@ -110,6 +110,20 @@ export default class PackageDAO extends BaseDAO {
         return await PackageDAO.packageById(connection, pkgId);
     }
 
+    public static async addPackageDiffMap(connection: IConnection, deploymentKey: string,
+                                      packageInfo: PackageDTO, packageHash: string): Promise<any> {
+
+        let pkgId = packageInfo.id;
+        const newDiffs = [
+            {
+                packageHash,
+                size: packageInfo.diffPackageMap[packageHash].size,
+                url: packageInfo.diffPackageMap[packageHash].url,
+            }
+        ];
+        return await PackageDAO.addPackageDiffs(connection, pkgId, newDiffs);
+    }
+
     public static async updatePackage(connection: IConnection, deploymentKey: string,
                                       packageInfo: any, label: string): Promise<PackageDTO> {
 

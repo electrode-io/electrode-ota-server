@@ -34,7 +34,10 @@ export interface IElectrodeOtaDao {
 
     packageById(packageId: number): Promise<PackageDTO>;
     addPackage(deploymentKey: string, packageInfo: PackageDTO): Promise<PackageDTO>;
+    // update the package along with diff-maps and tags
     updatePackage(deploymentKey: string, packageInfo: any, label: string): Promise<PackageDTO>;
+    // Add package diff map
+    addPackageDiffMap(deploymentKey: string, packageInfo: PackageDTO, packageHash: string): Promise<any>;
     getNewestApplicablePackage(deploymentKey: string, tags: string[] | undefined, appVersion: string | undefined): Promise<PackageDTO | void>;
 
     history(appId: number, deploymentName: string): Promise<PackageDTO[]>;
