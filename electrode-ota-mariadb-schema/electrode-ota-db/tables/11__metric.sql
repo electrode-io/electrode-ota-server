@@ -2,6 +2,7 @@
 
 --changeset awhelms:electrode_ota_db_0_0_1 dbms:mariadb
 CREATE TABLE metric (
+	id int(10) unsigned NOT NULL AUTO_INCREMENT,
 	deployment_id MEDIUMINT UNSIGNED NOT NULL,
 	app_version VARCHAR(64) NOT NULL,
 	client_unique_id VARCHAR(128) NOT NULL,
@@ -10,6 +11,7 @@ CREATE TABLE metric (
 	previous_label_or_app_version VARCHAR(64),
 	status VARCHAR(64),
 	
+	PRIMARY KEY (id),
 	INDEX idx_metric_deployment_id (deployment_id)
 );
 
