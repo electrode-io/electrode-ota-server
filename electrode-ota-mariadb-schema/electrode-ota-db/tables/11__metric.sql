@@ -11,7 +11,7 @@ CREATE TABLE metric (
 	status VARCHAR(64),
 	
 	INDEX idx_metric_deployment_id (deployment_id)
-);
+) ENGINE=Aria;
 
 --changeset awhelms:electrode_ota_db_0_0_6 dbms:mariadb
 ALTER TABLE metric ADD COLUMN create_time DATETIME DEFAULT CURRENT_TIMESTAMP;
