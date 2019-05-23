@@ -7,11 +7,17 @@ import { diffPackageMapCurrent } from 'electrode-ota-server-model-manifest/lib/m
 import appFactory from 'electrode-ota-server-model-app/lib/app';
 import { expect } from 'chai';
 import fs from 'fs';
+import sinon from 'sinon';
+import path from 'path';
+
+const fixture = path.join.bind(path, __dirname, "fixture");
+const readFixture = file => fs.readFileSync(fixture(file));
 
 describe('model/acquisition', function () {
     let ac;
     let appBL;
     let dao;
+    let sandbox;
     this.timeout(50000);
     let i = 0;
     const genRatio = (ratio) => {
@@ -29,6 +35,12 @@ describe('model/acquisition', function () {
         appBL = appFactory({}, dao, upload, logger);
     });
     after(shutdown);
+    beforeEach(() => {
+        sandbox = sinon.sandbox.create();
+    });
+    afterEach(() => {
+        sandbox.restore();
+    })
 
     describe("isUpdateAble", () => {
         it('should be 50% rollout', () => {
@@ -250,7 +262,6 @@ describe('model/acquisition', function () {
                     packageHash: 'ABCD',
                     clientUniqueId
                 }).then((result) => {
-                    console.log(result);
                     expect(result.isAvailable).to.be.false;
                 })
             })
@@ -329,7 +340,74 @@ describe('model/acquisition', function () {
                     expect(result.appVersion).eq("20.2.1");
                 })
             })
-        })
+        });
+
+        it("does not updatePackage if packageHash is not in deployment", () => {
+            sandbox.spy(dao, "updatePackage");
+            return appBL.upload({
+                app: name,
+                email,
+                package: readFixture("package.0.zip"),
+                deployment: "Staging",
+                packageInfo: {
+                    description: "Some Package",
+                    appVersion: "1.4.3"
+                }
+            }).then(pkg => {
+                return ac.updateCheck({
+                    deploymentKey: stagingKey,
+                    packageHash: "AABBCCDD",
+                    appVersion: "1.4.3",
+                    clientUniqueId
+                }).then(result => {
+                    expect(result.updateAppVersion).false;
+                    expect(dao.updatePackage.called).false;
+
+                })
+            })
+        });
+
+        it("generates a diff for previous package", () => {
+            let firstPkg, secondPkg;
+            return appBL.upload({
+                app:name,
+                email,
+                package: readFixture("package.0.zip"),
+                deployment: "Staging",
+                packageInfo: {
+                    description: "First package",
+                    appVersion: "14.33.2"
+                }
+            }).then(pkg => {
+                firstPkg = pkg;
+                return appBL.upload({
+                    app: name,
+                    email,
+                    package: readFixture("package.1.zip"),
+                    deployment: "Staging",
+                    packageInfo: {
+                        description: "Second package",
+                        appVersion: "14.33.2"
+                    }
+                });
+            }).then(pkg => {
+                secondPkg = pkg;
+                return ac.updateCheck({
+                    deploymentKey: stagingKey,
+                    appVersion: "14.33.2",
+                    packageHash: firstPkg.packageHash,
+                    clientUniqueId: "ABCDEF01234"
+                });
+            }).then(result => {
+                expect(result.appVersion).eq("14.33.2");
+                expect(result.isAvailable).true;
+                expect(result.downloadURL).not.eq(firstPkg.downloadURL);
+                expect(result.downloadURL).not.eq(secondPkg.downloadURL);
+                return dao.packageById(secondPkg.id_);
+            }).then(pkg => {
+                expect(pkg.diffPackageMap).has.key(firstPkg.packageHash);
+            });
+        });
     });
 
     describe("deployReportStatus", () => {
