@@ -58,3 +58,11 @@ bentootadb_liquibase_1 exited with code 0
 
 The db will be available on your local system on port 33060.  The docker settings are in docker-compose.yml.
 
+## FAQ
+- `POOL_NOEXIST` errors
+This occurs when connectivity with MariaDB is lost or intermittent.  When all connections are lost, the connection pool also dies.  To have the connection pool retry, make sure `restoreNodeTimeout` cluster config is > 0.
+```js
+        clusterConfig: {
+          restoreNodeTimeout: 500
+        },
+```
