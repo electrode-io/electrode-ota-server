@@ -60,6 +60,7 @@ The db will be available on your local system on port 33060.  The docker setting
 
 #### Recreating the database
 ```sh
+% cd electrode-ota-mariadb-schema
 % docker-compose run liquibase dropAll
 % docker-compose run liquibase update
 ```
