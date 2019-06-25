@@ -1,7 +1,7 @@
 Electrode OTA Server 
 ===
 
-##Configuration
+## Configuration
 Electrode OTA Server is built on [electrode-server](https://github.com/electrode-io/electrode-server) along with the 
 [electrode-confippet](https://github.com/electrode-io/electrode-confippet). So it follows the conventions used with
 those systems.
