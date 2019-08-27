@@ -4,8 +4,6 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 	
-	<!-- <include file="tables/1__bento_table.sql" relativeToChangelogFile="true" /> -->
-	
 	<include file="tables/1__user.sql" relativeToChangelogFile="true" />
 	<include file="tables/2__app.sql" relativeToChangelogFile="true" />
 	<include file="tables/3__app_permission.sql" relativeToChangelogFile="true" />
@@ -20,5 +18,6 @@
 	<include file="tables/12_deployment_app.sql" relativeToChangelogFile="true" />
 	<include file="tables/13_package_tag.sql" relativeToChangelogFile="true" />
 	<include file="tables/14_package_content.sql" relativeToChangelogFile="true" />
+	<include file="tables/15_metrics_summary.sql" relativeToChangelogFile="true" />
 	
 </databaseChangeLog>

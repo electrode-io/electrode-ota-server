@@ -6,7 +6,7 @@
 
 ## To run this example
 
-1. Update github settings in `config/development.json`.  
+1. Update clientId, clientSecret github settings in `config/development.json`.  
 ```json
     "electrode-ota-server-auth": {
       "options": {

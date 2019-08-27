@@ -40,7 +40,8 @@ The following files must have execute permissions
 - ./docker/common/wait-for-it.sh
 - ./sql-tests/run-tests.sh
 
-You can also just run docker to bring the db up and have liquibase run the change set.
+
+To bring up a running DB, run the DB in docker and have liquibase run the change set.
 
 ```
 docker-compose up -d
