@@ -4,6 +4,7 @@
   "description": "",
   "main": "lib/index.js",
   "dependencies": {
+    "@types/mocha": "^5.2.7",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-plugin-istanbul": "^4.1.1",
@@ -19,7 +20,11 @@
     "code-push": "^1.10.2-beta",
     "lerna": "2.0.0-beta.37",
     "mocha": "^2.5.3",
-    "nyc": "^10.2.0"
+    "nyc": "^10.2.0",
+    "source-map-support": "^0.4.16",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.6.0",
+    "typescript": "^3.6.2"
   },
   "scripts": {
     "test": "exit 0",
@@ -28,6 +33,7 @@
   "bin": {
     "ota-babel": "bin/ota-babel.js",
     "ota-mocha": "bin/ota-mocha.js",
-    "ota-nyc": "bin/ota-nyc.js"
+    "ota-nyc": "bin/ota-nyc.js",
+    "ota-mocha-ts": "bin/ota-mocha-ts.js"
   }
 }

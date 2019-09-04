@@ -219,6 +219,16 @@ Update the log level in the options of electrode-ota-server-logger
 }
 ```
 
+#### Add a new package
+
+Use Lerna to create the package
+
+```sh
+% lerna create <package-name>
+```
+
+This creates a base project.  Update `package.json` to match other projects.
+
 Apache-2.0 © WalmartLabs
 <br>
 Built with :heart: by [Team Electrode](https://github.com/orgs/electrode-io/people) @WalmartLabs.

@@ -14,10 +14,10 @@
     "electrode-ota-server-diregister": "^4.4.21",
     "electrode-ota-server-errors": "^4.4.23",
     "electrode-ota-server-util": "^4.4.23",
+    "electrode-ota-server-logger": "^4.4.23",
     "express-cassandra": "1.9.0"
   },
   "devDependencies": {
-    "electrode-ota-server-logger": "^4.4.23",
     "electrode-ota-server-test-support": "^4.4.23",
     "electrode-ota-server-util-dev": "^4.4.19"
   }
