@@ -6,6 +6,7 @@ import { AppDAO,
          DeploymentDAO,
          HistoryDAO,
          MetricDAO,
+         MetricSummaryDAO,
          PackageDAO,
          UserDAO } from "./dao";
 import { AppDTO,
@@ -13,6 +14,7 @@ import { AppDTO,
          DeploymentDTO,
          MetricInDTO,
          MetricOutDTO,
+         MetricSummaryDTO,
          PackageDTO,
          UserDTO,
          MetricByStatusOutDTO} from "./dto";
@@ -278,6 +280,36 @@ export default class ElectrodeOtaDaoRdbms implements IElectrodeOtaDao {
     public async metricsByStatus(deploymentKey: string): Promise<MetricByStatusOutDTO[]> {
         return this.connectAndExecute((connection) => {
             return MetricDAO.metricsByStatus(connection, deploymentKey);
+        })
+    }
+
+    public async getMetricSummary(deploymentKey: string): Promise<MetricSummaryDTO | undefined> {
+        return this.connectAndExecute((connection) => {
+            return MetricSummaryDAO.getMetricSummary(connection, deploymentKey);
+        })
+    }
+
+    public async addOrUpdateMetricSummary(summary: MetricSummaryDTO): Promise<void> {
+        return this.connectAndExecute((connection) => {
+            return MetricSummaryDAO.addOrUpdateMetricSummary(connection, summary);
+        });
+    }
+
+    public async isSummaryRequired(deploymentKey:string, lastRunTimeUTC: Date): Promise<boolean> {
+        return this.connectAndExecute((connection) => {
+            return MetricSummaryDAO.isSummaryRequired(connection, deploymentKey, lastRunTimeUTC);
+        })
+    }
+
+    public async acquireMetricLock(deploymentKey:string, acquirer: string, lockExpireUTC:Date): Promise<MetricSummaryDTO | undefined>{
+        return this.connectAndExecute((connection) => {
+            return MetricSummaryDAO.acquireMetricLock(connection, deploymentKey, acquirer, lockExpireUTC);
+        });
+    }
+
+    public async releaseMetricLock(summary: MetricSummaryDTO): Promise<void> {
+        return this.connectAndExecute((connection) => {
+            return MetricSummaryDAO.releaseMetricLock(connection, summary);
         })
     }
 

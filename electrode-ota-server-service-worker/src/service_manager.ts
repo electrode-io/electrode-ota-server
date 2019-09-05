@@ -1,7 +1,7 @@
 import * as child_process_module from "child_process";
 import { EventEmitter } from "events";
 import { Stream } from "stream";
-import ConfigDTO from "./dto/config";
+import ConfigDTO from "../types/config";
 
 const defaultOptions = {
   numberWorkers: 1,

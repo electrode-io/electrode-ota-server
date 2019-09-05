@@ -6,6 +6,7 @@ import { DeploymentAppQueries } from "./DeploymentAppQueries";
 import { DeploymentPackageQueries } from "./DeploymentPackageQueries";
 import { DeploymentQueries } from "./DeploymentQueries";
 import { MetricQueries } from "./MetricQueries";
+import { MetricSummaryQueries } from "./MetricSummaryQueries";
 import { PackageContentQueries } from "./PackageContentQueries";
 import { PackageDiffQueries } from "./PackageDiffQueries";
 import { PackageQueries } from "./PackageQueries";
@@ -22,6 +23,7 @@ export {
     DeploymentPackageQueries,
     DeploymentQueries,
     MetricQueries,
+    MetricSummaryQueries,
     PackageContentQueries,
     PackageDiffQueries,
     PackageTagQueries,

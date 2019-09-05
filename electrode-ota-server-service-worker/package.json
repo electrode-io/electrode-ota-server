@@ -21,18 +21,12 @@
     "lib"
   ],
   "dependencies": {
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^12.7.2",
     "electrode-ota-server-diregister": "^4.4.21",
     "electrode-ota-server-logger": "^4.4.23",
     "electrode-ota-server-util": "^4.4.23"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.0",
-    "@types/sinon": "^7.0.13",
-    "chai": "^4.2.0",
-    "electrode-ota-server-util-dev": "../electrode-ota-server-util-dev",
-    "sinon": "^7.4.1"
+    "electrode-ota-server-util-dev": "../electrode-ota-server-util-dev"
   },
   "nyc": {
     "check-coverage": true,

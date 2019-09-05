@@ -3,6 +3,7 @@ import { AppDTO,
         DeploymentDTO,
         MetricInDTO,
         MetricOutDTO,
+        MetricSummaryDTO,
         PackageDTO,
         UserDTO } from "./dto";
 // import { App, ClientRatio, Deployment, Metric, Package, User } from "./entities";
@@ -50,8 +51,15 @@ export interface IElectrodeOtaDao {
 
     insertMetric(metric: MetricInDTO): Promise<void>;
     metrics(deploymentKey: string): Promise<MetricOutDTO[]>;
+    metricsByStatus(deploymentKey: string): Promise<MetricByStatusOutDTO[]>;
 
     clientRatio(clientUniqueId: string, packageHash: string): Promise<ClientRatioDTO | undefined>;
     insertClientRatio(clientUniqueId: string, packageHash: string,
                       ratio: number, updated: boolean): Promise<void>;
+
+    isSummaryRequired(deploymentKey:string, lastRunTimeUTC: Date): Promise<boolean>;
+    getMetricSummary(deploymentKey:string): Promise<MetricSummaryDTO | undefined>;
+    addOrUpdateMetricSummary(summary: MetricSummaryDTO): Promise<void>;
+    acquireMetricLock(deploymentKey:string, acquirer: string, lockExpireUTC:Date): Promise<MetricSummaryDTO | undefined>;
+    releaseMetricLock(summary: MetricSummaryDTO): Promise<void>;
 }
