@@ -1,7 +1,10 @@
 language: node_js
+dist: trusty
 node_js:
   - "6"
-jdk: openjdk8
+
+jdk:
+  - openjdk8
 
 addons:
   code_climate:
