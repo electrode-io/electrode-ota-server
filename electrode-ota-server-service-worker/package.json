@@ -1,0 +1,55 @@
+{
+  "name": "electrode-ota-service-worker",
+  "version": "4.4.23",
+  "description": "Electrode OTA service worker",
+  "author": "Dat Vong <Dat.Vong@walmartlabs.com>",
+  "homepage": "https://github.com/electrode-io/electrode-ota-server/tree/master/electrode-ota-service-worker#readme",
+  "repository": "https://github.com/electrode-io/electrode-ota-server",
+  "license": "Apache-2.0",
+  "main": "lib/index",
+  "scripts": {
+    "test": "ota-mocha-ts",
+    "coverage": "npx nyc ota-mocha-ts",
+    "build": "ota-babel",
+    "prepublishOnly": "npm run build"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "files": [
+    "lib"
+  ],
+  "dependencies": {
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.7.2",
+    "electrode-ota-server-diregister": "^4.4.21",
+    "electrode-ota-server-logger": "^4.4.23",
+    "electrode-ota-server-util": "^4.4.23"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.0",
+    "@types/sinon": "^7.0.13",
+    "chai": "^4.2.0",
+    "electrode-ota-server-util-dev": "../electrode-ota-server-util-dev",
+    "sinon": "^7.4.1"
+  },
+  "nyc": {
+    "check-coverage": true,
+    "all": true,
+    "lines": 100,
+    "include": [
+      "src/**/*.ts"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "exclude": [],
+    "reporter": [
+      "text",
+      "html",
+      "lcov"
+    ],
+    "report-dir": "coverage/js"
+  }
+}

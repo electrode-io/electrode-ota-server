@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "commonjs",
+    "lib": ["es6"],
+    "declaration": true,
+    "outDir": "./lib",
+    "strict": true,
+    "sourceMap": true,
+    "typeRoots": ["./node_modules/@types", "./types"]
+  },
+  "exclude": ["node_modules", "./dist", "./test"]
+}
