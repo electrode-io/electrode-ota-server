@@ -2,7 +2,7 @@ import diregister from "electrode-ota-server-diregister";
 import * as path from "path";
 
 import ServiceManager from "./service_manager";
-import ConfigDTO from "./dto/config";
+import ConfigDTO from "../types/config";
 
 const defaultWorkerOptions = {
   numberWorkers: 1,
