@@ -9,8 +9,8 @@
   "main": "lib/index",
   "scripts": {
     "test": "ota-mocha-ts",
-    "coverage": "npx nyc ota-mocha-ts",
-    "build": "ota-babel",
+    "coverage": "nyc ota-mocha-ts",
+    "build": "rimraf ./lib && tsc -v && tsc && echo 'build complete'",
     "prepublishOnly": "npm run build"
   },
   "directories": {
@@ -21,12 +21,22 @@
     "lib"
   ],
   "dependencies": {
+    "electrode-confippet": "^1.5.0",
+    "electrode-ota-server-dao-mariadb": "^4.4.23",
+    "electrode-ota-server-default-config": "^4.4.23",
     "electrode-ota-server-diregister": "^4.4.21",
     "electrode-ota-server-logger": "^4.4.23",
     "electrode-ota-server-util": "^4.4.23"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "../electrode-ota-server-util-dev"
+    "electrode-ota-server-util-dev": "^4.4.19",
+    "sinon": "^7.4.1",
+    "@types/chai": "^3.5.0",
+    "@types/mocha": "^2.2.42",
+    "@types/sinon": "4.3.3",
+    "nyc": "^14.1.1",
+    "ts-node": "^3.3.0",
+    "typescript": "2.4.2"
   },
   "nyc": {
     "check-coverage": true,

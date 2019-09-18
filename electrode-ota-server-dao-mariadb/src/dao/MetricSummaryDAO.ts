@@ -5,22 +5,6 @@ import BaseDAO from "./BaseDAO";
 import DeploymentDAO from "./DeploymentDAO";
 
 export default class MetricSummaryDAO extends BaseDAO {
-  public static async isSummaryRequired(
-    connection: IConnection,
-    deploymentKey: string,
-    lastRunTimeUTC: Date
-  ): Promise<boolean> {
-    const deployment = await DeploymentDAO.deploymentForKey(connection, deploymentKey);
-    let summary = await MetricSummaryDAO.getSummaryByDeploymentId(connection, deployment.id);
-    let nowUTC: Date = new Date(Date.now());
-    // If no lock or (lock expired and lastRunTime has past)
-    return (
-      typeof summary === "undefined" ||
-      ((!summary.lockTimeUTC || summary.lockTimeUTC < nowUTC) &&
-        summary.lastRunTimeUTC < lastRunTimeUTC)
-    );
-  }
-
   public static async acquireMetricLock(
     connection: IConnection,
     deploymentKey: string,

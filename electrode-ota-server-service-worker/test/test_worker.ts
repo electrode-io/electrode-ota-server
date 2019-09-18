@@ -1,15 +1,21 @@
 "use strict";
 
-function workerProcess() {
-  console.log("Hello World");
-}
-let timer = setInterval(workerProcess, 200);
-console.error(`Yo useless error`);
+process.on("message", data => {
+  switch (data.action) {
+    case "ping":
+      process.send("pong");
+      break;
+    case "stdout":
+      console.log("Hello World");
+      process.send("ok");
+      break;
+    case "stderr":
+      console.error("Yo error");
+      process.send("ok");
+      break;
+  }
+});
 
 process.once("SIGINT", () => {
-  clearInterval(timer);
   process.exit(0);
 });
-if (process.send) {
-  process.send({ status: "OK" });
-}

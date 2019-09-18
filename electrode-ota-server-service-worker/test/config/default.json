@@ -1,0 +1,35 @@
+{
+  "plugins": {
+    "electrode-ota-server-dao-plugin": {
+      "module": "electrode-ota-server-dao-mariadb",
+      "options": {
+        "clusterConfig": {
+          "canRetry": true,
+          "defaultSelector": "ORDER",
+          "removeNodeErrorCount": 5,
+          "restoreNodeTimeout": 0
+        },
+        "poolConfigs": [
+          {
+            "database": "electrode_ota",
+            "host": "localhost",
+            "password": "ota",
+            "port": 33060,
+            "user": "ota",
+            "dialect": "mysql"
+          }
+        ],
+        "encryptionConfig": {
+          "keyfile": "./test/sample_encryption.key",
+          "fields": [
+            "user.name",
+            "user.email",
+            "package.released_by",
+            "access_key.friendly_name",
+            "access_key.description"
+          ]
+        }
+      }
+    }
+  }
+}

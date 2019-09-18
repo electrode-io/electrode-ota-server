@@ -2033,24 +2033,22 @@ describe("Data Access via RDBMS", function() {
           let phase1 = createMetricInDTOs(metricDeploymentKey, metricData.slice(0,2));
           let phase2 = createMetricInDTOs(metricDeploymentKey, metricData.slice(2,6));
 
-          const utcOffset = new Date().getTimezoneOffset() * ONE_MINUTE_MS;
-          // DB minimum resolution is 1 second
-          const startTime = new Date(Date.now() + utcOffset);
-          startTime.setUTCMilliseconds(0);
+          const startTime = new Date(Date.now() - 1000);
           let midTime:Date;
           return Promise.all(phase1.map(d => dao.insertMetric(d)))
             .then(() => {
-              return new Promise(resolve => setTimeout(resolve, 1000));
+              midTime = new Date(Date.now());
+              return new Promise(resolve => setTimeout(resolve, 2000));
             })
             .then(() => {
-              midTime = new Date(Date.now() + utcOffset);
-              midTime.setUTCMilliseconds(0);
               return Promise.all(phase2.map(d => dao.insertMetric(d)));
             })
-            .then(() => dao.metricsByStatusAndTime(metricDeploymentKey, startTime, midTime))
+            .then(() => {
+              return dao.metricsByStatusAndTime(metricDeploymentKey, startTime, midTime)
+            })
             .then(metrics => {
               expect(metrics.length).eq(2);
-              const endTime = new Date(Date.now() + utcOffset);
+              const endTime = new Date(Date.now());
               return dao.metricsByStatusAndTime(metricDeploymentKey, midTime, endTime);
             }).then(metrics => {
               expect(metrics.length).eq(4);
