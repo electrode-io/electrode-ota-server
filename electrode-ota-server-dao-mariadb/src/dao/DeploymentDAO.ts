@@ -138,6 +138,18 @@ export default class DeploymentDAO extends BaseDAO {
         }));
     }
 
+    public static async getDeployments(connection: IConnection): Promise<DeploymentDTO[]> {
+        const results = await DeploymentDAO.query(connection, DeploymentQueries.getDeployments, []);
+        return results.map((result: any) => {
+            const deployment = new DeploymentDTO();
+            deployment.id = result.id;
+            deployment.key = result.deployment_key;
+            deployment.name = result.name;
+            deployment.createTime = result.create_time;
+            return deployment;
+        });
+    }
+
     private static async createDeploymentFromResult(connection: IConnection, result: any): Promise<DeploymentDTO> {
         const deployment = new DeploymentDTO();
         deployment.id = result.id;

@@ -3,6 +3,7 @@
   "version": "4.4.23",
   "description": "OTA Authentication Configuration",
   "main": "lib/index.js",
+  "license": "Apache-2.0",
   "scripts": {
     "test": "ota-mocha",
     "build": "ota-babel",

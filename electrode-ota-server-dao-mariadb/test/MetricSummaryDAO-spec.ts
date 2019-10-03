@@ -256,7 +256,7 @@ describe("MetricSummaryDAO", function() {
     const twoHoursAgoUTC = new Date(Date.now() - TWO_HOURS);
     const summaryDTO = new MetricSummaryDTO();
     summaryDTO.deploymentId = stageDeploymentId!;
-    summaryDTO.lastRunTime = new Date(Date.now() - ONE_HOUR);
+    summaryDTO.lastRunTimeUTC = new Date(Date.now() - ONE_HOUR);
     return dao
       .addOrUpdateMetricSummary(summaryDTO)
       .then(summary => dao.isSummaryRequired(stageDeploymentKey, twoHoursAgoUTC))
@@ -269,7 +269,7 @@ describe("MetricSummaryDAO", function() {
     const twoHoursAgoUTC = new Date(Date.now() - TWO_HOURS);
     const summaryDTO = new MetricSummaryDTO();
     summaryDTO.deploymentId = stageDeploymentId!;
-    summaryDTO.lastRunTime = new Date(Date.now() - TWO_HOURS - 10);
+    summaryDTO.lastRunTimeUTC = new Date(Date.now() - TWO_HOURS - 10);
     return dao
       .addOrUpdateMetricSummary(summaryDTO)
       .then(summary => dao.isSummaryRequired(stageDeploymentKey, twoHoursAgoUTC))
@@ -315,7 +315,7 @@ describe("MetricSummaryDAO", function() {
   it("test add metric summary", () => {
     const summaryToAdd = new MetricSummaryDTO();
     summaryToAdd.deploymentId = stageDeploymentId!;
-    summaryToAdd.lastRunTime = new Date(Date.now() - ONE_HOUR);
+    summaryToAdd.lastRunTimeUTC = new Date(Date.now() - ONE_HOUR);
     summaryToAdd.summaryJson = '{"pango":"pongo"}';
     return dao
       .getMetricSummary(stageDeploymentKey)
@@ -328,7 +328,7 @@ describe("MetricSummaryDAO", function() {
         expect(summary).not.undefined;
         expect(summary!.id!).not.undefined;
         expect(summary!.deploymentId!).eq(summaryToAdd.deploymentId);
-        expect(summary!.lastRunTime.getTime()).eq(summaryToAdd.lastRunTime.getTime());
+        expect(summary!.lastRunTimeUTC.getTime()).eq(summaryToAdd.lastRunTimeUTC.getTime());
         expect(summary!.summaryJson).eq(summaryToAdd.summaryJson);
       });
   });
@@ -336,7 +336,7 @@ describe("MetricSummaryDAO", function() {
   it("test update metric summary", () => {
     const summaryToAdd = new MetricSummaryDTO();
     summaryToAdd.deploymentId = stageDeploymentId!;
-    summaryToAdd.lastRunTime = new Date(Date.now() - ONE_HOUR);
+    summaryToAdd.lastRunTimeUTC = new Date(Date.now() - ONE_HOUR);
     summaryToAdd.summaryJson = '{"pango":"pongo"}';
     return dao
       .getMetricSummary(stageDeploymentKey)

@@ -4,6 +4,7 @@ import { AppDTO,
         MetricInDTO,
         MetricOutDTO,
         MetricSummaryDTO,
+        MetricByStatusOutDTO,
         PackageDTO,
         UserDTO } from "./dto";
 // import { App, ClientRatio, Deployment, Metric, Package, User } from "./entities";
@@ -11,6 +12,7 @@ import { AppDTO,
 export interface IElectrodeOtaDao {
     connect(options: any): Promise<void>;
     close(): Promise<void>;
+    disconnect(): Promise<void>;
 
     createUser(user: UserDTO): Promise<UserDTO>;
     userByEmail(email: string): Promise<UserDTO>;
@@ -32,6 +34,7 @@ export interface IElectrodeOtaDao {
     deploymentForKey(deploymentKey: string): Promise<DeploymentDTO>;
     deploymentsByApp(appId: number, deploymentNames: string[]): Promise<any>;
     deploymentByApp(appId: number, deploymentName: string): Promise<DeploymentDTO>;
+    getDeployments():Promise<DeploymentDTO[]>;
 
     packageById(packageId: number): Promise<PackageDTO>;
     addPackage(deploymentKey: string, packageInfo: PackageDTO): Promise<PackageDTO>;
@@ -52,6 +55,7 @@ export interface IElectrodeOtaDao {
     insertMetric(metric: MetricInDTO): Promise<void>;
     metrics(deploymentKey: string): Promise<MetricOutDTO[]>;
     metricsByStatus(deploymentKey: string): Promise<MetricByStatusOutDTO[]>;
+    metricsByStatusAndTime(deploymentKey: string, start:Date, end:Date): Promise<MetricByStatusOutDTO[]>;
 
     clientRatio(clientUniqueId: string, packageHash: string): Promise<ClientRatioDTO | undefined>;
     insertClientRatio(clientUniqueId: string, packageHash: string,

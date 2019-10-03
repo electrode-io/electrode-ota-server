@@ -1,6 +1,7 @@
 {
   "name": "electrode-ota-server-boot",
   "version": "4.4.23",
+  "license": "Apache-2.0",
   "main": "lib/index.js",
   "bin": {
     "electrode-ota": "bin/boot.js"

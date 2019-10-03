@@ -1,6 +1,8 @@
 export const DeploymentQueries = {
     deleteDeploymentById : `DELETE FROM deployment WHERE id = ?`,
 
+    getDeployments: `SELECT id, name, create_time, deployment_key FROM deployment`,
+
     getDeploymentByKey : `SELECT id, name, create_time, deployment_key
                         FROM deployment
                         WHERE deployment_key = ?`,

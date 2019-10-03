@@ -34,6 +34,7 @@ const testDBConfig = {
   },
   poolConfigs: [
     {
+      // debug: true,
       database: "electrode_ota",
       host: "localhost",
       password: "ota",
@@ -56,16 +57,33 @@ const testDBConfig = {
 const stageDeploymentKey = "qjPVRyntQQrKJhkkNbVJeULhAIfVtHaBDfCFggzL";
 const intlStageDeploymentKey = "aoh0u3u9u0uoihaoshdfhh9842234Fdkap30";
 const prodDeploymentKey = "PutMeonDyCkrSQWnbOqFnawEAwRteuxCZPeGhshl";
+const metricDeploymentKey = "cJ3PGiq4Z3SQ3IEpivV4VuXF5lTDylmdMNeY1CALJrw=";
 const STAGING = "Staging";
 const INTLSTAGING = "IntlStaging";
 const PROD = "Production";
+const METRICS = "Metrics";
 const packageHash =
   "0848a9900dc54d5e88c90d39a7454b1b64a3557b337b9dadf6c20de5ed305182";
+const ONE_MINUTE_MS = 60000;
 
 let appId = 0;
 const appName = "testApp";
 let pkgId = 0;
 // tslint:disable:no-unused-expression
+
+const createMetricInDTOs = (deploymentKey:string, metrics:any) => {
+  let dtos = [];
+  for(let i=0; i<metrics.length; i++) {
+    const dto = new MetricInDTO();
+    dto.deploymentKey = deploymentKey;
+    dto.label = metrics[i]['label'];
+    dto.appVersion = metrics[i]['appVersion'];
+    dto.status = metrics[i]['status'];
+    dto.clientUniqueId = "ABCDEF12345";
+    dtos.push(dto);
+  }
+  return dtos;
+}
 
 process.on("unhandledRejection", (reason, p) => {
   console.log("Unhandled Rejection, reason:", reason);
@@ -85,6 +103,9 @@ describe("Data Access via RDBMS", function() {
     it("closes the cluster", () => {
       return dao.close();
     });
+    it("disconnect alias for close", () => {
+      return dao.disconnect();
+    })
   });
 
   describe("dao methods", () => {
@@ -504,6 +525,10 @@ describe("Data Access via RDBMS", function() {
             key: prodDeploymentKey,
             name: PROD
           };
+          appDTO.deployments[METRICS] = {
+            key: metricDeploymentKey,
+            name: METRICS
+          };
 
           return dao.createApp(appDTO).then(updated => {
             appDTO.id = updated.id;
@@ -896,6 +921,29 @@ describe("Data Access via RDBMS", function() {
           });
         });
       });
+
+      describe("getDeployments", () => {
+        it("get all deployments", () => {
+          return dao.getConnection().then(connection => {
+            return new Promise((resolve, reject) => connection.query(`SELECT * FROM deployment`, [], (err, result) => {
+                if (err) {
+                  reject(err);
+                }
+                resolve(result);
+              }));
+          }).then((result:any[]) => {
+              return dao.getDeployments()
+                .then((deployments:any[]) => {
+                  expect(deployments.length).gt(0);
+                  expect(deployments.length).eq(result.length);
+                  let deploymentKeys = new Set(deployments.map(x => x.key));
+                  let queryKeys = new Set(result.map(x => x['deployment_key']));
+                  expect(deploymentKeys).deep.eq(queryKeys);
+                });
+          });
+        })
+      });
+
     });
 
     describe("package-related methods", () => {
@@ -1971,6 +2019,42 @@ describe("Data Access via RDBMS", function() {
             assertCount(metrics, "v3", "1.1.0", "DeploymentSucceeded", 2);
             assertCount(metrics, "v3", "1.2.0", "DeploymentFailed", 2);
           });
+        });
+
+        it("fetch summary of metrics by status and time", () => {
+          const metricData = [
+            { label: "v1", appVersion: "1.0.0", status:"DeploymentSucceeded"},
+            { label: "v1", appVersion: "1.0.0", status:"Downloaded"},
+            { label: "v2", appVersion: "1.2.0", status:"Downloaded"},
+            { label: "v2", appVersion: "1.2.5", status:"DeploymentFailed"},
+            { label: "v3", appVersion: "1.3.0", status:"DeploymentFailed"},
+            { label: "v3", appVersion: "1.3.5", status:"Downloaded"}
+          ]
+          let phase1 = createMetricInDTOs(metricDeploymentKey, metricData.slice(0,2));
+          let phase2 = createMetricInDTOs(metricDeploymentKey, metricData.slice(2,6));
+
+          const utcOffset = new Date().getTimezoneOffset() * ONE_MINUTE_MS;
+          // DB minimum resolution is 1 second
+          const startTime = new Date(Date.now() + utcOffset);
+          startTime.setUTCMilliseconds(0);
+          let midTime:Date;
+          return Promise.all(phase1.map(d => dao.insertMetric(d)))
+            .then(() => {
+              return new Promise(resolve => setTimeout(resolve, 1000));
+            })
+            .then(() => {
+              midTime = new Date(Date.now() + utcOffset);
+              midTime.setUTCMilliseconds(0);
+              return Promise.all(phase2.map(d => dao.insertMetric(d)));
+            })
+            .then(() => dao.metricsByStatusAndTime(metricDeploymentKey, startTime, midTime))
+            .then(metrics => {
+              expect(metrics.length).eq(2);
+              const endTime = new Date(Date.now() + utcOffset);
+              return dao.metricsByStatusAndTime(metricDeploymentKey, midTime, endTime);
+            }).then(metrics => {
+              expect(metrics.length).eq(4);
+            });
         });
       });
     });

@@ -17,7 +17,7 @@ export default class MetricSummaryDAO extends BaseDAO {
     return (
       typeof summary === "undefined" ||
       ((!summary.lockTimeUTC || summary.lockTimeUTC < nowUTC) &&
-        summary.lastRunTime < lastRunTimeUTC)
+        summary.lastRunTimeUTC < lastRunTimeUTC)
     );
   }
 
@@ -35,7 +35,7 @@ export default class MetricSummaryDAO extends BaseDAO {
       if (typeof summary === "undefined") {
         summary = new MetricSummaryDTO();
         summary.deploymentId = deployment.id;
-        summary.lastRunTime = new Date(0);
+        summary.lastRunTimeUTC = new Date(0);
         summary.summaryJson = "{}";
       }
       if (!summary.lockTimeUTC || summary.lockTimeUTC < nowUTC) {
@@ -61,7 +61,7 @@ export default class MetricSummaryDAO extends BaseDAO {
     return MetricSummaryDAO.query(connection, MetricSummaryQueries.updateSummaryById, [
       null,
       null,
-      summary.lastRunTime,
+      summary.lastRunTimeUTC,
       summary.summaryJson,
       summary.id
     ]);
@@ -84,14 +84,14 @@ export default class MetricSummaryDAO extends BaseDAO {
         metric.deploymentId,
         metric.lockBy,
         metric.lockTimeUTC,
-        metric.lastRunTime,
+        metric.lastRunTimeUTC,
         metric.summaryJson
       ]);
     }
     return MetricSummaryDAO.query(connection, MetricSummaryQueries.updateSummaryById, [
       metric.lockBy,
       metric.lockTimeUTC,
-      metric.lastRunTime,
+      metric.lastRunTimeUTC,
       metric.summaryJson,
       metric.id
     ]);
@@ -116,7 +116,7 @@ export default class MetricSummaryDAO extends BaseDAO {
     const outgoing = new MetricSummaryDTO();
     outgoing.id = result.id;
     outgoing.deploymentId = result.deployment_id;
-    outgoing.lastRunTime = result.last_run_time;
+    outgoing.lastRunTimeUTC = result.last_run_time;
     outgoing.lockBy = result.lock_by;
     outgoing.lockTimeUTC = result.lock_time;
     outgoing.summaryJson = result.summary_json;
