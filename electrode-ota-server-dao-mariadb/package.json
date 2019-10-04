@@ -9,7 +9,8 @@
     "url": "https://github.com/electrode-io/electrode-ota-server/issues"
   },
   "homepage": "https://github.com/electrode-io/electrode-ota-server",
-  "main": "lib/index.js",
+  "main": "lib/index",
+  "typings": "lib/index",
   "scripts": {
     "test": "nyc mocha --compilers ts-node/register --require source-map-support/register --full-trace --bail test/**/*-spec.ts --reporter spec --timeout 100000",
     "lint": "tslint --project .; exit 0",
@@ -48,7 +49,7 @@
     "@types/lodash": "4.14.108",
     "@types/mocha": "^2.2.42",
     "@types/mysql": "0.0.34",
-    "@types/sinon": "^7.0.13",
+    "@types/sinon": "4.3.3",
     "chai": "^4.1.1",
     "mocha": "^3.5.0",
     "nyc": "^11.1.0",

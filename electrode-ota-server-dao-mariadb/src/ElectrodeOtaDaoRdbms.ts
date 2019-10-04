@@ -48,6 +48,10 @@ export default class ElectrodeOtaDaoRdbms implements IElectrodeOtaDao {
         });
     }
 
+    public disconnect(): Promise<void> {
+        return this.close();
+    }
+
     public close(): Promise<void> {
         return new Promise((resolve, reject) => {
             this.cluster.end((err) => {
@@ -186,6 +190,12 @@ export default class ElectrodeOtaDaoRdbms implements IElectrodeOtaDao {
         });
     }
 
+    public async getDeployments(): Promise<DeploymentDTO[]> {
+        return this.connectAndExecute<DeploymentDTO[]>((connection) => {
+            return DeploymentDAO.getDeployments(connection);
+        })
+    }
+
     // PACKAGE functions =================
 
     public async packageById(packageId: number): Promise<PackageDTO> {
@@ -280,6 +290,12 @@ export default class ElectrodeOtaDaoRdbms implements IElectrodeOtaDao {
     public async metricsByStatus(deploymentKey: string): Promise<MetricByStatusOutDTO[]> {
         return this.connectAndExecute((connection) => {
             return MetricDAO.metricsByStatus(connection, deploymentKey);
+        })
+    }
+
+    public async metricsByStatusAndTime(deploymentKey: string, startDateUTC: Date, endDateUTC: Date): Promise<MetricByStatusOutDTO[]> {
+        return this.connectAndExecute((connection) => {
+            return MetricDAO.metricsByStatusAndTime(connection, deploymentKey, startDateUTC, endDateUTC);
         })
     }
 

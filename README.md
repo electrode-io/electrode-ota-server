@@ -8,7 +8,7 @@ is API compatible with [code-push-cli](https://microsoft.github.io/code-push/doc
 
 ## Requirements
 
-- Node ^6.6.0
+- Node ^8.16.0
 
 
 
