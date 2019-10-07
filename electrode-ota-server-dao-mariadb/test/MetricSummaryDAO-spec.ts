@@ -231,53 +231,6 @@ describe("MetricSummaryDAO", function() {
       });
   });
 
-  it("test summary is required", () => {
-    const twoHoursAgoUTC = new Date(Date.now() - TWO_HOURS);
-    return dao.isSummaryRequired(stageDeploymentKey, twoHoursAgoUTC).then(result => {
-      expect(result).true;
-    });
-  });
-
-  it("test summary not required if it is locked", () => {
-    const twoHoursAgoUTC = new Date(Date.now() - TWO_HOURS);
-    return dao
-      .acquireMetricLock(stageDeploymentKey, "host1", lockExpire)
-      .then(summary => {
-        expect(summary).not.undefined;
-        expect(summary!.lockBy).eq("host1");
-        return dao.isSummaryRequired(stageDeploymentKey, twoHoursAgoUTC);
-      })
-      .then(result => {
-        expect(result).false;
-      });
-  });
-
-  it("test summary not required if summarized within two hours ago", () => {
-    const twoHoursAgoUTC = new Date(Date.now() - TWO_HOURS);
-    const summaryDTO = new MetricSummaryDTO();
-    summaryDTO.deploymentId = stageDeploymentId!;
-    summaryDTO.lastRunTimeUTC = new Date(Date.now() - ONE_HOUR);
-    return dao
-      .addOrUpdateMetricSummary(summaryDTO)
-      .then(summary => dao.isSummaryRequired(stageDeploymentKey, twoHoursAgoUTC))
-      .then(result => {
-        expect(result).false;
-      });
-  });
-
-  it("test summary required if summarized past two hours ago", () => {
-    const twoHoursAgoUTC = new Date(Date.now() - TWO_HOURS);
-    const summaryDTO = new MetricSummaryDTO();
-    summaryDTO.deploymentId = stageDeploymentId!;
-    summaryDTO.lastRunTimeUTC = new Date(Date.now() - TWO_HOURS - 10);
-    return dao
-      .addOrUpdateMetricSummary(summaryDTO)
-      .then(summary => dao.isSummaryRequired(stageDeploymentKey, twoHoursAgoUTC))
-      .then(result => {
-        expect(result).true;
-      });
-  });
-
   it("test get metric summary of unknown deploy", () => {
     return dao
       .getMetricSummary("abcd")

@@ -70,7 +70,7 @@ export default class MetricDAO extends BaseDAO {
             throw new Error("Not found. no deployment found for key [" + deploymentKey + "]");
         }
         const metricResults = await MetricDAO.query(connection, MetricQueries.getMetricsForDeploymentByStatusAndTime,
-            [depResults[0].id, startDate, endDate]);
+            [depResults[0].id, startDate.getTime()/1000, endDate.getTime()/1000]);
         return metricResults.map((result: any) => {
             const dto = new MetricByStatusOutDTO();
             dto.deploymentkey = deploymentKey;

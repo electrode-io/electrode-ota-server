@@ -61,7 +61,6 @@ export interface IElectrodeOtaDao {
     insertClientRatio(clientUniqueId: string, packageHash: string,
                       ratio: number, updated: boolean): Promise<void>;
 
-    isSummaryRequired(deploymentKey:string, lastRunTimeUTC: Date): Promise<boolean>;
     getMetricSummary(deploymentKey:string): Promise<MetricSummaryDTO | undefined>;
     addOrUpdateMetricSummary(summary: MetricSummaryDTO): Promise<void>;
     acquireMetricLock(deploymentKey:string, acquirer: string, lockExpireUTC:Date): Promise<MetricSummaryDTO | undefined>;

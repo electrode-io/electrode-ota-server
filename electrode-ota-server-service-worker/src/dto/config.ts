@@ -1,4 +1,4 @@
-export default type ConfigDTO = {
+export default class ConfigDTO {
   public exec: string;
   public args: string[];
   public numberWorkers?: number;

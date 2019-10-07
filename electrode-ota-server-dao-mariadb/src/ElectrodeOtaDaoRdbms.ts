@@ -311,12 +311,6 @@ export default class ElectrodeOtaDaoRdbms implements IElectrodeOtaDao {
         });
     }
 
-    public async isSummaryRequired(deploymentKey:string, lastRunTimeUTC: Date): Promise<boolean> {
-        return this.connectAndExecute((connection) => {
-            return MetricSummaryDAO.isSummaryRequired(connection, deploymentKey, lastRunTimeUTC);
-        })
-    }
-
     public async acquireMetricLock(deploymentKey:string, acquirer: string, lockExpireUTC:Date): Promise<MetricSummaryDTO | undefined>{
         return this.connectAndExecute((connection) => {
             return MetricSummaryDAO.acquireMetricLock(connection, deploymentKey, acquirer, lockExpireUTC);
