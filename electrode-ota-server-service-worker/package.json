@@ -1,5 +1,5 @@
 {
-  "name": "electrode-ota-service-worker",
+  "name": "electrode-ota-server-service-worker",
   "version": "4.4.23",
   "description": "Electrode OTA service worker",
   "author": "Dat Vong <Dat.Vong@walmartlabs.com>",

@@ -9,7 +9,7 @@ In your OTA Manager config, add this module as a plugin.
 ```json
 {
   "plugins": {
-    "electrode-ota-service-worker": {
+    "electrode-ota-server-service-worker": {
       "options": {
         "numberWorkers": 1,
         "workerSleep": 300
