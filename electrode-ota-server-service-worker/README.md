@@ -12,7 +12,8 @@ In your OTA Manager config, add this module as a plugin.
     "electrode-ota-server-service-worker": {
       "options": {
         "numberWorkers": 1,
-        "workerSleep": 300
+        "workerSleep": 300,
+        "logging": "error"
       }
     }
   }
@@ -23,6 +24,7 @@ The options are
 
 - numberWorkers: Number of workers to fork (default 1)
 - workerSleep: Time in seconds for the worker to sleep between updates (default 300 sec)
+- logging: Specifies the logging level (default "error").  Value values ["error", "info", "debug"].
 
 ## Contributing
 

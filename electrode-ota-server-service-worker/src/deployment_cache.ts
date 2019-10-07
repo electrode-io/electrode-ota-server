@@ -26,6 +26,14 @@ export default class DeploymentCache {
     this.deploymentCacheExpire = new Date(0);
   }
 
+  public status() {
+    return {
+      deployments: this.deployments.length,
+      done: this.doneList,
+      next: this.nextIdx
+    }
+  }
+
   public async next(): Promise<DeploymentDTO | boolean> {
     await this._refreshCache();
 

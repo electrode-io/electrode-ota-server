@@ -5,11 +5,18 @@ import DeploymentCache from "./deployment_cache";
 const HOUR_MS = 3600 * 1000;
 const TWO_HOURS_MS = 2 * HOUR_MS;
 
-interface OptionsType {
+export const LOGGING_DEBUG = 1;
+export const LOGGING_INFO = 2;
+export const LOGGING_ERROR = 3;
+
+export interface OptionsType {
   sleepSec: number;
   summationRangeInHours: number;
   lockExpirationInHours: number;
+  logging: number;
 }
+
+const noOp = () => {};
 
 export default class Summarizor {
   private options: OptionsType;
@@ -19,6 +26,9 @@ export default class Summarizor {
   private isStopped: boolean;
   private stopPromise: Promise<any> | null;
   private dpCache: DeploymentCache;
+  private _debugLogging: Function;
+  private _infoLogging: Function;
+  private _errorLogging: Function;
 
   constructor(options: OptionsType, dao: any, logger: any) {
     this.options = options;
@@ -27,13 +37,23 @@ export default class Summarizor {
     this.isStopped = false;
     this.stopPromise = new Promise(() => {});
     this.dpCache = new DeploymentCache(dao);
+
+    this._debugLogging = this.options.logging === LOGGING_DEBUG ? this._logInfo : noOp;
+    this._infoLogging = this.options.logging <= LOGGING_INFO ? this._logInfo : noOp;
   }
+
+  private _logInfo(msg: string) {
+    this.logger.info("[service-worker]", msg);
+  }
+
   public async start() {
     this.logger.info("[service-worker]", "Starting");
 
     while (!this.isStopped) {
+      this._debugLogging(`Begin work loop`);
       await this._doWork();
       if (!this.isStopped) {
+        this._debugLogging(`Sleeping for ${this.options.sleepSec}`);
         await Promise.race([this.stopPromise, this.sleep(this.options.sleepSec * 1000)]);
       }
     }
@@ -42,6 +62,7 @@ export default class Summarizor {
   }
 
   public async stop() {
+    this._debugLogging(`Stop called`);
     this.isStopped = true;
     if (this.timeout) {
       clearTimeout(this.timeout!);
@@ -78,6 +99,11 @@ export default class Summarizor {
       deployment.key,
       startPeriodUTC,
       endPeriodUTC
+    );
+    this._infoLogging(
+      `Summarize start: key=${deployment.key} new-metrics=${metrics.length} current=${
+        metricsSummary.summaryJson
+      }`
     );
     const { label } = deployment.package || { label: "" };
     let summary = metrics.reduce((accumulator: any, val: any) => {
@@ -126,6 +152,9 @@ export default class Summarizor {
     }
     metricsSummary.summaryJson = JSON.stringify(summary);
     metricsSummary.lastRunTimeUTC = endPeriodUTC;
+    this._infoLogging(
+      `Summarize complete: key=${deployment.key} new=${metricsSummary.summaryJson}`
+    );
     return metricsSummary;
   }
 
@@ -148,14 +177,15 @@ export default class Summarizor {
 
   private async _doWork() {
     const acquirer: string = hostname();
-    let deployment: DeploymentDTO | boolean = false;
+    let maybeDeployment: DeploymentDTO | boolean = false;
     let lockExpireTime: Date = new Date(Date.now() + this.options.lockExpirationInHours * HOUR_MS);
 
     try {
-      deployment = await this.dpCache.next();
-      if (deployment !== false) {
+      maybeDeployment = await this.dpCache.next();
+      if (maybeDeployment !== false) {
+        let deployment = maybeDeployment as DeploymentDTO;
         let metricsSummary = await this.dao.acquireMetricLock(
-          (deployment as DeploymentDTO).key,
+          deployment.key,
           acquirer,
           lockExpireTime
         );
@@ -163,20 +193,25 @@ export default class Summarizor {
           let summaryPeriod = this._getSummationEndPeriod(metricsSummary);
 
           let updatedSummary = await this._summarize(
-            deployment as DeploymentDTO,
+            deployment,
             metricsSummary,
             metricsSummary.lastRunTimeUTC,
             summaryPeriod
           );
           await this.dao.releaseMetricLock(updatedSummary);
+          this._infoLogging(`Summarize timestamp: key=${deployment.key} lastRun=${updatedSummary.lastRunTimeUTC}`);
           return true;
+        } else {
+          this._infoLogging(`Fail to acquire lock for: key=${deployment!.key}`);
         }
+      } else {
+        this._infoLogging(`No deployment to work on: ${JSON.stringify(this.dpCache.status())}`);
       }
     } catch (err) {
       this.logger.error(
         `[service-worker]`,
         ` Error summarizing deployment ${
-          deployment !== false ? (deployment as DeploymentDTO).key : "[no deployment]"
+          maybeDeployment !== false ? (maybeDeployment as DeploymentDTO).key : "[no deployment]"
         }, retry later.  Error: ${err.toString()}`
       );
     }

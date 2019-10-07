@@ -1,6 +1,6 @@
 #!/usr/bin/env/node
 import "babel-polyfill";
-import Summarizor from "./summarizor";
+import Summarizor, { LOGGING_DEBUG, LOGGING_INFO, LOGGING_ERROR } from "./summarizor";
 import { join } from "path";
 import { store } from "electrode-confippet";
 import { daoFactory, shutdown } from "./dao_factory";
@@ -15,7 +15,8 @@ const FIVE_MINUTES: number = 3000;
 const options = {
   sleepSec: FIVE_MINUTES,
   summationRangeInHours: 6,
-  lockExpirationInHours: 2
+  lockExpirationInHours: 2,
+  logging: LOGGING_ERROR
 };
 
 let args = require("minimist")(process.argv.slice(2));
@@ -29,6 +30,17 @@ if (args.query_range) {
   const rangeAsInt = parseInt(args.query_range);
   if (!isNaN(rangeAsInt) && rangeAsInt > 0) {
     options.summationRangeInHours = rangeAsInt;
+  }
+}
+
+if (args.logging) {
+  switch (args.logging.toLowerCase()) {
+    case "debug":
+      options.logging = LOGGING_DEBUG;
+      break;
+    case "info":
+      options.logging = LOGGING_INFO;
+      break;
   }
 }
 

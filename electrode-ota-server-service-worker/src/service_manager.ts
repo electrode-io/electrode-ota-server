@@ -44,7 +44,7 @@ export default class ServiceManager extends EventEmitter {
 
   /**
    * Starts forking the processes.  No guarantee is made on whether the processes are up.
-   * 
+   *
    */
   start(options: ConfigDTO): void {
     let fullOptions: ConfigDTO = Object.assign({}, defaultOptions, options);
@@ -87,7 +87,7 @@ export default class ServiceManager extends EventEmitter {
   private _forkOne(workRecord: WorkRecord): void {
     let handle = fork(workRecord.options.exec, workRecord.options.args, {
       cwd: workRecord.options.cwd,
-      detached: true,
+      detached: false,
       stdio: ["ignore", "pipe", "pipe", "ipc"]
     });
     workRecord.childHandle = handle;
@@ -99,10 +99,11 @@ export default class ServiceManager extends EventEmitter {
   }
 
   private _managerStopped(): void {
-          this.state = STATE_STOPPED;
-          this.emit("manager", "stopped");
-
+    this.workers = [];
+    this.state = STATE_STOPPED;
+    this.emit("manager", "stopped");
   }
+
   private _childExitHandler(handle: ChildProcess, code: number, signal: string): void {
     let idx = this.workers.findIndex(record => record.childHandle === handle);
     if (idx >= 0) {
