@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-util",
-  "version": "4.4.23",
+  "version": "4.5.0",
   "description": "OTA Utils",
   "main": "lib/index.js",
   "scripts": {
@@ -10,10 +10,10 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-diregister": "^4.4.21",
+    "electrode-ota-server-diregister": "^4.5.0",
     "randomstring": "^1.1.5"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^4.4.19"
+    "electrode-ota-server-util-dev": "^4.5.0"
   }
 }
