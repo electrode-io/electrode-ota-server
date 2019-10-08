@@ -51,11 +51,11 @@ describe("service-manager tests", function() {
     logger = {
       loggerInfo: [],
       loggerError: [],
-      info: (msg: string) => {
-        logger.loggerInfo.push(msg);
+      info: (msg: string, msg2:string) => {
+        logger.loggerInfo.push(`${msg} ${msg2}`);
       },
-      error: (msg: string) => {
-        logger.loggerError.push(msg);
+      error: (msg: string, msg2:string) => {
+        logger.loggerError.push(`${msg} ${msg2}`);
       }
     };
   });
@@ -156,9 +156,9 @@ describe("service-manager tests", function() {
         expect(resp).eq("ok");
         expect(logger.loggerInfo.length).eq(2);
         expect(logger.loggerInfo[0]).eq(
-          "[electrode-ota-service-worker] 1 service worker(s) starting"
+          "electrode-ota-service-worker 1 service worker(s) starting"
         );
-        expect(logger.loggerInfo[1]).eq("Hello World\n");
+        expect(logger.loggerInfo[1]).eq("service-worker Hello World\n");
       })
       .then(() => stopService());
   });
@@ -170,7 +170,7 @@ describe("service-manager tests", function() {
       .then(resp => {
         expect(resp).eq("ok");
         expect(logger.loggerError.length).eq(1);
-        expect(logger.loggerError[0]).eq(`Yo error\n`);
+        expect(logger.loggerError[0]).eq(`service-worker Yo error\n`);
       })
       .then(() => stopService());
   });
@@ -250,11 +250,11 @@ describe("Fake ServiceManager", () => {
     logger = {
       loggerInfo: [],
       loggerError: [],
-      info: (msg: string) => {
-        logger.loggerInfo.push(msg);
+      info: (msg: string, msg2:string) => {
+        logger.loggerInfo.push(`${msg} ${msg2}`);
       },
-      error: (msg: string) => {
-        logger.loggerError.push(msg);
+      error: (msg: string, msg2:string) => {
+        logger.loggerError.push(`${msg} ${msg2}`);
       }
     };
   });
@@ -276,7 +276,7 @@ describe("Fake ServiceManager", () => {
       if (state === "error") {
         expect(logger.loggerError.length).eq(1);
         expect(logger.loggerError[0]).eq(
-          "[electrode-ota-service-worker] Unable to fork process Error: Failures"
+          "electrode-ota-service-worker Unable to fork process Error: Failures"
         );
         mockSvc.stop();
         done();

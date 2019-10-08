@@ -24,6 +24,7 @@ export default class Summarizor {
   private timeout: any | null = null;
   private logger: any;
   private isStopped: boolean;
+  private hostname: string;
   private stopPromise: Promise<any> | null;
   private dpCache: DeploymentCache;
   private _debugLogging: Function;
@@ -37,17 +38,18 @@ export default class Summarizor {
     this.isStopped = false;
     this.stopPromise = new Promise(() => {});
     this.dpCache = new DeploymentCache(dao);
+    this.hostname = hostname();
 
     this._debugLogging = this.options.logging === LOGGING_DEBUG ? this._logInfo : noOp;
     this._infoLogging = this.options.logging <= LOGGING_INFO ? this._logInfo : noOp;
   }
 
   private _logInfo(msg: string) {
-    this.logger.info("[service-worker]", msg);
+    this.logger.info(this.hostname, msg);
   }
 
   public async start() {
-    this.logger.info("[service-worker]", "Starting");
+    this.logger.info(this.hostname, "Starting");
 
     while (!this.isStopped) {
       this._debugLogging(`Begin work loop`);
@@ -58,7 +60,7 @@ export default class Summarizor {
       }
     }
 
-    this.logger.info("[service-worker]", "Stopped");
+    this.logger.info(this.hostname, "Stopped");
   }
 
   public async stop() {
@@ -176,7 +178,6 @@ export default class Summarizor {
   }
 
   private async _doWork() {
-    const acquirer: string = hostname();
     let maybeDeployment: DeploymentDTO | boolean = false;
     let lockExpireTime: Date = new Date(Date.now() + this.options.lockExpirationInHours * HOUR_MS);
 
@@ -186,7 +187,7 @@ export default class Summarizor {
         let deployment = maybeDeployment as DeploymentDTO;
         let metricsSummary = await this.dao.acquireMetricLock(
           deployment.key,
-          acquirer,
+          this.hostname,
           lockExpireTime
         );
         if (metricsSummary) {
@@ -209,7 +210,7 @@ export default class Summarizor {
       }
     } catch (err) {
       this.logger.error(
-        `[service-worker]`,
+        this.hostname,
         ` Error summarizing deployment ${
           maybeDeployment !== false ? (maybeDeployment as DeploymentDTO).key : "[no deployment]"
         }, retry later.  Error: ${err.toString()}`

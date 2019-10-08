@@ -78,8 +78,8 @@ export default class ServiceManager extends EventEmitter {
       this._forkOne(record);
     }
     if (this.logger) {
-      this.logger.info(
-        `[electrode-ota-service-worker] ${options.numberWorkers!} service worker(s) starting`
+      this.logger.info('electrode-ota-service-worker',
+        `${options.numberWorkers!} service worker(s) starting`
       );
     }
   }
@@ -111,7 +111,7 @@ export default class ServiceManager extends EventEmitter {
       this.workers[idx].restart += 1;
       this.emit("child", "exited", handle);
       if (this.logger) {
-        this.logger.info(`[electrode-ota-service-worker] Worker processes exited`);
+        this.logger.info('electrode-ota-service-worker', `Worker processes exited`);
       }
 
       if (this.state != STATE_STOPPING) {
@@ -126,7 +126,7 @@ export default class ServiceManager extends EventEmitter {
 
   private _childErrorHandler(handle: ChildProcess, err: any): void {
     if (this.logger) {
-      this.logger.error(`[electrode-ota-service-worker] Unable to fork process ${err}`);
+      this.logger.error('electrode-ota-service-worker', `Unable to fork process ${err}`);
     }
     let idx = this.workers.findIndex(record => record.childHandle === handle);
     if (idx >= 0) {
@@ -142,14 +142,14 @@ export default class ServiceManager extends EventEmitter {
     if (handle.stdout) {
       handle.stdout.on("data", (data: Buffer | string) => {
         if (this.logger) {
-          this.logger.info(data.toString());
+          this.logger.info('service-worker', data.toString());
         }
       });
     }
     if (handle.stderr) {
       handle.stderr.on("data", (data: Buffer | string) => {
         if (this.logger) {
-          this.logger.error(data.toString());
+          this.logger.error('service-worker', data.toString());
         }
       });
     }

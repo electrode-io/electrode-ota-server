@@ -16,6 +16,7 @@ import {
   clearTables
 } from "./test_utils";
 let sinon = require("sinon");
+let os = require("os");
 
 const HOUR_MS = 3600 * 1000;
 const deploymentKey = "ABCDEF12345";
@@ -66,6 +67,7 @@ describe("summarizor tests", function() {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
+    sandbox.stub(os, "hostname").returns("mango-host");
     logger = {
       info: sandbox.stub(),
       error: sandbox.stub()
@@ -106,13 +108,13 @@ describe("summarizor tests", function() {
       .then(() => {
         expect(summarizer.isStopped).true;
         expect(logger.info.callCount).eq(2);
-        expect(logger.info.getCall(1).args[0]).eq(`[service-worker]`);
+        expect(logger.info.getCall(1).args[0]).eq(`mango-host`);
         expect(logger.info.getCall(1).args[1]).eq(`Stopped`);
       })
       .then(done, done);
     expect(summarizer.isStopped).false;
     expect(logger.info.callCount).eq(1);
-    expect(logger.info.getCall(0).args[0]).eq(`[service-worker]`);
+    expect(logger.info.getCall(0).args[0]).eq(`mango-host`);
     expect(logger.info.getCall(0).args[1]).eq(`Starting`);
     summarizer.stop();
   });
@@ -414,7 +416,7 @@ describe("summarizor tests", function() {
   it("test exception in doWork logs to logger", async () => {
     await summarizer.test_run_loop();
     expect(logger.error.callCount).eq(1);
-    expect(logger.error.getCall(0).args[0]).eq("[service-worker]");
+    expect(logger.error.getCall(0).args[0]).eq("mango-host");
     expect(logger.error.getCall(0).args[1]).contains(
       "Error summarizing deployment [no deployment]"
     );
