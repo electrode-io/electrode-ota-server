@@ -19,7 +19,7 @@ describe("test service worker", function() {
   const appOwnerEmail = "owner@walmart.com";
   const appName = "Super App";
   const stageDeploymentKey = "MVM6OcJsG/XZ7Ir2cJQHK02Q9pidMY3q0GFfWE+gTy8=";
-  const serviceWorkerFile = join(__dirname, "../src/service_worker.ts");
+  const serviceWorkerFile = join(__dirname, "../src/service_worker");
   const configDir = resolve(__dirname, "config");
   const serverConfigs = require(resolve(configDir, "default.json"));
   let sandbox: any;
@@ -50,8 +50,8 @@ describe("test service worker", function() {
     });
   });
 
-  const startServiceWorker = (): Promise<any> => {
-    const args: string[] = ["--sleep=1", `--query_range=24`];
+  const startServiceWorker = (logging:string): Promise<any> => {
+    const args: string[] = ["--sleep=1", `--query_range=24`, `--logging=${logging}`];
     handle = fork(serviceWorkerFile, args, {
       env: { OTA_CONFIG_DIR: configDir },
       execArgv: ["-r", "ts-node/register"],
@@ -116,7 +116,7 @@ describe("test service worker", function() {
   };
 
   it("starts and stops", async () => {
-    handle = await startServiceWorker();
+    handle = await startServiceWorker("debug");
     const exitP = ensureProcessExit(handle);
     handle.kill("SIGINT");
     await exitP;
@@ -126,7 +126,7 @@ describe("test service worker", function() {
     let dao = await createDao();
     await insertMetricsToDatabase(dao);
 
-    handle = await startServiceWorker();
+    handle = await startServiceWorker("info");
     // Poll 5 seconds
     let summary: any;
     for (let i = 0; i < 10; i++) {

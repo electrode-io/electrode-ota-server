@@ -44,7 +44,7 @@ export default class ServiceManager extends EventEmitter {
 
   /**
    * Starts forking the processes.  No guarantee is made on whether the processes are up.
-   * 
+   *
    */
   start(options: ConfigDTO): void {
     let fullOptions: ConfigDTO = Object.assign({}, defaultOptions, options);
@@ -78,8 +78,8 @@ export default class ServiceManager extends EventEmitter {
       this._forkOne(record);
     }
     if (this.logger) {
-      this.logger.info(
-        `[electrode-ota-service-worker] ${options.numberWorkers!} service worker(s) starting`
+      this.logger.info('electrode-ota-service-worker',
+        `${options.numberWorkers!} service worker(s) starting`
       );
     }
   }
@@ -87,7 +87,7 @@ export default class ServiceManager extends EventEmitter {
   private _forkOne(workRecord: WorkRecord): void {
     let handle = fork(workRecord.options.exec, workRecord.options.args, {
       cwd: workRecord.options.cwd,
-      detached: true,
+      detached: false,
       stdio: ["ignore", "pipe", "pipe", "ipc"]
     });
     workRecord.childHandle = handle;
@@ -99,10 +99,11 @@ export default class ServiceManager extends EventEmitter {
   }
 
   private _managerStopped(): void {
-          this.state = STATE_STOPPED;
-          this.emit("manager", "stopped");
-
+    this.workers = [];
+    this.state = STATE_STOPPED;
+    this.emit("manager", "stopped");
   }
+
   private _childExitHandler(handle: ChildProcess, code: number, signal: string): void {
     let idx = this.workers.findIndex(record => record.childHandle === handle);
     if (idx >= 0) {
@@ -110,7 +111,7 @@ export default class ServiceManager extends EventEmitter {
       this.workers[idx].restart += 1;
       this.emit("child", "exited", handle);
       if (this.logger) {
-        this.logger.info(`[electrode-ota-service-worker] Worker processes exited`);
+        this.logger.info('electrode-ota-service-worker', `Worker processes exited`);
       }
 
       if (this.state != STATE_STOPPING) {
@@ -125,7 +126,7 @@ export default class ServiceManager extends EventEmitter {
 
   private _childErrorHandler(handle: ChildProcess, err: any): void {
     if (this.logger) {
-      this.logger.error(`[electrode-ota-service-worker] Unable to fork process ${err}`);
+      this.logger.error('electrode-ota-service-worker', `Unable to fork process ${err}`);
     }
     let idx = this.workers.findIndex(record => record.childHandle === handle);
     if (idx >= 0) {
@@ -141,14 +142,14 @@ export default class ServiceManager extends EventEmitter {
     if (handle.stdout) {
       handle.stdout.on("data", (data: Buffer | string) => {
         if (this.logger) {
-          this.logger.info(data.toString());
+          this.logger.info('service-worker', data.toString());
         }
       });
     }
     if (handle.stderr) {
       handle.stderr.on("data", (data: Buffer | string) => {
         if (this.logger) {
-          this.logger.error(data.toString());
+          this.logger.error('service-worker', data.toString());
         }
       });
     }

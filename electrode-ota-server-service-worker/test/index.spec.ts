@@ -60,6 +60,23 @@ describe("index tests", () => {
     factory(options, logger);
   });
 
+  it("index passes logging flag", (done) => {
+    let options = {
+      numberWorkers: 1,
+      logging: "debug"
+    };
+    expect(svc.workers.length).eq(0);
+    svc.on("child", (state: string, child:any) => {
+      if (state === "starting") {
+        expect(svc.workers.length).eq(1);
+        expect(svc.workers[0].options['args']).contains("--logging");
+        expect(svc.workers[0].options['args']).contains("debug");
+        done();
+      }
+    })
+    factory(options, logger);
+  });
+
   it("index creates ServiceManager", () => {
     test_inject_svc(undefined);
 

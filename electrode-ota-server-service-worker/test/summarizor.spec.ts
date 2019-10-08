@@ -1,6 +1,6 @@
 "use strict";
 
-import Summarizor from "../src/summarizor";
+import Summarizor, { LOGGING_INFO } from "../src/summarizor";
 import { daoFactory, shutdown } from "../src/dao_factory";
 import { expect } from "chai";
 import { resolve } from "path";
@@ -16,6 +16,7 @@ import {
   clearTables
 } from "./test_utils";
 let sinon = require("sinon");
+let os = require("os");
 
 const HOUR_MS = 3600 * 1000;
 const deploymentKey = "ABCDEF12345";
@@ -66,6 +67,7 @@ describe("summarizor tests", function() {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
+    sandbox.stub(os, "hostname").returns("mango-host");
     logger = {
       info: sandbox.stub(),
       error: sandbox.stub()
@@ -106,13 +108,13 @@ describe("summarizor tests", function() {
       .then(() => {
         expect(summarizer.isStopped).true;
         expect(logger.info.callCount).eq(2);
-        expect(logger.info.getCall(1).args[0]).eq(`[service-worker]`);
+        expect(logger.info.getCall(1).args[0]).eq(`mango-host`);
         expect(logger.info.getCall(1).args[1]).eq(`Stopped`);
       })
       .then(done, done);
     expect(summarizer.isStopped).false;
     expect(logger.info.callCount).eq(1);
-    expect(logger.info.getCall(0).args[0]).eq(`[service-worker]`);
+    expect(logger.info.getCall(0).args[0]).eq(`mango-host`);
     expect(logger.info.getCall(0).args[1]).eq(`Starting`);
     summarizer.stop();
   });
@@ -127,7 +129,7 @@ describe("summarizor tests", function() {
         clock.tick(1000);
         return summarizer.stop();
       }
-    ])
+    ]);
   });
 
   it("summarize with no new metrics", () => {
@@ -268,7 +270,7 @@ describe("summarizor tests", function() {
   });
 
   it("test doWork starts summarizing at 2019/01/01", () => {
-    const startDate = new Date(Date.UTC(2019,1,1));
+    const startDate = new Date(Date.UTC(2019, 1, 1));
     dao.getDeployments.resolves(deployments);
     currentSummary.lastRunTimeUTC = new Date(0);
     dao.acquireMetricLock.resolves(currentSummary);
@@ -277,9 +279,8 @@ describe("summarizor tests", function() {
       expect(dao.metricsByStatusAndTime.callCount).eq(1);
       expect(dao.metricsByStatusAndTime.getCall(0).args[0]).eq(deployments[0].key);
       expect(dao.metricsByStatusAndTime.getCall(0).args[2].getTime()).eq(startDate.getTime());
-    })
-
-  })
+    });
+  });
 
   it("test acquiresLock with configuration expiration hours from now", () => {
     const lockExpireUTC: Date = new Date(Date.now() + options.lockExpirationInHours * HOUR_MS);
@@ -415,9 +416,30 @@ describe("summarizor tests", function() {
   it("test exception in doWork logs to logger", async () => {
     await summarizer.test_run_loop();
     expect(logger.error.callCount).eq(1);
-    expect(logger.error.getCall(0).args[0]).eq("[service-worker]");
-    expect(logger.error.getCall(0).args[1]).contains("Error summarizing deployment [no deployment]");
+    expect(logger.error.getCall(0).args[0]).eq("mango-host");
+    expect(logger.error.getCall(0).args[1]).contains(
+      "Error summarizing deployment [no deployment]"
+    );
     logger.error.reset();
+  });
+
+  it("test summarizer logs info", async () => {
+    dao.getDeployments.resolves(deployments);
+    dao.acquireMetricLock.resolves(currentSummary);
+    dao.metricsByStatusAndTime.resolves([]);
+    options = {
+      sleepSec: 0.3,
+      summationRangeInHours: 2,
+      lockExpirationInHours: 2,
+      logging: LOGGING_INFO
+    };
+    summarizer = new Summarizor(options, dao, logger);
+    await summarizer.test_run_loop();
+
+    expect(logger.info.callCount).eq(3);
+    expect(logger.info.getCall(0).args[1]).eq(`Summarize start: key=${deployments[0].key} new-metrics=0 current={}`);
+    expect(logger.info.getCall(1).args[1]).eq(`Summarize complete: key=${deployments[0].key} new={}`);
+    expect(logger.info.getCall(2).args[1]).match(/^Summarize timestamp: key=(.*) lastRun=(.*)$/);
   });
 });
 

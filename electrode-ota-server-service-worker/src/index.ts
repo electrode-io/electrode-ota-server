@@ -6,7 +6,8 @@ import ConfigDTO from "./dto/config";
 
 const defaultWorkerOptions = {
   numberWorkers: 1,
-  workerSleep: 300
+  workerSleep: 300,
+  logging: "error"
 };
 
 let svc:ServiceManager;
@@ -18,7 +19,7 @@ export const factory = async (moduleOptions: any, logger: any) => {
   const workerOptions = Object.assign({}, defaultWorkerOptions, moduleOptions);
   const serviceDescriptor: ConfigDTO = {
     exec: path.join(__dirname, "./service_worker"),
-    args: ["--sleep", "" + (workerOptions.workerSleep * 1000) ],
+    args: ["--sleep", "" + (workerOptions.workerSleep * 1000), "--logging", workerOptions.logging ],
     numberWorkers: workerOptions.numberWorkers
   };
   return svc.start(serviceDescriptor);
