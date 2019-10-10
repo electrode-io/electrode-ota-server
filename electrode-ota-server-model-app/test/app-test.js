@@ -1,9 +1,8 @@
-import initDao, {
-  shutdown
-} from "electrode-ota-server-test-support/lib/init-dao";
+import initDao, { shutdown } from "electrode-ota-server-test-support/lib/init-maria-dao";
 import eql from "electrode-ota-server-test-support/lib/eql";
 import path from "path";
 import fs from "fs";
+import yazl from "yazl";
 import appFactory from "electrode-ota-server-model-app/lib/app";
 import accountFactory from "electrode-ota-server-model-account/lib/account";
 import { fileservice as upload } from "electrode-ota-server-fileservice-upload";
@@ -26,12 +25,36 @@ const APP = {
 describe("model/app", function() {
   this.timeout(50000);
   let account, ac, dao;
+
+  const createAccount = (email, name = "joe") => {
+    return account.createToken({
+      profile: { email, name },
+      provider: "GitHub"
+    });
+  };
+
+  const createZip = content => {
+    let zf = new yazl.ZipFile();
+    let output = [];
+    zf.outputStream.on("data", c => output.push(c));
+    let piss = new Promise(resolve => {
+      zf.outputStream.on("end", () => {
+        const buf = Buffer.concat(output);
+        resolve(buf);
+      });
+    });
+    zf.addBuffer(Buffer.from(content), "yo.txt");
+    zf.end();
+    return piss;
+  };
+
   before(async () => {
-    dao = await initDao();
+    dao = await initDao({}, console);
     let w = 0;
     account = accountFactory({}, dao, console);
     const up = upload({}, dao);
     ac = appFactory({}, dao, up, console);
+    await createAccount(APP.email, "test");
   });
 
   after(shutdown);
@@ -62,8 +85,8 @@ describe("model/app", function() {
   it("should add/rename/remove deployment", () => {
     const email = "deployment@p.com",
       app = "deployment";
-    return ac
-      .createApp({ email, name: "deployment" })
+    return createAccount(email, "deploy")
+      .then(() => ac.createApp({ email, name: "deployment" }))
       .then(_ => ac.listDeployments({ email, app }))
       .then(deps => {
         expect(deps)
@@ -83,9 +106,7 @@ describe("model/app", function() {
       .then(deps => {
         expect(deps.length).to.eql(2);
       })
-      .then(_ =>
-        ac.renameDeployment({ email, app, deployment: "what", name: "sowhat" })
-      )
+      .then(_ => ac.renameDeployment({ email, app, deployment: "what", name: "sowhat" }))
       .then(_ => ac.listDeployments({ email, app }))
       .then(deps => {
         expect(deps.length).to.eql(2);
@@ -96,11 +117,12 @@ describe("model/app", function() {
 
     return ac
       .createApp({ email, name: "superd" })
-      .then(_ => {
+      .then(_ => createZip(`Zipped package to upload`))
+      .then(pkg => {
         return ac.upload({
           app: "superd",
           email,
-          package: `This is a string`,
+          package: pkg,
           packageInfo: {
             isDisabled: true,
             rollout: 25,
@@ -109,11 +131,12 @@ describe("model/app", function() {
           }
         });
       })
-      .then(_ => {
+      .then(_ => createZip(`Another zipped package to upload`))
+      .then(pkg => {
         return ac.upload({
           app: "superd",
           email,
-          package: `This is another string`,
+          package: pkg,
           packageInfo: {
             appVersion: "1.0.2",
             rollout: 50,
@@ -141,43 +164,37 @@ describe("model/app", function() {
         eql([
           {
             appVersion: "1.0.2",
-            blobUrl:
-              "8d7573816249dc6f9f34bd04dc07d4bb62c5deb6c3b1b5e574e0f26c0d2f25c9",
+            blobUrl: "b8fb2583c7c33e0ab01c50ae3bacbba74a380f5316fa329da52f0a818312eb4f",
             description: "Not Super Cool",
-            diffPackageMap: null,
+            diffPackageMap: {},
             isDisabled: false,
             isMandatory: true,
             label: "v2",
             originalDeployment: null,
             originalLabel: null,
-            manifestBlobUrl: null,
-            packageHash:
-              "8d7573816249dc6f9f34bd04dc07d4bb62c5deb6c3b1b5e574e0f26c0d2f25c9",
+            manifestBlobUrl: "fef54b6971e2b5008be8b1e805ce86f2b837de69be45b50eea465ba1818b4544",
+            packageHash: "b8fb2583c7c33e0ab01c50ae3bacbba74a380f5316fa329da52f0a818312eb4f",
             releaseMethod: "Upload",
             releasedBy: "test@p.com",
             rollout: 50,
-            size: "22",
-            tags: null
+            size: 144
           },
           {
             appVersion: "1.0.0",
-            blobUrl:
-              "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
+            blobUrl: "e9f5494b6434ec91c6dac80d66da461d056ceaa6b9b65bad93a98cf03f8f1880",
             description: "Super Cool",
-            diffPackageMap: null,
+            diffPackageMap: {},
             isDisabled: true,
             isMandatory: true,
             label: "v1",
-            manifestBlobUrl: null,
+            manifestBlobUrl: "c0df7b5ee9d68548a4d17291762f94ba9b2326a448f7ce84c5eced52b8561917",
             originalDeployment: null,
             originalLabel: null,
-            packageHash:
-              "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
+            packageHash: "e9f5494b6434ec91c6dac80d66da461d056ceaa6b9b65bad93a98cf03f8f1880",
             releaseMethod: "Upload",
             releasedBy: "test@p.com",
             rollout: 25,
-            size: "16",
-            tags: null
+            size: 136
           }
         ])
       )
@@ -189,9 +206,7 @@ describe("model/app", function() {
           to: "Production"
         })
       )
-      .then(_ =>
-        ac.historyDeployment({ app: "superd", email, deployment: "Production" })
-      )
+      .then(_ => ac.historyDeployment({ app: "superd", email, deployment: "Production" }))
       .then(v => {
         expect(v.length, "should be 1").to.eql(1);
         v.forEach(v => {
@@ -203,23 +218,20 @@ describe("model/app", function() {
       .then(
         eql({
           appVersion: "1.0.2",
-          blobUrl:
-            "8d7573816249dc6f9f34bd04dc07d4bb62c5deb6c3b1b5e574e0f26c0d2f25c9",
+          blobUrl: "b8fb2583c7c33e0ab01c50ae3bacbba74a380f5316fa329da52f0a818312eb4f",
           description: "Not Super Cool",
-          diffPackageMap: null,
+          diffPackageMap: {},
           isDisabled: false,
           isMandatory: true,
           label: "v1",
-          manifestBlobUrl: null,
+          manifestBlobUrl: "fef54b6971e2b5008be8b1e805ce86f2b837de69be45b50eea465ba1818b4544",
           originalDeployment: "Staging",
           originalLabel: "v2",
           releaseMethod: "Promote",
           releasedBy: "test@p.com",
           rollout: null,
-          size: "22",
-          packageHash:
-            "8d7573816249dc6f9f34bd04dc07d4bb62c5deb6c3b1b5e574e0f26c0d2f25c9",
-          tags: null
+          size: 144,
+          packageHash: "b8fb2583c7c33e0ab01c50ae3bacbba74a380f5316fa329da52f0a818312eb4f"
         })
       )
       .then(dep =>
@@ -244,62 +256,66 @@ describe("model/app", function() {
       .then(
         eql({
           appVersion: "1.2.3",
-          blobUrl:
-            "8d7573816249dc6f9f34bd04dc07d4bb62c5deb6c3b1b5e574e0f26c0d2f25c9",
+          blobUrl: "b8fb2583c7c33e0ab01c50ae3bacbba74a380f5316fa329da52f0a818312eb4f",
           description: "Not Super Cool",
-          diffPackageMap: null,
+          diffPackageMap: {},
           isDisabled: true,
           isMandatory: true,
-          manifestBlobUrl: null,
+          manifestBlobUrl: "fef54b6971e2b5008be8b1e805ce86f2b837de69be45b50eea465ba1818b4544",
           label: "v1",
           originalDeployment: "Staging",
           originalLabel: "v2",
-          packageHash:
-            "8d7573816249dc6f9f34bd04dc07d4bb62c5deb6c3b1b5e574e0f26c0d2f25c9",
+          packageHash: "b8fb2583c7c33e0ab01c50ae3bacbba74a380f5316fa329da52f0a818312eb4f",
           releaseMethod: "Promote",
           releasedBy: "test@p.com",
           rollout: 50,
-          size: "22",
-          tags: null
+          size: 144
         })
       );
   });
 
   it("should upload with short version 2.0", () => {
     const email = "test@short_version.com";
-    return ac.createApp({email, name: "short_version"})
-      .then(_ => ac.upload({
-        app: "short_version",
-        email,
-        package: `Some package content`,
-        packageInfo: {
-          appVersion: "2.0",
-          description: "Short app-version test"
-        }
-      }))
-      .then(_ => ac.historyDeployment({
-        app: "short_version",
-        deployment: "Staging",
-        email
-      }))
+    return createAccount(email, "ver")
+      .then(() => ac.createApp({ email, name: "short_version" }))
+      .then(_ => createZip(`Some short version 2.0 content`))
+      .then(pkg =>
+        ac.upload({
+          app: "short_version",
+          email,
+          package: pkg,
+          packageInfo: {
+            appVersion: "2.0",
+            description: "Short app-version test"
+          }
+        })
+      )
+      .then(_ =>
+        ac.historyDeployment({
+          app: "short_version",
+          deployment: "Staging",
+          email
+        })
+      )
       .then(pkg => {
         expect(pkg.length).eq(1);
         expect(pkg[0].appVersion).eq("2.0");
-        expect(pkg[0].description).eq("Short app-version test")
+        expect(pkg[0].description).eq("Short app-version test");
       });
   });
 
   it("disallow promote of same bundle", () => {
-    const email = "swaggychamp@gmail.com";
+    const email = "swaggypromote@gmail.com";
     const appName = "disallowSameBundle";
 
-    return ac
-      .createApp({ email, name: appName })
-      .then(() =>
+    return createAccount(email, "swaggypromot")
+      .then(_ => ac.createApp({ email, name: appName }))
+      .then(_ => createZip(`some bundle`))
+      .then(pkg =>
         ac.upload({
           app: appName,
           email,
-          package: readFixture("step.0.blob.zip"),
+          package: pkg,
           deployment: "Staging",
           packageInfo: {
             description: "release me"
@@ -337,13 +353,14 @@ describe("model/app", function() {
     const appName = "allowSameBundleDifferentAppVersion";
     let firstLabel = "",
       secondLabel = "";
-    return ac
-      .createApp({ email, name: appName })
-      .then(() =>
+    return createAccount(email, "champ")
+      .then(() => ac.createApp({ email, name: appName }))
+      .then(_ => createZip(`same bundle different versions`))
+      .then(pkg =>
         ac.upload({
           app: appName,
           email,
-          package: readFixture("step.0.blob.zip"),
+          package: pkg,
           deployment: "Staging",
           packageInfo: {
             description: "version 1",
@@ -354,11 +371,12 @@ describe("model/app", function() {
       .then(dep => {
         firstLabel = dep.label;
       })
-      .then(() =>
+      .then(_ => createZip(`sample bundle version 2`))
+      .then(pkg =>
         ac.upload({
           app: appName,
           email,
-          package: readFixture("step.0.blob.zip"),
+          package: pkg,
           deployment: "Staging",
           packageInfo: {
             description: "version 2",
@@ -393,11 +411,12 @@ describe("model/app", function() {
     const email = "test@p.com";
     return ac
       .createApp({ email, name: "rollback" })
-      .then(_ =>
+      .then(_ => createZip(`This is a string`))
+      .then(pkg =>
         ac.upload({
           app: "rollback",
           email,
-          package: `This is a string`,
+          package: pkg,
           packageInfo: {
             isDisabled: true,
             rollout: 25,
@@ -406,11 +425,12 @@ describe("model/app", function() {
           }
         })
       )
-      .then(_ =>
+      .then(_ => createZip(`This is a different string`))
+      .then(pkg =>
         ac.upload({
           app: "rollback",
           email,
-          package: `This is a different string`,
+          package: pkg,
           packageInfo: {
             appVersion: "1.0.2",
             rollout: 50,
@@ -420,9 +440,7 @@ describe("model/app", function() {
         })
       )
       .then(_ => ac.rollback({ email, app: "rollback", deployment: "Staging" }))
-      .then(_ =>
-        ac.historyDeployment({ email, app: "rollback", deployment: "Staging" })
-      )
+      .then(_ => ac.historyDeployment({ email, app: "rollback", deployment: "Staging" }))
       .then(history => {
         expect(history, "history length")
           .to.be.an("array")
@@ -438,63 +456,54 @@ describe("model/app", function() {
           {
             appVersion: "1.0.0",
             description: "Super Cool",
-            diffPackageMap: null,
+            diffPackageMap: {},
             isDisabled: true,
             isMandatory: true,
             label: "v3",
             originalDeployment: null,
-            manifestBlobUrl: null,
+            manifestBlobUrl: "97ff01925b85e2a51cfb0e26d468914599e1212f7d234f823c2c2cf9ac806e9e",
             originalLabel: "v1",
-            packageHash:
-              "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
-            blobUrl:
-              "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
+            packageHash: "95c531cd4ea137d07e7afa9a8f4a48dd101b5f60d8a74bd4f3a1cb534d899307",
+            blobUrl: "95c531cd4ea137d07e7afa9a8f4a48dd101b5f60d8a74bd4f3a1cb534d899307",
 
             releaseMethod: "Rollback",
             releasedBy: "test@p.com",
             rollout: 100,
-            size: "16",
-            tags: null
+            size: 126
           },
           {
             appVersion: "1.0.2",
             description: "Not Super Cool",
-            diffPackageMap: null,
+            diffPackageMap: {},
             isDisabled: false,
             isMandatory: true,
-            manifestBlobUrl: null,
+            manifestBlobUrl: "e3e0f766cabc8ad8d9e3dc71ecb17236add2702947f015024e5cef4f3ceecbfb",
             label: "v2",
             originalDeployment: null,
             originalLabel: null,
-            packageHash:
-              "f879d06a6923af0723ee0ac3ffbf8e81d2ef8596a7b8cb0160452e1cea74474a",
-            blobUrl:
-              "f879d06a6923af0723ee0ac3ffbf8e81d2ef8596a7b8cb0160452e1cea74474a",
+            packageHash: "9d00bcaa96c59928d148aa36bb7c38b5a9b70b3056d67ba7ec9e2e453b928658",
+            blobUrl: "9d00bcaa96c59928d148aa36bb7c38b5a9b70b3056d67ba7ec9e2e453b928658",
             releaseMethod: "Upload",
             releasedBy: "test@p.com",
             rollout: 50,
-            size: "26",
-            tags: null
+            size: 136
           },
           {
             appVersion: "1.0.0",
             description: "Super Cool",
-            diffPackageMap: null,
+            diffPackageMap: {},
             isDisabled: true,
-            manifestBlobUrl: null,
+            manifestBlobUrl: "97ff01925b85e2a51cfb0e26d468914599e1212f7d234f823c2c2cf9ac806e9e",
             isMandatory: true,
             label: "v1",
             originalDeployment: null,
             originalLabel: null,
-            blobUrl:
-              "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
-            packageHash:
-              "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
+            blobUrl: "95c531cd4ea137d07e7afa9a8f4a48dd101b5f60d8a74bd4f3a1cb534d899307",
+            packageHash: "95c531cd4ea137d07e7afa9a8f4a48dd101b5f60d8a74bd4f3a1cb534d899307",
             releaseMethod: "Upload",
             releasedBy: "test@p.com",
             rollout: 25,
-            size: "16",
-            tags: null
+            size: 126
           }
         ])
       );
@@ -503,11 +512,12 @@ describe("model/app", function() {
     const email = "test@p.com";
     return ac
       .createApp({ email, name: "rollbackToLabel" })
-      .then(_ =>
+      .then(_ => createZip(`This is a rollback string`))
+      .then(pkg =>
         ac.upload({
           app: "rollbackToLabel",
           email,
-          package: `This is a string`,
+          package: pkg,
           packageInfo: {
             isDisabled: true,
             rollout: 25,
@@ -516,11 +526,12 @@ describe("model/app", function() {
           }
         })
       )
-      .then(_ =>
+      .then(_ => createZip(`This is another rollback string`))
+      .then(pkg =>
         ac.upload({
           app: "rollbackToLabel",
           email,
-          package: `This is a different string`,
+          package: pkg,
           packageInfo: {
             appVersion: "1.0.2",
             rollout: 50,
@@ -556,64 +567,55 @@ describe("model/app", function() {
         eql([
           {
             appVersion: "1.0.0",
-            blobUrl:
-              "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
+            blobUrl: "f96293b842f1eaf5ca72b693abc1dead085a3d4fce0beceed3701c77b7193417",
             description: "Super Cool",
-            diffPackageMap: null,
+            diffPackageMap: {},
             isDisabled: true,
-            manifestBlobUrl: null,
+            manifestBlobUrl: "bb82ad6ea783dc1068254ce3d68aae5d0500c227881826f68a9d9b99374613e4",
 
             isMandatory: true,
             label: "v3",
             originalDeployment: null,
             originalLabel: "v1",
-            packageHash:
-              "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
+            packageHash: "f96293b842f1eaf5ca72b693abc1dead085a3d4fce0beceed3701c77b7193417",
             releaseMethod: "Rollback",
             releasedBy: "test@p.com",
             rollout: 100,
-            size: "16",
-            tags: null
+            size: 135
           },
           {
             appVersion: "1.0.2",
-            blobUrl:
-              "f879d06a6923af0723ee0ac3ffbf8e81d2ef8596a7b8cb0160452e1cea74474a",
+            blobUrl: "999d71e3e7b89a796f3714bb5d2e890f9aab27b5ccdd75d1269a68a9e620a0e6",
             description: "Not Super Cool",
-            diffPackageMap: null,
+            diffPackageMap: {},
             isDisabled: false,
             isMandatory: true,
-            manifestBlobUrl: null,
+            manifestBlobUrl: "4a5b60d8af17408862707d5734b02baf1400356271c6b99cc89a124a37bcf27b",
             label: "v2",
             originalDeployment: null,
             originalLabel: null,
-            packageHash:
-              "f879d06a6923af0723ee0ac3ffbf8e81d2ef8596a7b8cb0160452e1cea74474a",
+            packageHash: "999d71e3e7b89a796f3714bb5d2e890f9aab27b5ccdd75d1269a68a9e620a0e6",
             releaseMethod: "Upload",
             releasedBy: "test@p.com",
             rollout: 50,
-            size: "26",
-            tags: null
+            size: 141
           },
           {
             appVersion: "1.0.0",
-            blobUrl:
-              "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
+            blobUrl: "f96293b842f1eaf5ca72b693abc1dead085a3d4fce0beceed3701c77b7193417",
             description: "Super Cool",
-            diffPackageMap: null,
+            diffPackageMap: {},
             isDisabled: true,
             isMandatory: true,
-            manifestBlobUrl: null,
+            manifestBlobUrl: "bb82ad6ea783dc1068254ce3d68aae5d0500c227881826f68a9d9b99374613e4",
             label: "v1",
             originalDeployment: null,
             originalLabel: null,
-            packageHash:
-              "4e9518575422c9087396887ce20477ab5f550a4aa3d161c5c22a996b0abb8b35",
+            packageHash: "f96293b842f1eaf5ca72b693abc1dead085a3d4fce0beceed3701c77b7193417",
             releaseMethod: "Upload",
             releasedBy: "test@p.com",
             rollout: 25,
-            size: "16",
-            tags: null
+            size: 135
           }
         ])
       );
@@ -621,12 +623,13 @@ describe("model/app", function() {
   //const TOKEN = {profile: {email: 'test@t.com', name: 'test'}, provider: 'GitHub', query: {hostname: 'TestHost'}};
 
   it("should add/remove/transfer collabordators", () =>
-    ac
-      .createApp({
-        email: "what@p.com",
-        name: "addcollab"
-      })
-
+    createAccount("what@p.com", "what")
+      .then(() =>
+        ac.createApp({
+          email: "what@p.com",
+          name: "addcollab"
+        })
+      )
       .then(_ =>
         ac
           .addCollaborator({
@@ -635,9 +638,7 @@ describe("model/app", function() {
             collaborator: "stuff@p.com"
           })
           .then(shouldError, e => {
-            expect(e.message).to.eql(
-              `The specified e-mail address doesn't represent a registered user`
-            );
+            expect(e.message).to.eql(`No user found with email [stuff@p.com]`);
             return null;
           })
       )
@@ -678,9 +679,7 @@ describe("model/app", function() {
             collaborator: "what@p.com"
           })
           .then(shouldError, e => {
-            expect(e.message).to.eql(
-              "Cannot remove the owner of the app from collaborator list."
-            );
+            expect(e.message).to.eql("Cannot remove the owner of the app from collaborator list.");
             return null;
           })
       )
@@ -724,9 +723,7 @@ describe("model/app", function() {
             transfer: "dne@p.com"
           })
           .then(shouldError, e => {
-            expect(e.message).to.eql(
-              `The specified e-mail address doesn't represent a registered user`
-            );
+            expect(e.message).to.eql(`No user found with email [dne@p.com]`);
           })
       )
       .then(_ =>
@@ -759,8 +756,8 @@ describe("model/app", function() {
   it("should upload zipped app and create manifest", () => {
     const email = "zipper@walmart.com";
     const appName = "zipped_app";
-    return ac
-      .createApp({ email, name: appName })
+    return createAccount(email, "zipper")
+      .then(() => ac.createApp({ email, name: appName }))
       .then(() =>
         ac.upload({
           app: appName,
@@ -795,19 +792,22 @@ describe("model/app", function() {
   it("should reject duplicate upload", () => {
     const email = "duplicator@walmart.com";
     const appName = "duplicate_upload";
-    return ac
-      .createApp({ email, name: appName })
-      .then(() =>
-        ac.upload({
+    let dupPackage;
+    return createAccount(email, "duplicator")
+      .then(() => ac.createApp({ email, name: appName }))
+      .then(_ => createZip(`package to be duplicated`))
+      .then(pkg => {
+        dupPackage = pkg;
+        return ac.upload({
           app: appName,
           email,
-          package: readFixture("step.0.blob.zip"),
+          package: pkg,
           deployment: "Staging",
           packageInfo: {
             description: "First upload succeeds"
           }
-        })
-      )
+        });
+      })
       .then(() => {
         let hasException = false;
         return ac
@@ -815,7 +815,7 @@ describe("model/app", function() {
             app: appName,
             email,
             deployment: "Staging",
-            package: readFixture("step.0.blob.zip"),
+            package: dupPackage,
             packageInfo: {
               description: "Second upload should fail"
             }
@@ -836,13 +836,14 @@ describe("model/app", function() {
   it("allow duplicate upload for different versions", () => {
     const email = "dup_version@walmart.com";
     const appName = "duplicate_version_allowed";
-    return ac
-      .createApp({ email, name: appName })
-      .then(() =>
+    return createAccount(email, "dup")
+      .then(() => ac.createApp({ email, name: appName }))
+      .then(_ => createZip(`upload version 1`))
+      .then(pkg =>
         ac.upload({
           app: appName,
           email,
-          package: readFixture("step.0.blob.zip"),
+          package: pkg,
           deployment: "Staging",
           packageInfo: {
             description: "First upload succeeds",
@@ -850,49 +851,52 @@ describe("model/app", function() {
           }
         })
       )
-      .then(() =>
-        ac
-          .upload({
-            app: appName,
-            email,
-            package: readFixture("step.0.blob.zip"),
-            deployment: "Staging",
-            packageInfo: {
-              description: "Second upload succeeds too",
-              appVersion: "1.1.0"
-            }
-          })
-          .then(newPkg => {
-            expect(newPkg).not.to.be.undefined;
-            expect(newPkg.appVersion).to.eq("1.1.0");
-          })
-      );
+      .then(_ => createZip(`upload version 2`))
+      .then(pkg =>
+        ac.upload({
+          app: appName,
+          email,
+          package: pkg,
+          deployment: "Staging",
+          packageInfo: {
+            description: "Second upload succeeds too",
+            appVersion: "1.1.0"
+          }
+        })
+      )
+      .then(newPkg => {
+        expect(newPkg).not.to.be.undefined;
+        expect(newPkg.appVersion).to.eq("1.1.0");
+      });
   });
 
   it("should handle tags on upload", () => {
     const email = "tagger@taggington.com";
     const appName = "appWillUseTags";
     const tags = ["SOCCER-MOMS", "NASCAR-DADS"];
-    return ac.createApp({ email, name: appName }).then(() => {
-      return ac
-        .upload({
-          app: appName,
-          email,
-          package: readFixture("step.0.blob.zip"),
-          deployment: "Staging",
-          packageInfo: {
-            description: "release with tags",
-            tags
-          }
-        })
-        .then(newPkg => {
-          expect(newPkg).not.to.be.undefined;
-          expect(newPkg.tags).not.to.be.undefined;
-          expect(newPkg.tags.length).to.eq(tags.length);
-          expect(newPkg.tags.indexOf(tags[0])).to.be.gte(0);
-          expect(newPkg.tags.indexOf(tags[1])).to.be.gte(0);
-        });
-    });
+    return createAccount(email, "tagger")
+      .then(() => ac.createApp({ email, name: appName }))
+      .then(_ => createZip(`tags package`))
+      .then(pkg => {
+        return ac
+          .upload({
+            app: appName,
+            email,
+            package: pkg,
+            deployment: "Staging",
+            packageInfo: {
+              description: "release with tags",
+              tags
+            }
+          })
+          .then(newPkg => {
+            expect(newPkg).not.to.be.undefined;
+            expect(newPkg.tags).not.to.be.undefined;
+            expect(newPkg.tags.length).to.eq(tags.length);
+            expect(newPkg.tags.indexOf(tags[0])).to.be.gte(0);
+            expect(newPkg.tags.indexOf(tags[1])).to.be.gte(0);
+          });
+      });
   });
 
   it("should handle tags on promote", () => {
@@ -900,13 +904,14 @@ describe("model/app", function() {
     const appName = "appWillUseTagsOnPromotion";
     const tags = ["SITE-1222"];
 
-    return ac
-      .createApp({ email, name: appName })
-      .then(() =>
+    return createAccount(email, "taggy")
+      .then(() => ac.createApp({ email, name: appName }))
+      .then(_ => createZip(`taggy package`))
+      .then(pkg =>
         ac.upload({
           app: appName,
           email,
-          package: readFixture("step.0.blob.zip"),
+          package: pkg,
           deployment: "Staging",
           packageInfo: {
             description: "release without tags"
@@ -935,13 +940,14 @@ describe("model/app", function() {
     const appName = "appWillUpdateTags";
     const tags = ["SOUTHERN-US", "MIDWEST-US"];
 
-    return ac
-      .createApp({ email, name: appName })
-      .then(() =>
+    return createAccount(email, "tag")
+      .then(() => ac.createApp({ email, name: appName }))
+      .then(_ => createZip(`tags on update`))
+      .then(pkg =>
         ac.upload({
           app: appName,
           email,
-          package: readFixture("step.0.blob.zip"),
+          package: pkg,
           deployment: "Staging",
           packageInfo: {
             description: "release without tags initially"
@@ -968,13 +974,14 @@ describe("model/app", function() {
   it("should updateDeployment for a label", () => {
     const email = "label@walmart.com";
     const appName = "updateDeploymentWithLabel";
-    return ac
-      .createApp({ email, name: appName })
-      .then(() =>
+    return createAccount(email, "label")
+      .then(() => ac.createApp({ email, name: appName }))
+      .then(_ => createZip(`Package for v1`))
+      .then(pkg =>
         ac.upload({
           app: appName,
           email,
-          package: "Package for v1",
+          package: pkg,
           deployment: "Staging",
           packageInfo: {
             description: "v1 description",
@@ -984,11 +991,12 @@ describe("model/app", function() {
           }
         })
       )
-      .then(() =>
+      .then(_ => createZip(`Package for v2`))
+      .then(pkg =>
         ac.upload({
           app: appName,
           email,
-          package: "Package v2",
+          package: pkg,
           deployment: "Staging",
           packageInfo: {
             description: "v2 description",
@@ -1041,43 +1049,57 @@ describe("model/app", function() {
   it("should updateDeployment short appVersion", () => {
     const email = "short-version@walmart.com";
     const appName = "updateDeploymentWithShortVersion";
-    return ac
-      .createApp({ email, name: appName })
-      .then(() =>
+    return account
+      .createToken({
+        profile: { email, name: "short" },
+        provider: "GitHub"
+      })
+      .then(() => ac.createApp({ email, name: appName }))
+      .then(_ => createZip(`v1 short package`))
+      .then(pkg =>
         ac.upload({
           app: appName,
           email,
-          package: "Package for 19.18",
+          package: pkg,
           deployment: "Staging",
           packageInfo: {
             description: "v1 description",
             appVersion: "19.18"
           }
         })
-      ).then(() => ac.updateDeployment({
-        app:appName,
-        email,
-        description: "v1 updated description",
-        deployment: "Staging",
-        appVersion: "19.18"
-      })).then(updated => {
+      )
+      .then(() =>
+        ac.updateDeployment({
+          app: appName,
+          email,
+          description: "v1 updated description",
+          deployment: "Staging",
+          appVersion: "19.18"
+        })
+      )
+      .then(updated => {
         expect(updated).not.undefined;
         expect(updated.description).eq("v1 updated description");
         expect(updated.appVersion).eq("19.18");
-      })
+      });
   });
 
   it("updateDeployment should not copy from latest", () => {
     const email = "joesmoe@walmart.com";
     const appName = "updateDeployementDoesNotCopy";
 
-    return ac
-      .createApp({ email, name: appName })
-      .then(() =>
+    return account
+      .createToken({
+        profile: { email, name: "joe" },
+        provider: "GitHub"
+      })
+      .then(() => ac.createApp({ email, name: appName }))
+      .then(() => createZip(`package copy latest`))
+      .then(pkg =>
         ac.upload({
           app: appName,
           email,
-          package: "v1 Package",
+          package: pkg,
           deployment: "Staging",
           packageInfo: {
             description: "v1 description to be modified",
@@ -1090,11 +1112,12 @@ describe("model/app", function() {
           }
         })
       )
-      .then(() =>
+      .then(() => createZip(`package copy latest 2`))
+      .then(pkg =>
         ac.upload({
           app: appName,
           email,
-          package: "v2 Package",
+          package: pkg,
           deployment: "Staging",
           packageInfo: {
             description: "v2 description",
@@ -1150,8 +1173,12 @@ describe("model/app", function() {
     const email = "metricsApp@walmart.com";
     const deployment = "Staging";
     let deploymentKey;
-    return ac
-      .createApp({ email, name: appName })
+    return account
+      .createToken({
+        profile: { email, name: "metrics" },
+        provider: "GitHub"
+      })
+      .then(() => ac.createApp({ email, name: appName }))
       .then(app => dao.deploymentByApp(app.id, "Staging"))
       .then(deployment => {
         deploymentKey = deployment.key;
@@ -1171,7 +1198,7 @@ describe("model/app", function() {
               deploymentKey,
               status: d.status,
               label: d.label,
-              appversion: d.appversion
+              appVersion: d.appversion
             })
           )
         );
@@ -1196,46 +1223,49 @@ describe("model/app", function() {
     const email = "negativeMetrics@walmart.com";
     const deployment = "Staging";
     let deploymentKey;
-    return ac
-      .createApp({ email, name: appName })
+    return createAccount(email, "negative")
+      .then(() => ac.createApp({ email, name: appName }))
       .then(app => dao.deploymentByApp(app.id, deployment))
       .then(deployment => {
         deploymentKey = deployment.key;
-        return ac.upload({
+        return createZip(`negative package`);
+      })
+      .then(pkg =>
+        ac.upload({
           app: appName,
           email,
-          package: "Package of v1",
+          package: pkg,
           deployment: "Staging",
           packageInfo: {
             label: "v1"
           }
-        });
-      })
+        })
+      )
       .then(() => {
         const data = [
-          {
-            status: "DeploymentSucceeded",
-            label: "v1",
-            appversion: "1.0.0",
-            previouslabelorappversion: "1.0.0"
-          },
-          {
-            status: "DeploymentSucceeded",
-            label: "v1",
-            appversion: "1.0.0",
-            previouslabelorappversion: "1.0.0"
-          },
-          {
-            status: "DeploymentSucceeded",
-            label: "v1",
-            appversion: "1.0.0",
-            previouslabelorappversion: "1.0.0"
-          },
           {
             status: "DeploymentSucceeded",
             label: "1.0.0",
             appversion: "1.0.0",
             previouslabelorappversion: "0.0.0"
+          },
+          {
+            status: "DeploymentSucceeded",
+            label: "v1",
+            appversion: "1.0.0",
+            previouslabelorappversion: "1.0.0"
+          },
+          {
+            status: "DeploymentSucceeded",
+            label: "v1",
+            appversion: "1.0.0",
+            previouslabelorappversion: "1.0.0"
+          },
+          {
+            status: "DeploymentSucceeded",
+            label: "v1",
+            appversion: "1.0.0",
+            previouslabelorappversion: "1.0.0"
           }
         ];
         return Promise.all(
@@ -1245,8 +1275,8 @@ describe("model/app", function() {
               deploymentKey,
               status: d.status,
               label: d.label,
-              appversion: d.appversion,
-              previouslabelorappversion: d.previouslabelorappversion
+              appVersion: d.appversion,
+              previousLabelOrAppVersion: d.previouslabelorappversion
             })
           )
         );
@@ -1266,5 +1296,39 @@ describe("model/app", function() {
         expect(metrics["1.0.0"].installed).to.eq(1);
         expect(metrics["1.0.0"].failed).to.eq(0);
       });
+  });
+
+  it("retrieve metric from summary if available in summary", async () => {
+    const email = "cached_summary@walmart.com";
+    const deploymentType = "Staging";
+    const appName = "myApp";
+
+    await createAccount(email, "cached_summary");
+    const app = await ac.createApp({ email, name: appName });
+    const deployment = await dao.deploymentByApp(app.id, deploymentType);
+    const pkg = await createZip(`package summarized`);
+    await ac.upload({
+      app:appName,
+      email,
+      package: pkg,
+      deployment: deploymentType,
+      packageInfo: { label: "v1" }
+    });
+    await dao.insertMetric({
+      clientUniqueId: "UDD",
+      deploymentKey: deployment.key,
+      status: "DeploymentSucceeded",
+      label: "1.0.0",
+      appVersion: "1.0.0",
+      previousLabelOrAppVersion: "0.9.0"
+    });
+    await dao.addOrUpdateMetricSummary({
+      deploymentId: deployment.id,
+      lastRunTimeUTC: new Date(),
+      summaryJson: JSON.stringify({"1.0.0": { active: 2, downloaded: 2, installed: 1, failed: 1 }})
+    });
+
+    const metrics = await ac.metrics({ email, app:appName, deployment:deploymentType });
+    expect(metrics["1.0.0"]).deep.eq({ active: 2, downloaded: 2, installed: 1, failed: 1 });
   });
 });
