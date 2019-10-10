@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-service-worker",
-  "version": "4.5.0",
+  "version": "4.5.1",
   "description": "Electrode OTA service worker",
   "author": "Dat Vong <Dat.Vong@walmartlabs.com>",
   "homepage": "https://github.com/electrode-io/electrode-ota-server/tree/master/electrode-ota-service-worker#readme",
@@ -27,7 +27,7 @@
     "electrode-ota-server-diregister": "^4.5.0",
     "electrode-ota-server-logger": "^4.5.0",
     "electrode-ota-server-util": "^4.5.0",
-    "minimist":"1.2.0"
+    "minimist": "1.2.0"
   },
   "devDependencies": {
     "@types/chai": "^3.5.0",
