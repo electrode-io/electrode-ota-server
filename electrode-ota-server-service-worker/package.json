@@ -26,7 +26,8 @@
     "electrode-ota-server-default-config": "^4.5.0",
     "electrode-ota-server-diregister": "^4.5.0",
     "electrode-ota-server-logger": "^4.5.0",
-    "electrode-ota-server-util": "^4.5.0"
+    "electrode-ota-server-util": "^4.5.0",
+    "minimist":"1.2.0"
   },
   "devDependencies": {
     "@types/chai": "^3.5.0",
