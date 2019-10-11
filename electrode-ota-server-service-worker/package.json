@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-service-worker",
-  "version": "4.5.1",
+  "version": "4.5.2",
   "description": "Electrode OTA service worker",
   "author": "Dat Vong <Dat.Vong@walmartlabs.com>",
   "homepage": "https://github.com/electrode-io/electrode-ota-server/tree/master/electrode-ota-service-worker#readme",
