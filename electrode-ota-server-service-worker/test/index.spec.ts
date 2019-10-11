@@ -40,6 +40,7 @@ describe("index tests", () => {
     svc.on("child", (state: string, child: any) => {
       if (state === "starting") {
         expect(svc.runningWorkers()).eq(1);
+        expect(svc.workers[0].options['args']).deep.eq(["--sleep", "300", "--logging", "error"]);
         done();
       }
     });
@@ -60,17 +61,17 @@ describe("index tests", () => {
     factory(options, logger);
   });
 
-  it("index passes logging flag", (done) => {
+  it("index passes logging and sleep flags", (done) => {
     let options = {
       numberWorkers: 1,
-      logging: "debug"
+      logging: "debug",
+      workerSleep: 13
     };
     expect(svc.workers.length).eq(0);
     svc.on("child", (state: string, child:any) => {
       if (state === "starting") {
         expect(svc.workers.length).eq(1);
-        expect(svc.workers[0].options['args']).contains("--logging");
-        expect(svc.workers[0].options['args']).contains("debug");
+        expect(svc.workers[0].options['args']).deep.eq(["--sleep", "13", "--logging", "debug"]);
         done();
       }
     })

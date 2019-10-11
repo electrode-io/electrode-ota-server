@@ -19,7 +19,7 @@ export const factory = async (moduleOptions: any, logger: any) => {
   const workerOptions = Object.assign({}, defaultWorkerOptions, moduleOptions);
   const serviceDescriptor: ConfigDTO = {
     exec: path.join(__dirname, "./service_worker"),
-    args: ["--sleep", "" + (workerOptions.workerSleep * 1000), "--logging", workerOptions.logging ],
+    args: ["--sleep", "" + (workerOptions.workerSleep), "--logging", workerOptions.logging ],
     numberWorkers: workerOptions.numberWorkers
   };
   return svc.start(serviceDescriptor);
