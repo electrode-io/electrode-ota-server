@@ -44,7 +44,7 @@ export const clearTables = (connection) => {
 const defaultServerConfigs = {
   plugins: {
     "electrode-ota-server-dao-plugin": {
-      module: path.resolve(__dirname, "../../electrode-ota-server-dao-mariadb/lib/index"),
+      module: path.resolve(__dirname, "../../electrode-ota-server-dao-mariadb"),
       options: {
         clusterConfig: {
           canRetry: true,
