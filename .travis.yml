@@ -24,4 +24,4 @@ script:
   - cd electrode-ota-mariadb-schema
   - docker-compose build
   - docker-compose up -d
-  - docker-compose exec ota-db /common/wait-for-it.sh ota-db:3306
+  - docker-compose exec ota-db /common/wait-for-it.sh -t 30 ota-db:3306
