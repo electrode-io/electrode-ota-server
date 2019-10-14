@@ -57,7 +57,7 @@ const defaultServerConfigs = {
             database: "electrode_ota",
             host: "localhost",
             password: "ota",
-            port: 33060,
+            port: 3306,
             user: "ota"
           }
         ],
