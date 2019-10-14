@@ -25,5 +25,6 @@ script:
   - docker-compose build
   - docker-compose up -d
   - docker-compose exec ota-db /common/wait-for-it.sh -t 30 ota-db:3306
+  - docker-compose logs
   - yarn test
   - docker-compose down
