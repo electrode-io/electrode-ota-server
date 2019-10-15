@@ -100,6 +100,7 @@ To build..
 ```
 > npm install -g lerna yarn
 > lerna bootstrap
+> lerna run build
 ```
 
 To run all tests (will rebuilds all) ..

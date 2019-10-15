@@ -55,10 +55,10 @@ Start docker MariaDB in `electrode-ota-mariadb-schema`
 
 Run tests in this directory
 ```js
-% npm run test
+% yarn test
 ```
 
 Run build (compiles typescript)
 ```js
-% npm run build
+% yarn build
 ```
