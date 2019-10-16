@@ -202,6 +202,12 @@ describe("MetricSummaryDAO", function() {
     });
   });
 
+  it("test release lock without an acquire lock", () => {
+    const summaryToRelease = new MetricSummaryDTO();
+    summaryToRelease.deploymentId = stageDeploymentId!;
+    return dao.releaseMetricLock(summaryToRelease);
+  })
+
   it("test acquire lock, release lock, acquire lock", () => {
     return dao
       .acquireMetricLock(stageDeploymentKey, "host1", lockExpire)
@@ -221,12 +227,39 @@ describe("MetricSummaryDAO", function() {
     let updateFunc = sandbox.stub(MetricSummaryDAO, "addOrUpdateMetricSummary");
     let rollbackFunc = sandbox.spy(MetricSummaryDAO, "rollback");
     updateFunc.throws(new Error("addOrUpdate failed in some way"));
-    return dao.acquireMetricLock(stageDeploymentKey, "blitz", lockExpire)
+    return dao
+      .acquireMetricLock(stageDeploymentKey, "blitz", lockExpire)
       .then(() => {
         throw new Error("Exception expected");
-      }).catch((err) => {
+      })
+      .catch(err => {
         expect(err).not.undefined;
         expect(err.toString()).eq("Error: addOrUpdate failed in some way");
+        expect(rollbackFunc.called).true;
+      });
+  });
+
+  it("test release lock fails if not the same lock", () => {
+    let firstSummary: any;
+    let rollbackFunc = sandbox.spy(MetricSummaryDAO, "rollback");
+    const lockExpireNow = new Date(Date.now() - 1);
+    return dao
+      .acquireMetricLock(stageDeploymentKey, "donald shrimp fingers", lockExpireNow)
+      .then(summary => {
+        expect(summary).not.undefined;
+        expect(summary!.lockBy).eq("donald shrimp fingers");
+        firstSummary = summary;
+        return dao.acquireMetricLock(stageDeploymentKey, "donald the swamp", lockExpire);
+      })
+      .then(summary => {
+        expect(summary).not.undefined;
+        expect(summary!.lockBy).eq("donald the swamp");
+        return dao.releaseMetricLock(firstSummary);
+      })
+      .then(_ => expect.fail("Test expected to fail"))
+      .catch(err => {
+        expect(err).not.undefined;
+        expect(err.toString()).match(/Lock acquired by donald the swamp (.*) can not be released by donald shrimp fingers (.*(PDT))/);
         expect(rollbackFunc.called).true;
       });
   });

@@ -42,13 +42,25 @@ export default class MetricSummaryDAO extends BaseDAO {
     connection: IConnection,
     summary: MetricSummaryDTO
   ): Promise<void> {
-    return MetricSummaryDAO.query(connection, MetricSummaryQueries.updateSummaryById, [
-      null,
-      null,
-      summary.lastRunTimeUTC,
-      summary.summaryJson,
-      summary.id
-    ]);
+    await MetricSummaryDAO.beginTransaction(connection);
+    try {
+      let currentSummary = await MetricSummaryDAO.getSummaryByDeploymentId(connection, summary.deploymentId);
+      if (currentSummary) {
+        if (currentSummary.lockBy != summary.lockBy || currentSummary.lockTimeUTC !== currentSummary.lockTimeUTC) {
+          throw new Error(`Lock acquired by ${currentSummary.lockBy} (${currentSummary.lockTimeUTC}) can not be released by ${summary.lockBy} (${summary.lockTimeUTC})`);
+        }
+      }
+      let result = await MetricSummaryDAO.query(
+        connection,
+        MetricSummaryQueries.updateSummaryById,
+        [null, null, summary.lastRunTimeUTC, summary.summaryJson, summary.id]
+      );
+      await MetricSummaryDAO.commit(connection);
+      return result;
+    } catch (err) {
+      await MetricSummaryDAO.rollback(connection);
+      throw err;
+    }
   }
 
   public static async getMetricSummary(
