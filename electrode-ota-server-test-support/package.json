@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-test-support",
-  "version": "4.5.0",
+  "version": "4.6.0",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -12,14 +12,15 @@
     "bluebird": "^3.5.1",
     "boom": "^4.3.1",
     "chai": "^3.5.0",
-    "electrode-ota-server-util": "^4.5.0",
+    "electrode-ota-server-util": "^4.6.0",
     "supertest": "^3.0.0"
   },
   "peerDependencies": {
     "electrode-ota-server": "1.0.0",
-    "electrode-ota-server-dao-cassandra": "1.0.0"
+    "electrode-ota-server-dao-cassandra": "1.0.0",
+    "electrode-ota-server-dao-mariadb": "^4.5.0"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^4.5.0"
+    "electrode-ota-server-util-dev": "^4.6.0"
   }
 }

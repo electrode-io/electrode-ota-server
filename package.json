@@ -11,7 +11,7 @@
   "main": "index.js",
   "scripts": {
     "rebuild":
-      "lerna clean --yes && lerna bootstrap  --include-filtered-dependencies && yarn run relink ",
+      "lerna clean --yes && lerna bootstrap  --include-filtered-dependencies && lerna run build && yarn run relink ",
     "relink": "lr-link",
     "lerna": "yarn run rebuild",
     "test":
