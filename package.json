@@ -24,7 +24,7 @@
     "electrode-ota-server": "./index.js"
   },
   "engines": {
-    "node": "^8.16.0"
+    "node": ">=8.16"
   },
   "keywords": ["code-push", "ota", "electrode", "react-native", "cordova"],
   "dependencies": {
