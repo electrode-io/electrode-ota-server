@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-model-app",
-  "version": "4.6.0",
+  "version": "4.6.1",
   "main": "lib/index.js",
   "license": "Apache-2.0",
   "scripts": {
@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "electrode-ota-server-dao-cassandra": "^4.6.0",
-    "electrode-ota-server-dao-mariadb": "^4.6.0",
+    "electrode-ota-server-dao-mariadb": "^4.6.1",
     "electrode-ota-server-test-support": "^4.6.0",
     "electrode-ota-server-util-dev": "^4.6.0",
     "yazl": "^2.4.1"
