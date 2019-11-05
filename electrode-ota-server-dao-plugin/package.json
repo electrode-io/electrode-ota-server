@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-dao-plugin",
-  "version": "4.6.0",
+  "version": "4.6.2",
   "description": "OTA Express-Cassandra DAO",
   "main": "lib/index.js",
   "scripts": {
@@ -11,14 +11,14 @@
   },
   "dependencies": {
     "bluebird": "^3.5.1",
-    "electrode-ota-server-diregister": "^4.6.0",
-    "electrode-ota-server-errors": "^4.6.0",
-    "electrode-ota-server-logger": "^4.6.0",
-    "electrode-ota-server-util": "^4.6.0",
+    "electrode-ota-server-diregister": "^4.6.2",
+    "electrode-ota-server-errors": "^4.6.2",
+    "electrode-ota-server-logger": "^4.6.2",
+    "electrode-ota-server-util": "^4.6.2",
     "express-cassandra": "1.9.0"
   },
   "devDependencies": {
-    "electrode-ota-server-test-support": "^4.6.0",
-    "electrode-ota-server-util-dev": "^4.6.0"
+    "electrode-ota-server-test-support": "^4.6.2",
+    "electrode-ota-server-util-dev": "^4.6.2"
   }
 }
