@@ -10,15 +10,12 @@
   "homepage": "https://github.com/electrode-io/electrode-ota-server",
   "main": "index.js",
   "scripts": {
-    "rebuild":
-      "lerna clean --yes && lerna bootstrap  --include-filtered-dependencies && lerna run build && yarn run relink ",
+    "rebuild": "lerna clean --yes && lerna bootstrap  --include-filtered-dependencies && lerna run build && yarn run relink ",
     "relink": "lr-link",
     "lerna": "yarn run rebuild",
-    "test":
-      "yarn run lerna && mocha --compilers js:./electrode-ota-server-util-dev/babelhook ./electrode-ota-server*/test/*-test.js",
+    "test": "yarn run lerna && mocha --compilers js:./electrode-ota-server-util-dev/babelhook ./electrode-ota-server*/test/*-test.js",
     "lint": "./node_modules/.bin/eslint ./**/*.js",
-    "coverage":
-      "./node_modules/.bin/nyc --sourceMap=false --reportDir=./coverage --instrument=false --all --include=./electrode-ota-server*/src/**/*.js mocha --compilers js:./electrode-ota-server-util-dev/babelhook-coverage  ./electrode-ota-server*/test/*-test.js  && nyc report --reporter=html"
+    "coverage": "./node_modules/.bin/nyc --sourceMap=false --reportDir=./coverage --instrument=false --all --include=./electrode-ota-server*/src/**/*.js mocha --compilers js:./electrode-ota-server-util-dev/babelhook-coverage  ./electrode-ota-server*/test/*-test.js  && nyc report --reporter=html"
   },
   "bin": {
     "electrode-ota-server": "./index.js"
@@ -26,7 +23,13 @@
   "engines": {
     "node": ">=8.16"
   },
-  "keywords": ["code-push", "ota", "electrode", "react-native", "cordova"],
+  "keywords": [
+    "code-push",
+    "ota",
+    "electrode",
+    "react-native",
+    "cordova"
+  ],
   "dependencies": {
     "lerna": "^2.0.0-rc.2",
     "lerna-relinker": "^1.2.2"
@@ -49,6 +52,7 @@
     "eslint-config-walmart": "^2.2.0",
     "eslint-plugin-filenames": "^1.2.0",
     "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-mocha": "^6.2.1",
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-prettier": "^2.4.0",
     "eslint-plugin-promise": "^3.6.0",
