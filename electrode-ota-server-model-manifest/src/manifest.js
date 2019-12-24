@@ -222,7 +222,8 @@ export const downloadOrGenerateManifest = (download, upload, current) => {
     return download(current.packageHash, current.blobUrl)
         .then(({ content, length }) => generate(content))
         .then((manifest) => {
-            return upload(JSON.stringify(manifest), manifestHash(manifest))
+            const isManifest = true;
+            return upload(JSON.stringify(manifest), manifestHash(manifest), isManifest)
                 .then(({ blobUrl }) => current.manifestBlobUrl = blobUrl)
                 .then(() => manifest);
         });
