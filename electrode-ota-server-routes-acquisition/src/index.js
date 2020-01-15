@@ -33,8 +33,6 @@ export const register = diregister({
             }
             // if snake_case request? convert the response to the same
             const updateInfo = snakeCaseRequested ? keysToCamelOrSnake(updatedInfo) : updatedInfo;
-            console.log(request.url.path);
-            console.log({ updateInfo });
             reply({ updateInfo });
         });
     };
