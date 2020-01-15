@@ -78,5 +78,12 @@ describe('electrode-ota-server', function () {
         }
     })));
 
-
+    it('should respond to newly updated directive "/updated_check" with modified params', request({
+        url: '/update_check?deployment_key=evHVNrwuJDVdTvpSouLxKpEyowtcxyWcyVCxnsFD&app_version=1.2.3&package_hash=&is_companion=&label=&client_unique_id=76451410-77F2-423C-836C-623AA5F586B5'
+    }, body({
+        updateInfo: {
+            is_available: false,
+            should_run_binary_version: false
+        }
+    })));
 });

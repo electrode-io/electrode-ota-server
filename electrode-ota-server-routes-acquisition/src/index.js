@@ -1,48 +1,65 @@
-import { wrap, reqFields, streamToBuf } from 'electrode-ota-server-util';
+import { wrap, reqFields } from "electrode-ota-server-util";
 import diregister from "electrode-ota-server-diregister";
-const noContent = (reply) => (e) => {
+import keysToCamelOrSnake from "./keys-to-camel-or-snake";
+
+const HTTP_OK = 200;
+
+const ok = reply => e => {
     if (e) return reply(e);
-    reply().code(204);
-};
-const ok = (reply) => (e) => {
-    if (e) return reply(e);
-    reply('OK').code(200);
+    reply("OK").code(HTTP_OK);
 };
 
 export const register = diregister({
-    name: 'acquisitionRoute',
-    dependencies: ['electrode:route', 'ota!acquisition', 'ota!logger']
+    name: "acquisitionRoute",
+    dependencies: ["electrode:route", "ota!acquisition", "ota!logger"]
+// eslint-disable-next-line max-params
 }, (options, route, acquisition, logger) => {
     const {
         download,
         updateCheck,
         downloadReportStatus,
         deployReportStatus
-
     } = wrap(acquisition);
 
-    route([
+    const handleUpdateCheck = (request, reply) => {
+        logger.info(reqFields(request), "updateCheck request");
+        const snakeCaseRequested = /update_check/.test(request.url.path);
+        // if snake_case request? convert to camelCase
+        const qs = snakeCaseRequested ? keysToCamelOrSnake(request.query) : request.query;
+        updateCheck(qs, (e, updatedInfo) => {
+            if (e) {
+                console.log("error making update check ", request.query, e.message);
+                return reply(e);
+            }
+            // if snake_case request? convert the response to the same
+            const updateInfo = snakeCaseRequested ? keysToCamelOrSnake(updatedInfo) : updatedInfo;
+            console.log(request.url.path);
+            console.log({ updateInfo });
+            reply({ updateInfo });
+        });
+    };
 
+    route([
         {
             method: "GET",
             path: "/updateCheck",
             config: {
                 auth: false,
-                handler(request, reply) {
-                    logger.info(reqFields(request), "updateCheck request");
-                    updateCheck(request.query, (e, updateInfo) => {
-                        if (e) {
-                            console.log('error making update check ', request.query, e.message);
-                            return reply(e);
-                        }
-                        reply({ updateInfo });
-                    });
-                },
+                handler: handleUpdateCheck,
                 tags: ["api"]
             }
         },
         {
-            path: '/storagev2/{packageHash}',
+            method: "GET",
+            path: "/update_check",
+            config: {
+                auth: false,
+                handler: handleUpdateCheck,
+                tags: ["api"]
+            }
+        },
+        {
+            path: "/storagev2/{packageHash}",
             method: "GET",
             config: {
                 auth: false,
@@ -58,8 +75,8 @@ export const register = diregister({
             }
         },
         {
-            path: '/reportStatus/deploy',
-            method: 'POST',
+            path: "/reportStatus/deploy",
+            method: "POST",
             config: {
                 auth: false,
                 handler(request, reply) {
@@ -70,8 +87,8 @@ export const register = diregister({
             }
         },
         {
-            path: '/reportStatus/download',
-            method: 'POST',
+            path: "/reportStatus/download",
+            method: "POST",
             config: {
                 auth: false,
                 handler(request, reply) {
