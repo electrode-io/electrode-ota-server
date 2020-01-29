@@ -37,6 +37,22 @@ export const register = diregister({
         });
     };
 
+    const handleReportDeployStatus = (request, reply) => {
+        logger.info(reqFields(request), "report deployment status request");
+        const snakeCaseRequested = /report_status/.test(request.url.path);
+        // if snake_case request? convert to camelCase
+        const payload = snakeCaseRequested ? keysToCamelOrSnake(request.payload) : request.payload;
+        deployReportStatus(payload, ok(reply));
+    };
+
+    const handleReportDownloadStatus = (request, reply) => {
+        logger.info(reqFields(request), "report download status request");
+        const snakeCaseRequested = /report_status/.test(request.url.path);
+        // if snake_case request? convert to camelCase
+        const payload = snakeCaseRequested ? keysToCamelOrSnake(request.payload) : request.payload;
+        downloadReportStatus(request.payload, ok(reply));
+    };
+
     route([
         {
             method: "GET",
@@ -77,10 +93,16 @@ export const register = diregister({
             method: "POST",
             config: {
                 auth: false,
-                handler(request, reply) {
-                    logger.info(reqFields(request), "report deployment status request");
-                    deployReportStatus(request.payload, ok(reply));
-                },
+                handler: handleReportDeployStatus,
+                tags: ["api"]
+            }
+        },
+        {
+            path: "/report_status/deploy",
+            method: "POST",
+            config: {
+                auth: false,
+                handler: handleReportDeployStatus,
                 tags: ["api"]
             }
         },
@@ -89,10 +111,16 @@ export const register = diregister({
             method: "POST",
             config: {
                 auth: false,
-                handler(request, reply) {
-                    logger.info(reqFields(request), "report download status request");
-                    downloadReportStatus(request.payload, ok(reply));
-                },
+                handler: handleReportDownloadStatus,
+                tags: ["api"]
+            }
+        },
+        {
+            path: "/report_status/download",
+            method: "POST",
+            config: {
+                auth: false,
+                handler: handleReportDownloadStatus,
                 tags: ["api"]
             }
         }

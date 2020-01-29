@@ -141,8 +141,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
             metric.status = "Downloaded";
             return dao.insertMetric(metric)
                 .tap(() => logger.info({ depoymentKey: metric.deploymentKey, label: metric.label }, "recorded download success"));
-        }
-        ,
+        },
         /**
          * {
 	"appVersion": "1.0.0",
