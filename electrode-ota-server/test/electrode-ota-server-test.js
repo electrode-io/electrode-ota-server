@@ -78,7 +78,7 @@ describe('electrode-ota-server', function () {
         }
     })));
 
-    it('should respond to newly updated service "/updated_check" with modified params', request({
+    it('should respond to newly updated service "/update_check" with modified params', request({
         url: '/update_check?deployment_key=evHVNrwuJDVdTvpSouLxKpEyowtcxyWcyVCxnsFD&app_version=1.2.3&package_hash=&is_companion=&label=&client_unique_id=76451410-77F2-423C-836C-623AA5F586B5'
     }, body({
         updateInfo: {
@@ -87,8 +87,8 @@ describe('electrode-ota-server', function () {
         }
     })));
 
-    it('should respond with old response structure for "/updateCheck" service even if "updated_check=true" is in parameters', request({
-        url: '/update_check?deployment_key=evHVNrwuJDVdTvpSouLxKpEyowtcxyWcyVCxnsFD&app_version=1.2.3&package_hash=&is_companion=&label=&client_unique_id=76451410-77F2-423C-836C-623AA5F586B5'
+    it('should respond with old/existing response structure for "/updateCheck" service even if "update_check=true" is in parameters', request({
+        url: '/updateCheck?update_check=true&deployment_key=evHVNrwuJDVdTvpSouLxKpEyowtcxyWcyVCxnsFD&app_version=1.2.3&package_hash=&is_companion=&label=&client_unique_id=76451410-77F2-423C-836C-623AA5F586B5'
     }, body({
         updateInfo: {
             isAvailable: false,
@@ -99,13 +99,27 @@ describe('electrode-ota-server', function () {
     it('should respond to newly updated service "/report_status/deploy" with modified params', request({
         method: 'POST',
         url: '/report_status/deploy',
-        body: {"deployment_key": "evHVNrwuJDVdTvpSouLxKpEyowtcxyWcyVCxnsFD", "app_version": "1.2.3","package_hash":"","is_companion":"", "label": "", "client_unique_id": "76451410-77F2-423C-836C-623AA5F586B5"}
+        payload: {
+            deployment_key: "evHVNrwuJDVdTvpSouLxKpEyowtcxyWcyVCxnsFD",
+            app_version: "1.2.3",
+            package_hash:"",
+            is_companion:"",
+            label: "",
+            client_unique_id: "76451410-77F2-423C-836C-623AA5F586B5"
+        }
     }, body("OK")));
 
     it('should respond to newly updated service "/report_status/download" with modified params', request({
         method: 'POST',
         url: '/report_status/download',
-        body: {"deployment_key": "evHVNrwuJDVdTvpSouLxKpEyowtcxyWcyVCxnsFD", "app_version": "1.2.3","package_hash":"","is_companion":"", "label": "", "client_unique_id": "76451410-77F2-423C-836C-623AA5F586B5"}
+        payload: {
+            deployment_key: "evHVNrwuJDVdTvpSouLxKpEyowtcxyWcyVCxnsFD",
+            app_version: "1.2.3",
+            package_hash:"",
+            is_companion:"",
+            label: "",
+            client_unique_id: "76451410-77F2-423C-836C-623AA5F586B5"
+        }
     }, body("OK")));
 });
 
