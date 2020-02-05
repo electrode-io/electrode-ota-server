@@ -107,7 +107,7 @@ describe('electrode-ota-server', function () {
             label: "",
             client_unique_id: "76451410-77F2-423C-836C-623AA5F586B5"
         }
-    }, body("OK")));
+    }, match(/OK/)));
 
     it('should respond to newly updated service "/report_status/download" with modified params', request({
         method: 'POST',
@@ -120,8 +120,6 @@ describe('electrode-ota-server', function () {
             label: "",
             client_unique_id: "76451410-77F2-423C-836C-623AA5F586B5"
         }
-    }, (response) => {
-        console.log(response);
-    }));
+    }, match(/OK/)));
 });
 
