@@ -22,8 +22,9 @@ export const register = diregister({
     } = wrap(acquisition);
 
     const handleUpdateCheck = (request, reply) => {
-        logger.info(reqFields(request), "updateCheck request");
-        const snakeCaseRequested = /update_check/.test(request.url.path);
+        const action = request.url.pathname;
+        logger.info(reqFields(request), `${action} request`);
+        const snakeCaseRequested = /update_check/.test(action);
         // if snake_case request? convert to camelCase
         const qs = snakeCaseRequested ? keysToCamelOrSnake(request.query) : request.query;
         updateCheck(qs, (e, updatedInfo) => {
@@ -38,19 +39,21 @@ export const register = diregister({
     };
 
     const handleReportDeployStatus = (request, reply) => {
-        logger.info(reqFields(request), "report deployment status request");
-        const snakeCaseRequested = /report_status/.test(request.url.path);
+        const action = request.url.pathname;
+        logger.info(reqFields(request), `report deployment status request ${action}`);
+        const snakeCaseRequested = /report_status/.test(action);
         // if snake_case request? convert to camelCase
         const payload = snakeCaseRequested ? keysToCamelOrSnake(request.payload) : request.payload;
         deployReportStatus(payload, ok(reply));
     };
 
     const handleReportDownloadStatus = (request, reply) => {
-        logger.info(reqFields(request), "report download status request");
-        const snakeCaseRequested = /report_status/.test(request.url.path);
+        const action = request.url.pathname;
+        logger.info(reqFields(request), `report download status request ${action}`);
+        const snakeCaseRequested = /report_status/.test(action);
         // if snake_case request? convert to camelCase
         const payload = snakeCaseRequested ? keysToCamelOrSnake(request.payload) : request.payload;
-        downloadReportStatus(request.payload, ok(reply));
+        downloadReportStatus(payload, ok(reply));
     };
 
     route([
