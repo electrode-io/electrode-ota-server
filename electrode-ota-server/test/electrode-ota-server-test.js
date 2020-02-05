@@ -88,7 +88,7 @@ describe('electrode-ota-server', function () {
     })));
 
     it('should respond with old/existing response structure for "/updateCheck" service even if "update_check=true" is in parameters', request({
-        url: '/updateCheck?update_check=true&deployment_key=evHVNrwuJDVdTvpSouLxKpEyowtcxyWcyVCxnsFD&app_version=1.2.3&package_hash=&is_companion=&label=&client_unique_id=76451410-77F2-423C-836C-623AA5F586B5'
+        url: '/updateCheck?update_check=true&deploymentKey=evHVNrwuJDVdTvpSouLxKpEyowtcxyWcyVCxnsFD&appVersion=1.2.3&packageHash=&isCompanion=&label=&clientUniqueId=76451410-77F2-423C-836C-623AA5F586B5'
     }, body({
         updateInfo: {
             isAvailable: false,
@@ -120,6 +120,8 @@ describe('electrode-ota-server', function () {
             label: "",
             client_unique_id: "76451410-77F2-423C-836C-623AA5F586B5"
         }
-    }, body("OK")));
+    }, (response) => {
+        console.log(response);
+    }));
 });
 
