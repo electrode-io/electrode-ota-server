@@ -1,5 +1,9 @@
-import { missingParameter } from 'electrode-ota-server-errors';
-import version from 'semver';
+/* eslint-disable max-params */
+import { missingParameter } from "electrode-ota-server-errors";
+import version from "semver";
+
+const ZERO = 0;
+const HUNDRED = 100;
 
 export default (options, dao, weighted, _download, manifest, logger) => {
     const api = {
@@ -9,6 +13,9 @@ export default (options, dao, weighted, _download, manifest, logger) => {
 
         /**
          *  https://codepush.azurewebsites.net/updateCheck?deploymentKey=5UfjnOxv1FnCJ_DwPqMWQYSVlp0H4yecGHaB-&appVersion=1.2.3&packageHash=b10064ba007b3857655726404972980f963879fa4fe196b1ef9d06ae6d3891d5&isCompanion=&label=&clientUniqueId=4B4CBBF7-7F0A-4D34-BD9A-984FD190766D
+         * @param {Object} params as query-string Object
+         * @returns {Object} data-object
+         *
          * param deploymentKey
          * param appVersion
          * param packageHash
@@ -30,11 +37,11 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                     return {
                         isAvailable: false,
                         shouldRunBinaryVersion: false
-                    }
+                    };
                 }
 
                 pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags, params.appVersion);
-                if(!pkg) {
+                if (!pkg) {
                     // no package match, use latest version that matches tag
                     pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags);
                     if (!pkg) {
@@ -42,16 +49,17 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         return {
                             isAvailable: false,
                             shouldRunBinaryVersion: false
-                        }
+                        };
                     }
                 }
                 const pkgAppVersion = version.coerce(pkg.appVersion, true).toString();
                 const paramAppVersion = version.coerce(params.appVersion, true).toString();
 
-                let isNotAvailable = pkg.packageHash == params.packageHash || !('clientUniqueId' in params)
+                const isNotAvailable = pkg.packageHash == params.packageHash || !("clientUniqueId" in params)
                     || version.gt(paramAppVersion, pkgAppVersion)
                     || pkg.isDisabled;
 
+                // eslint-disable-next-line func-style
                 function makeReturn(isAvailable) {
                     const packageSize = pkg && pkg.size && (pkg.size - 0) || 0;
                     const ret = {
@@ -64,9 +72,9 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         packageHash: pkg.packageHash,
                         description: pkg.description,
                         // true == there is an update but it requires a newer binary version.
-                        "updateAppVersion": version.lt(paramAppVersion, pkgAppVersion),
+                        updateAppVersion: version.lt(paramAppVersion, pkgAppVersion),
                         //TODO - find out what this should be
-                        "shouldRunBinaryVersion": false
+                        shouldRunBinaryVersion: false
                     };
                     if (isAvailable) {
                         if (pkg.manifestBlobUrl && params.packageHash) {
@@ -81,7 +89,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                                     .then(history => history.filter(v => v.packageHash == params.packageHash))
                                     .then(matches => {
                                         // No packages match params.packageHash;  return existing package
-                                        if(matches.length == 0) {
+                                        if (matches.length === ZERO) {
                                             return ret;
                                         }
                                         // manifest generates the diff between latest package and client's package
@@ -89,6 +97,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                                             const newPackage = v[v.length - 1];
                                             // TODO: Offload generating a diff map to another process.
                                             // Save package diff created from manifest
+                                            // eslint-disable-next-line max-nested-callbacks
                                             return dao.addPackageDiffMap(deployment.key, newPackage, params.packageHash).then(() => {
                                                 const p2 = newPackage.diffPackageMap && newPackage.diffPackageMap[params.packageHash];
                                                 if (p2) {
@@ -112,7 +121,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                     makeReturn(!isNotAvailable) :
                     api.isUpdateAble(params.clientUniqueId, pkg.packageHash, pkg.rollout, pkg.tags).then(makeReturn);
 
-            }).tap((res) => {
+            }).tap(res => {
                 logger.info({
                     event: {
                         name: "checkedForUpdate",
@@ -129,11 +138,10 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                               deploymentKey,
                               label
                               }*/ metric) {
-            metric.status = 'Downloaded';
+            metric.status = "Downloaded";
             return dao.insertMetric(metric)
                 .tap(() => logger.info({ depoymentKey: metric.deploymentKey, label: metric.label }, "recorded download success"));
-        }
-        ,
+        },
         /**
          * {
 	"appVersion": "1.0.0",
@@ -166,11 +174,11 @@ export default (options, dao, weighted, _download, manifest, logger) => {
          * the last roll of the die.
          * Otherwise roll the die and save the results so if we get asked again...
          *
-         * @param uniqueClientId
-         * @param packageHash
-         * @param ratio
-         * @param tags
-         * @returns {*}
+         * @param {String} uniqueClientId unique-client identifier
+         * @param {String} packageHash unique name for the package as hash
+         * @param {String} ratio given ratio
+         * @param {String} tags the tag
+         * @returns {*} data-object
          */
         isUpdateAble(uniqueClientId, packageHash, ratio, tags) {
             // if the package has tags, the rollout will not be taken into account;
@@ -180,17 +188,17 @@ export default (options, dao, weighted, _download, manifest, logger) => {
             }
 
             //ratio 0 means no deployment.
-            if (ratio == 0) {
+            if (ratio === ZERO) {
                 return Promise.resolve(false);
             }
             //ratio null well shouldn't be so we'll do true.
-            if (ratio == 100 || ratio == null) {
+            if (ratio === HUNDRED || ratio == null) {
                 return Promise.resolve(true);
             }
 
             return dao.clientRatio(uniqueClientId, packageHash).then(resp => {
                 //if the ratio is the same just return the last decision;
-                if (resp && resp.ratio == ratio) {
+                if (resp && resp.ratio === ratio) {
                     return resp.updated;
                 }
                 const updated = weighted(ratio);
