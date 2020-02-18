@@ -86,7 +86,7 @@ export const register = diregister({
                         if (e) return reply(e);
                         const { content, length } = o;
                         reply(content)
-                            .header("Cache-Control", "s-maxage=31536000, max-age=0, proxy-revalidate")
+                            .header("Cache-Control", "s-maxage=31536000, max-age=0")
                             .type("application/octet-stream")
                             .bytes(length);
                     });
