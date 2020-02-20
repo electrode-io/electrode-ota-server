@@ -85,7 +85,10 @@ export const register = diregister({
                     download(request.params.packageHash, (e, o) => {
                         if (e) return reply(e);
                         const { content, length } = o;
-                        reply(content).type("application/octet-stream").bytes(length);
+                        reply(content)
+                            .header("Cache-Control", "s-maxage=31536000, max-age=0")
+                            .type("application/octet-stream")
+                            .bytes(length);
                     });
                 },
                 tags: ["api"]
