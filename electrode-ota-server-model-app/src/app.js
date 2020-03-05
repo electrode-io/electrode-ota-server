@@ -590,13 +590,17 @@ export default (options, dao, upload, logger) => {
             // cleanup and merge the results
             const latestSummary = doSummarize(metrics, label);
             if (isValidObject(latestSummary)) {
-              for (const k in summary) {
+              for (const k in latestSummary) {
+                if (!summary[k]) {
+                  summary[k] = { active: 0, downloaded: 0, failed: 0, installed: 0 };
+                }
                 summary[k].active += latestSummary[k].active;
                 summary[k].downloaded += latestSummary[k].downloaded;
                 summary[k].failed += latestSummary[k].failed;
                 summary[k].installed += latestSummary[k].installed;
               }
             }
+
             return summary;
           });
         }

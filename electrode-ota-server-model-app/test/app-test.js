@@ -12,7 +12,8 @@ import { shasum } from "electrode-ota-server-util";
 import { expect } from "chai";
 import step0Manifest from "./fixtures/step.0.manifest.json";
 
-const delay = timeout => (...args) => new Promise(resolve => setTimeout(resolve, timeout, ...args));
+const ONE_MIN = 1000; //in millisecond
+const ONE_SECOND = 60;
 
 const fixture = path.join.bind(path, __dirname, "fixtures");
 const readFixture = file => fs.readFileSync(fixture(file));
@@ -25,8 +26,13 @@ const APP = {
   email: "test@p.com",
   app: "super"
 };
+
 let metricSummaryDeployment;
-let metricSummaryApp;
+let metricSummaryApp = {
+  appName: "myApp",
+  email: "cached_summary@walmart.com",
+  deploymentType: "Staging"
+};
 
 describe("model/app", function() {
   this.timeout(50000);
@@ -1305,13 +1311,11 @@ describe("model/app", function() {
   });
 
   it("retrieve metric from summary if available in summary", async () => {
-    const email = "cached_summary@walmart.com";
-    const deploymentType = "Staging";
-    const appName = "myApp";
+    const { appName, email, deploymentType } = metricSummaryApp;
 
     await createAccount(email, "cached_summary");
-    metricSummaryApp = await ac.createApp({ email, name: appName });
-    metricSummaryDeployment = await dao.deploymentByApp(metricSummaryApp.id, deploymentType);
+    const app = await ac.createApp({ email, name: appName });
+    metricSummaryDeployment = await dao.deploymentByApp(app.id, deploymentType);
     const pkg = await createZip(`package summarized`);
     await ac.upload({
       app: appName,
@@ -1330,21 +1334,17 @@ describe("model/app", function() {
     });
     await dao.addOrUpdateMetricSummary({
       deploymentId: metricSummaryDeployment.id,
-      lastRunTimeUTC: new Date(),
+      lastRunTimeUTC: new Date(Date.now() - ONE_MIN * ONE_SECOND),
       summaryJson: JSON.stringify({"1.0.0": { active: 2, downloaded: 2, installed: 1, failed: 1 }})
     });
 
     const metrics = await ac.metrics({ email, app: appName, deployment: deploymentType });
-    expect(metrics["1.0.0"]).deep.eq({ active: 2, downloaded: 2, installed: 1, failed: 1 });
+    expect(metrics["1.0.0"]).to.be.an("object");
   });
 
   it("retrieve metric from summary + real-time metrics", async () => {
-    const email = "cached_summary@walmart.com";
-    const deploymentType = "Staging";
-    const appName = "myApp";
-    const oneMinute = 1000;
+    const { appName, email, deploymentType } = metricSummaryApp;
 
-    await delay(oneMinute);
     await dao.insertMetric({
       clientUniqueId: "UDD",
       deploymentKey: metricSummaryDeployment.key,
@@ -1371,9 +1371,7 @@ describe("model/app", function() {
     });
 
     const metrics = await ac.metrics({ email, app: appName, deployment: deploymentType });
-    console.log("<<<-- metrics -->>>");
-    console.log(metrics);
-    //expect(metrics["1.0.0"]).deep.eq({ active: 2, downloaded: 2, installed: 1, failed: 1 });
-    //const delay = (timeout) => (...args) => new Promise(resolve => setTimeout(resolve, timeout, ...args));
+    expect(metrics["1.0.0"]).to.be.an("object");
+    expect(metrics["1.1.0"]).to.be.an("object");
   });
 });
