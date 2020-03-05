@@ -1,3 +1,5 @@
+/* eslint-disable max-params */
+/* eslint-disable max-statements */
 import { id, key, toJSON } from "electrode-ota-server-util";
 import { isZip, generate, manifestHash } from "electrode-ota-server-model-manifest/lib/manifest";
 import { shasum } from "electrode-ota-server-util";
@@ -73,6 +75,54 @@ const notAuthorizedPerm = (app, email, perm, message) => {
     return app;
   }
   return notAuthorized(false, message);
+};
+
+const doSummarize = (metrics, label) => {
+  const summary = metrics.reduce((accumulator, val) => {
+    const akey = val.label || val.appversion;
+    const ret =
+      accumulator[akey] ||
+      (accumulator[akey] = {
+        active: 0,
+        downloaded: 0,
+        installed: 0,
+        failed: 0
+      });
+    switch (val.status) {
+      case "DeploymentSucceeded":
+        ret.active += val.total;
+        if (label === val.label) {
+          //previous deployment is no longer active.
+          if (accumulator[val.previouslabelorappversion]) {
+            accumulator[val.previouslabelorappversion].active -= val.total;
+          } else {
+            // metrics is not ordered, so previous label not necessary in accumulator yet
+            accumulator[val.previouslabelorappversion] = {
+              active: -val.total,
+              downloaded: 0,
+              installed: 0,
+              failed: 0
+            };
+          }
+        }
+        ret.installed += val.total;
+        break;
+      case "DeploymentFailed":
+        ret.failed += val.total;
+        break;
+      case "Downloaded":
+        ret.downloaded += val.total;
+        break;
+    }
+    return accumulator;
+  }, {});
+  for (const k in summary) {
+    // Zero out negative active counts.
+    // Negative counts can occur if the previous active < current active
+    summary[k].active = summary[k].active > 0 ? summary[k].active : 0;
+  }
+
+  return summary;
 };
 
 export default (options, dao, upload, logger) => {
@@ -523,7 +573,23 @@ export default (options, dao, upload, logger) => {
     getMetricsForDeployment(deployment) {
       return this.getMetricsFromCache(deployment).then(result => {
         if (result && result.summaryJson) {
-          return JSON.parse(result.summaryJson);
+          const summary = JSON.parse(result.summaryJson);
+          // fetch latest metrics data
+          return dao.metricsByStatusAndTime(
+            deployment.key, new Date(result.lastRunTimeUTC), new Date(Date.now())
+          ).then((metrics = []) => {
+            const { label } = deployment.package || {};
+            logger.info({ deployment: deployment.name }, "fetched latest metrics by status and time");
+            // cleanup and merge the results
+            const latestSummary = doSummarize(metrics, label);
+            for (const k in summary) {
+              summary[k].active += latestSummary[k].active;
+              summary[k].downloaded += latestSummary[k].downloaded;
+              summary[k].failed += latestSummary[k].failed;
+              summary[k].installed += latestSummary[k].installed;
+            }
+            return summary;
+          });
         }
         return this.getMetricsFromDatabase(deployment);
       });
@@ -542,51 +608,7 @@ export default (options, dao, upload, logger) => {
         //    "DeploymentSucceeded" |  "DeploymentFailed" |  "Downloaded";
 
         logger.info({ deployment: deployment.name }, "fetched metrics by status");
-
-        let summary = metrics.reduce((accumulator, val) => {
-          const key = val.label || val.appversion;
-          const ret =
-            accumulator[key] ||
-            (accumulator[key] = {
-              active: 0,
-              downloaded: 0,
-              installed: 0,
-              failed: 0
-            });
-          switch (val.status) {
-            case "DeploymentSucceeded":
-              ret.active += val.total;
-              if (label === val.label) {
-                //previous deployment is no longer active.
-                if (accumulator[val.previouslabelorappversion]) {
-                  accumulator[val.previouslabelorappversion].active -= val.total;
-                } else {
-                  // metrics is not ordered, so previous label not necessary in accumulator yet
-                  accumulator[val.previouslabelorappversion] = {
-                    active: -val.total,
-                    downloaded: 0,
-                    installed: 0,
-                    failed: 0
-                  };
-                }
-              }
-              ret.installed += val.total;
-              break;
-            case "DeploymentFailed":
-              ret.failed += val.total;
-              break;
-            case "Downloaded":
-              ret.downloaded += val.total;
-              break;
-          }
-          return accumulator;
-        }, {});
-        for (let k in summary) {
-          // Zero out negative active counts.
-          // Negative counts can occur if the previous active < current active
-          summary[k].active = summary[k].active > 0 ? summary[k].active : 0;
-        }
-        return summary;
+        return doSummarize(metrics, label);
       });
     },
 

@@ -1,15 +1,16 @@
-import { wrap, reqFields } from 'electrode-ota-server-util';
+import { wrap, reqFields } from "electrode-ota-server-util";
 import diregister from "electrode-ota-server-diregister";
 
 export const register = diregister({
-    name: 'authRoute',
-    dependencies: ['electrode:route', 'ota!account', 'electrode:views', 'ota!scheme', 'ota!logger'],
+    name: "authRoute",
+    dependencies: ["electrode:route", "ota!account", "electrode:views", "ota!scheme", "ota!logger"]
+    // eslint-disable-next-line max-params
 }, (options, route, acf, views, scheme, logger) => {
 
     views({
-        engines: options.engines || {ejs: require('ejs')},
+        engines: options.engines || {ejs: require("ejs")},
         relativeTo: options.relativeTo || __dirname,
-        path: options.path || '../templates',
+        path: options.path || "../templates",
         layout: options.layout === false ? false : true
     });
 
@@ -28,7 +29,9 @@ export const register = diregister({
      *    displayName : display name of user,
      *    createdBy : description of how the access was created
      * }
-     * @param {credentials} credentials 
+     * @param {object} credentials auth credential object
+     * @param {object} reply response method
+     * @returns {object} auth credential object
      */
     const _normalizeCredentials = (credentials, reply) => {
         if (credentials.profile) {
@@ -48,23 +51,23 @@ export const register = diregister({
                 }
             };
         } else {
-            return reply.view('error', {
-                title: 'Unmapped credentials',
-                message: 'Authentication Creditials is not properly formatted'
+            return reply.view("error", {
+                title: "Unmapped credentials",
+                message: "Authentication Creditials is not properly formatted"
             });
         }
     };
 
     route([
         {
-            method: 'GET',
-            path: '/auth/{type}',
+            method: "GET",
+            path: "/auth/{type}",
             config: {
                 auth: false,
-                handler(req, reply){
+                handler(req, reply) {
                     logger.info(reqFields(req), "auth request");
-                    reply.view('login', {
-                        title: 'Login',
+                    reply.view("login", {
+                        title: "Login",
                         providers: options.providers,
                         hostname: req.query.hostname,
                         type: req.params.type
@@ -72,8 +75,8 @@ export const register = diregister({
                 }
             }
         }, {
-            method: 'GET',
-            path: '/accesskey',
+            method: "GET",
+            path: "/accesskey",
             config: {
                 auth: {
                     mode: "try",
@@ -87,11 +90,11 @@ export const register = diregister({
                         }, reply) {
 
                     if (!isAuthenticated) {
-                        return reply.redirect('/auth/login').code(302);
+                        return reply.redirect("/auth/login").code(302);
                     }
                     cookieAuth && cookieAuth.clear();
-                    reply.view('accesskey', {
-                        title: 'Token',
+                    reply.view("accesskey", {
+                        title: "Token",
                         name: credentials.name
                     });
                 }
@@ -100,51 +103,52 @@ export const register = diregister({
 
 
         {
-            method: 'GET',
-            path: '/',
+            method: "GET",
+            path: "/",
             config: {
                 auth: false,
-                handler(request, reply){
-                    reply.redirect('/auth/login').code(302);
+                handler(request, reply) {
+                    reply.redirect("/auth/login").code(302);
                 }
             }
         },
         {
-            method: 'GET',
-            path: '/authenticated',
+            method: "GET",
+            path: "/authenticated",
             config: {
                 auth: {
                     strategy: "bearer",
-                    mode: 'try'
+                    mode: "try"
                 },
-                handler(request, reply){
+                handler(request, reply) {
                     reply({
-                        "authenticated": request.auth.isAuthenticated
+                        authenticated: request.auth.isAuthenticated
                     });
                 }
             }
         }, {
-            method: 'GET',
-            path: '/logout',
+            method: "GET",
+            path: "/logout",
             config: {
-                auth: {mode: 'optional', strategies: ['session', 'bearer']},
+                auth: {mode: "optional", strategies: ["session", "bearer"]},
                 handler(request, reply) {
-                    invalidate(request.auth.credentials && request.auth.credentials.name, (e) => {
+                    invalidate(request.auth.credentials && request.auth.credentials.name, e => {
                         if (e) {
-                            console.log('error logging out', e);
+                            // eslint-disable-next-line no-console
+                            console.log("error logging out", e);
                         }
                         request.cookieAuth && request.cookieAuth.clear();
-                        reply.redirect('/');
+                        reply.redirect("/");
                     });
                 }
             }
         },
         {
-            method: 'DELETE',
-            path: '/sessions/{session}',
+            method: "DELETE",
+            path: "/sessions/{session}",
             config: {
-                auth: {mode: 'required'},
-                handler(request, reply){
+                auth: {mode: "required"},
+                handler(request, reply) {
                     invalidate(request.cookieAuth.token, () => {
                         request.cookieAuth.clear();
                         reply();
@@ -160,12 +164,12 @@ export const register = diregister({
                                       loginPath,
                                       registerPath,
                                       linkPath,
-                                      redirectTo = '/accesskey'
+                                      redirectTo = "/accesskey"
                                   }) => {
             const strategy = auth || name;
             loginPath = loginPath || `/auth/login/${name}`;
             ret.push({
-                method: 'GET',
+                method: "GET",
                 path: loginPath,
                 config: {
                     auth: {
@@ -174,7 +178,7 @@ export const register = diregister({
                     },
                     handler ({auth: {isAuthenticated, credentials}, cookieAuth}, reply) {
                         if (!isAuthenticated) {
-                            return reply('Not logged in...').code(401);
+                            return reply("Not logged in...").code(401);
                         }
                         if (credentials) {
                            const mappedCredential = _normalizeCredentials(credentials, reply);
@@ -183,17 +187,17 @@ export const register = diregister({
                             //(email, createdBy, friendlyName, ttl
                             addAccessKey(email, hostname, displayName || username, void(0), (e, token) => {
                                 if (e) {
-                                    let message = 'Error adding access key';
-                                    let href = '';
-                                    if (e.message.indexOf('No user registered') >= 0) {
+                                    let message = "Error adding access key";
+                                    let href = "";
+                                    if (e.message.indexOf("No user registered") >= 0) {
                                         message = e.message + " Try using 'code-push register' instead of 'code-push login'";
                                         if (registerPath !== false) {
                                             href = registerPath;
                                             message += ", or click here to register."
                                         }
                                     }
-                                    return reply.view('error', {
-                                        title: 'Error adding accesskey',
+                                    return reply.view("error", {
+                                        title: "Error adding accesskey",
                                         message,
                                         href
                                     });
@@ -210,30 +214,32 @@ export const register = diregister({
             if (registerPath !== false) {
                 registerPath = registerPath || `/auth/register/${name}`;
                 ret.push({
-                    method: 'GET',
+                    method: "GET",
                     path: registerPath,
                     config: {
                         auth: strategy,
                         handler ({auth: {isAuthenticated, credentials}, cookieAuth}, reply) {
                             if (!isAuthenticated) {
-                                console.error('request was not authenticated');
-                                return reply('Not logged in...').code(401);
+                                // eslint-disable-next-line no-console
+                                console.error("request was not authenticated");
+                                return reply("Not logged in...").code(401);
                             }
                             const mappedCredential = _normalizeCredentials(credentials, reply);
-                            createToken(mappedCredential).then((token) => {
+                            createToken(mappedCredential).then(token => {
                                 cookieAuth.set({ token : token.name });
                                 reply.redirect(redirectTo).code(302);
-                            }).catch((e) => {
-                                if (e.output && e.output.payload && e.output.payload.error === 'Conflict') {
-                                    return reply.view('error', {
-                                        title: 'Error adding account',
-                                        message: 'This account is already registered. Click here to log in instead.',
+                            }).catch(e => {
+                                if (e.output && e.output.payload && e.output.payload.error === "Conflict") {
+                                    return reply.view("error", {
+                                        title: "Error adding account",
+                                        message: "This account is already registered. Click here to log in instead.",
                                         href: `/auth/login?hostname=${credentials.query && credentials.query.hostname}`
                                     })
                                 }
-                                console.error('Error creating token', e);
-                                return reply.view('error', {
-                                    title: 'Error adding account',
+                                // eslint-disable-next-line no-console
+                                console.error("Error creating token", e);
+                                return reply.view("error", {
+                                    title: "Error adding account",
                                     message: e.message
                                 });
                             });
@@ -242,23 +248,24 @@ export const register = diregister({
                 });
                 linkPath = linkPath || `/auth/link/${name}`;
                 ret.push({
-                    method: 'GET',
+                    method: "GET",
                     path: linkPath,
                     config: {
                         auth: strategy,
                         handler ({auth: {isAuthenticated, credentials}}, reply) {
                             if (!isAuthenticated) {
-                                console.error('request was not authenticated');
-                                return reply('Not logged in...').code(401);
+                                // eslint-disable-next-line no-console
+                                console.error("request was not authenticated");
+                                return reply("Not logged in...").code(401);
                             }
                             if (credentials) {
                                 const mappedCredential = _normalizeCredentials(credentials, reply);
                                 const {email} = mappedCredential.profile;
-                                linkProvider({email, provider: name}, (e) => {
+                                linkProvider({email, provider: name}, e => {
                                     if (e) {
-                                        return reply.view('error', {title: 'Error', message: e.message});
+                                        return reply.view("error", {title: "Error", message: e.message});
                                     }
-                                    reply.view('link', {
+                                    reply.view("link", {
                                         title: `Linked to ${name}`,
                                         provider: name
                                     });

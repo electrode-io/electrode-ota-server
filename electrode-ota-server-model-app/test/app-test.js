@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 import initDao, { shutdown } from "electrode-ota-server-test-support/lib/init-maria-dao";
 import eql from "electrode-ota-server-test-support/lib/eql";
 import path from "path";
@@ -15,6 +16,7 @@ const fixture = path.join.bind(path, __dirname, "fixtures");
 const readFixture = file => fs.readFileSync(fixture(file));
 
 const shouldError = () => {
+  // eslint-disable-next-line no-unused-expressions
   expect(false, "Should have an error").to.be.true;
 };
 const APP = {
@@ -83,8 +85,8 @@ describe("model/app", function() {
       .then(apps => expect(apps.length).to.eql(0));
   });
   it("should add/rename/remove deployment", () => {
-    const email = "deployment@p.com",
-      app = "deployment";
+    const email = "deployment@p.com";
+    const app = "deployment";
     return createAccount(email, "deploy")
       .then(() => ac.createApp({ email, name: "deployment" }))
       .then(_ => ac.listDeployments({ email, app }))
@@ -351,8 +353,8 @@ describe("model/app", function() {
   it("allow promote of same bundle for different app versions", () => {
     const email = "swaggychamp@gmail.com";
     const appName = "allowSameBundleDifferentAppVersion";
-    let firstLabel = "",
-      secondLabel = "";
+    let firstLabel = "";
+    let secondLabel = "";
     return createAccount(email, "champ")
       .then(() => ac.createApp({ email, name: appName }))
       .then(_ => createZip(`same bundle different versions`))
