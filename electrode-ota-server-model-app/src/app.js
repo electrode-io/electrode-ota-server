@@ -77,6 +77,13 @@ const notAuthorizedPerm = (app, email, perm, message) => {
   return notAuthorized(false, message);
 };
 
+const isValidObject = obj => {
+  if (obj !== null && typeof obj === "object") {
+    return Object.keys(obj).length >= 1;
+  }
+  return false;
+};
+
 const doSummarize = (metrics, label) => {
   const summary = metrics.reduce((accumulator, val) => {
     const akey = val.label || val.appversion;
@@ -582,11 +589,13 @@ export default (options, dao, upload, logger) => {
             logger.info({ deployment: deployment.name }, "fetched latest metrics by status and time");
             // cleanup and merge the results
             const latestSummary = doSummarize(metrics, label);
-            for (const k in summary) {
-              summary[k].active += latestSummary[k].active;
-              summary[k].downloaded += latestSummary[k].downloaded;
-              summary[k].failed += latestSummary[k].failed;
-              summary[k].installed += latestSummary[k].installed;
+            if (isValidObject(latestSummary)) {
+              for (const k in summary) {
+                summary[k].active += latestSummary[k].active;
+                summary[k].downloaded += latestSummary[k].downloaded;
+                summary[k].failed += latestSummary[k].failed;
+                summary[k].installed += latestSummary[k].installed;
+              }
             }
             return summary;
           });
