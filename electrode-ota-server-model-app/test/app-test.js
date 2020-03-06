@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 import initDao, { shutdown } from "electrode-ota-server-test-support/lib/init-maria-dao";
 import eql from "electrode-ota-server-test-support/lib/eql";
 import path from "path";
@@ -11,15 +12,26 @@ import { shasum } from "electrode-ota-server-util";
 import { expect } from "chai";
 import step0Manifest from "./fixtures/step.0.manifest.json";
 
+const ONE_MIN = 1000; //in millisecond
+const ONE_SECOND = 60;
+
 const fixture = path.join.bind(path, __dirname, "fixtures");
 const readFixture = file => fs.readFileSync(fixture(file));
 
 const shouldError = () => {
+  // eslint-disable-next-line no-unused-expressions
   expect(false, "Should have an error").to.be.true;
 };
 const APP = {
   email: "test@p.com",
   app: "super"
+};
+
+let metricSummaryDeployment;
+let metricSummaryApp = {
+  appName: "myApp",
+  email: "cached_summary@walmart.com",
+  deploymentType: "Staging"
 };
 
 describe("model/app", function() {
@@ -83,8 +95,8 @@ describe("model/app", function() {
       .then(apps => expect(apps.length).to.eql(0));
   });
   it("should add/rename/remove deployment", () => {
-    const email = "deployment@p.com",
-      app = "deployment";
+    const email = "deployment@p.com";
+    const app = "deployment";
     return createAccount(email, "deploy")
       .then(() => ac.createApp({ email, name: "deployment" }))
       .then(_ => ac.listDeployments({ email, app }))
@@ -351,8 +363,8 @@ describe("model/app", function() {
   it("allow promote of same bundle for different app versions", () => {
     const email = "swaggychamp@gmail.com";
     const appName = "allowSameBundleDifferentAppVersion";
-    let firstLabel = "",
-      secondLabel = "";
+    let firstLabel = "";
+    let secondLabel = "";
     return createAccount(email, "champ")
       .then(() => ac.createApp({ email, name: appName }))
       .then(_ => createZip(`same bundle different versions`))
@@ -1299,16 +1311,14 @@ describe("model/app", function() {
   });
 
   it("retrieve metric from summary if available in summary", async () => {
-    const email = "cached_summary@walmart.com";
-    const deploymentType = "Staging";
-    const appName = "myApp";
+    const { appName, email, deploymentType } = metricSummaryApp;
 
     await createAccount(email, "cached_summary");
     const app = await ac.createApp({ email, name: appName });
-    const deployment = await dao.deploymentByApp(app.id, deploymentType);
+    metricSummaryDeployment = await dao.deploymentByApp(app.id, deploymentType);
     const pkg = await createZip(`package summarized`);
     await ac.upload({
-      app:appName,
+      app: appName,
       email,
       package: pkg,
       deployment: deploymentType,
@@ -1316,19 +1326,52 @@ describe("model/app", function() {
     });
     await dao.insertMetric({
       clientUniqueId: "UDD",
-      deploymentKey: deployment.key,
+      deploymentKey: metricSummaryDeployment.key,
       status: "DeploymentSucceeded",
       label: "1.0.0",
       appVersion: "1.0.0",
       previousLabelOrAppVersion: "0.9.0"
     });
     await dao.addOrUpdateMetricSummary({
-      deploymentId: deployment.id,
-      lastRunTimeUTC: new Date(),
+      deploymentId: metricSummaryDeployment.id,
+      lastRunTimeUTC: new Date(Date.now() - ONE_MIN * ONE_SECOND),
       summaryJson: JSON.stringify({"1.0.0": { active: 2, downloaded: 2, installed: 1, failed: 1 }})
     });
 
-    const metrics = await ac.metrics({ email, app:appName, deployment:deploymentType });
-    expect(metrics["1.0.0"]).deep.eq({ active: 2, downloaded: 2, installed: 1, failed: 1 });
+    const metrics = await ac.metrics({ email, app: appName, deployment: deploymentType });
+    expect(metrics["1.0.0"]).to.be.an("object");
+  });
+
+  it("retrieve metric from summary + real-time metrics", async () => {
+    const { appName, email, deploymentType } = metricSummaryApp;
+
+    await dao.insertMetric({
+      clientUniqueId: "UDD",
+      deploymentKey: metricSummaryDeployment.key,
+      status: "DeploymentSucceeded",
+      label: "1.1.0",
+      appVersion: "1.0.0",
+      previousLabelOrAppVersion: "1.0.0"
+    });
+    await dao.insertMetric({
+      clientUniqueId: "UDD",
+      deploymentKey: metricSummaryDeployment.key,
+      status: "DeploymentSucceeded",
+      label: "1.1.0",
+      appVersion: "1.0.0",
+      previousLabelOrAppVersion: "1.0.0"
+    });
+    await dao.insertMetric({
+      clientUniqueId: "UDD",
+      deploymentKey: metricSummaryDeployment.key,
+      status: "DeploymentSucceeded",
+      label: "1.1.0",
+      appVersion: "1.0.0",
+      previousLabelOrAppVersion: "1.0.0"
+    });
+
+    const metrics = await ac.metrics({ email, app: appName, deployment: deploymentType });
+    expect(metrics["1.0.0"]).to.be.an("object");
+    expect(metrics["1.1.0"]).to.be.an("object");
   });
 });

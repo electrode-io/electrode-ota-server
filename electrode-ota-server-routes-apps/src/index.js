@@ -1,12 +1,13 @@
-import Joi from 'joi';
-import { wrap, reqFields } from 'electrode-ota-server-util';
+/* eslint-disable max-params */
+import Joi from "joi";
+import { wrap, reqFields } from "electrode-ota-server-util";
 import diregister from "electrode-ota-server-diregister";
-const toAppOut = (src) => {
+const toAppOut = src => {
     const app = Object.assign({}, src);
     delete app.id;
     return app;
 };
-const noContent = (reply) => (e) => {
+const noContent = reply => e => {
     if (e) return reply(e);
     return reply().code(204);
 };
@@ -24,7 +25,7 @@ const toColab = (email, src) => {
     return app;
 };
 
-const toAppColab = (email) => (app) => toColab(email, toAppOut(app));
+const toAppColab = email => app => toColab(email, toAppOut(app));
 const PARAMS = {
     app: {
         app: Joi.string().required(true)
@@ -36,8 +37,8 @@ const PARAMS = {
 };
 
 export const register = diregister({
-    name: 'appsRoute',
-    dependencies: ['electrode:route', 'ota!app', 'ota!logger', 'ota!scheme']
+    name: "appsRoute",
+    dependencies: ["electrode:route", "ota!app", "ota!logger", "ota!scheme"]
 }, (options, route, app, logger) => {
     const {
         createApp,
@@ -70,8 +71,8 @@ export const register = diregister({
 
     route([
         {
-            method: 'POST',
-            path: '/apps/{app}/deployments/{deployment}/release',
+            method: "POST",
+            path: "/apps/{app}/deployments/{deployment}/release",
             config: {
                 validate: {
                     params: PARAMS.deployment
@@ -81,7 +82,7 @@ export const register = diregister({
                     logger.info(reqFields(request), "upload request ");
                     const {
                         params: { app, deployment }, auth: { credentials: { email } },
-                        server: { app: { config: { app: { downloadUrl = request.server.info.uri + '/storagev2/' } } } },
+                        server: { app: { config: { app: { downloadUrl = `${request.server.info.uri}/storagev2/` } } } },
                         payload
                     } = request;
                     payload.packageInfo = JSON.parse(payload.packageInfo);
@@ -94,8 +95,8 @@ export const register = diregister({
             }
         },
         {
-            method: 'PATCH',
-            path: '/apps/{app}/deployments/{deployment}/release',
+            method: "PATCH",
+            path: "/apps/{app}/deployments/{deployment}/release",
             config: {
                 validate: {
                     params: PARAMS.deployment
@@ -113,8 +114,8 @@ export const register = diregister({
             }
         },
         {
-            method: 'POST',
-            path: '/apps/',
+            method: "POST",
+            path: "/apps/",
             config: {
                 payload: Object.assign({}, options.payload),
                 handler(request, reply) {
@@ -129,8 +130,8 @@ export const register = diregister({
             }
         },
         {
-            method: 'GET',
-            path: '/apps',
+            method: "GET",
+            path: "/apps",
             config: {
                 handler(request, reply) {
                     logger.info(reqFields(request), "app list request");
@@ -143,8 +144,8 @@ export const register = diregister({
                 tags: ["api"]
             }
         }, {
-            method: 'GET',
-            path: '/apps/{app}',
+            method: "GET",
+            path: "/apps/{app}",
             config: {
                 validate: {
                     params: PARAMS.app
@@ -162,8 +163,8 @@ export const register = diregister({
             }
         },
         {
-            method: 'PATCH',
-            path: '/apps/{app}',
+            method: "PATCH",
+            path: "/apps/{app}",
             config: {
                 validate: {
                     params: PARAMS.app
@@ -179,8 +180,8 @@ export const register = diregister({
         },
 
         {
-            method: 'DELETE',
-            path: '/apps/{app}',
+            method: "DELETE",
+            path: "/apps/{app}",
             config: {
                 validate: {
                     params: PARAMS.app
@@ -194,24 +195,24 @@ export const register = diregister({
             }
         },
         {
-            method: 'POST',
-            path: '/apps/{app}/transfer/{transfer}',
+            method: "POST",
+            path: "/apps/{app}/transfer/{transfer}",
             config: {
                 payload: Object.assign({}, options.payload),
                 handler(request, reply) {
                     logger.info(reqFields(request), "transfer app request");
                     const { params: { app, transfer }, auth: { credentials: { email } } } = request;
-                    transferApp({ app, email, transfer }, (e) => {
+                    transferApp({ app, email, transfer }, e => {
                         if (e) return reply(e);
-                        return reply('Created').code(201);
+                        return reply("Created").code(201);
                     })
                 },
                 tags: ["api"]
             }
         },
         {
-            method: 'GET',
-            path: '/apps/{app}/deployments/',
+            method: "GET",
+            path: "/apps/{app}/deployments/",
             config: {
                 handler(request, reply) {
                     logger.info(reqFields(request), "get deployment list request");
@@ -226,8 +227,8 @@ export const register = diregister({
 
         },
         {
-            method: 'POST',
-            path: '/apps/{app}/deployments/',
+            method: "POST",
+            path: "/apps/{app}/deployments/",
             config: {
                 validate: {
                     params: PARAMS.app,
@@ -253,8 +254,8 @@ export const register = diregister({
 
         },
         {
-            method: 'PATCH',
-            path: '/apps/{app}/deployments/{deployment}',
+            method: "PATCH",
+            path: "/apps/{app}/deployments/{deployment}",
             config: {
                 validate: {
                     params: PARAMS.deployment,
@@ -273,8 +274,8 @@ export const register = diregister({
 
         },
         {
-            method: 'GET',
-            path: '/apps/{app}/deployments/{deployment}',
+            method: "GET",
+            path: "/apps/{app}/deployments/{deployment}",
             config: {
                 validate: {
                     params: PARAMS.deployment
@@ -295,8 +296,8 @@ export const register = diregister({
 
         },
         {
-            method: 'DELETE',
-            path: '/apps/{app}/deployments/{deployment}',
+            method: "DELETE",
+            path: "/apps/{app}/deployments/{deployment}",
             config: {
                 validate: {
                     params: PARAMS.deployment
@@ -311,8 +312,8 @@ export const register = diregister({
 
         },
         {
-            method: 'DELETE',
-            path: '/apps/{app}/deployments/{deployment}/history',
+            method: "DELETE",
+            path: "/apps/{app}/deployments/{deployment}/history",
             config: {
                 validate: {
                     params: PARAMS.deployment
@@ -326,8 +327,8 @@ export const register = diregister({
             }
 
         }, {
-            method: 'GET',
-            path: '/apps/{app}/deployments/{deployment}/history',
+            method: "GET",
+            path: "/apps/{app}/deployments/{deployment}/history",
             config: {
                 validate: {
                     params: PARAMS.deployment
@@ -345,8 +346,8 @@ export const register = diregister({
 
         },
         {
-            method: 'POST',
-            path: '/apps/{app}/deployments/{deployment}/promote/{to}',
+            method: "POST",
+            path: "/apps/{app}/deployments/{deployment}/promote/{to}",
             config: {
                 validate: {
                     params: Object.assign({ to: Joi.string() }, PARAMS.deployment)
@@ -364,11 +365,11 @@ export const register = diregister({
             }
         },
         {
-            method: 'POST',
-            path: '/apps/{app}/deployments/{deployment}/rollback/{label?}',
+            method: "POST",
+            path: "/apps/{app}/deployments/{deployment}/rollback/{label?}",
             config: {
                 validate: {
-                    params: Object.assign({ label: Joi.string().allow('') }, PARAMS.deployment)
+                    params: Object.assign({ label: Joi.string().allow("") }, PARAMS.deployment)
                 },
                 payload: Object.assign({}, options.payload),
                 handler(request, reply) {
@@ -384,8 +385,8 @@ export const register = diregister({
 
         },
         {
-            method: 'GET',
-            path: '/apps/{app}/deployments/{deployment}/metrics',
+            method: "GET",
+            path: "/apps/{app}/deployments/{deployment}/metrics",
             config: {
                 validate: {
                     params: PARAMS.deployment
@@ -395,7 +396,7 @@ export const register = diregister({
                     const { params: { app, deployment }, auth: { credentials: { email } } } = request;
                     metrics({ app, deployment, email }, (e, metrics) => {
                         if (e) {
-                            console.log('error in metrics', e);
+                            console.log("error in metrics", e);
                             return reply(e);
                         }
                         reply({ metrics });
@@ -403,11 +404,10 @@ export const register = diregister({
                 },
                 tags: ["api"]
             }
-        }
-        ,
+        },
         {
-            method: 'GET',
-            path: '/apps/{app}/collaborators',
+            method: "GET",
+            path: "/apps/{app}/collaborators",
             config: {
                 handler(request, reply) {
                     logger.info(reqFields(request), "get collaborators request");
@@ -431,8 +431,8 @@ export const register = diregister({
             }
         },
         {
-            method: 'POST',
-            path: '/apps/{app}/collaborators/{collaborator}',
+            method: "POST",
+            path: "/apps/{app}/collaborators/{collaborator}",
             config: {
                 payload: Object.assign({}, options.payload),
                 handler(request, reply) {
@@ -440,15 +440,15 @@ export const register = diregister({
                     const { params: { app, collaborator }, auth: { credentials: { email } } } = request;
                     addCollaborator({ email, app, collaborator }, (e, o) => {
                         if (e) return reply(e);
-                        return reply('Created').code(201);
+                        return reply("Created").code(201);
                     });
                 },
                 tags: ["api"]
             }
         },
         {
-            method: 'DELETE',
-            path: '/apps/{app}/collaborators/{collaborator}',
+            method: "DELETE",
+            path: "/apps/{app}/collaborators/{collaborator}",
             config: {
                 handler(request, reply) {
                     logger.info(reqFields(request), "remove collaborator request");
