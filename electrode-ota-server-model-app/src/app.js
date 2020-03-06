@@ -132,6 +132,22 @@ const doSummarize = (metrics, label) => {
   return summary;
 };
 
+const mergeMetricsSummary = (srcSummary, newSummary) => {
+  const resultSummary = Object.assign({}, srcSummary);
+  if (isValidObject(newSummary)) {
+    for (const k in newSummary) {
+      if (!resultSummary[k]) {
+        resultSummary[k] = { active: 0, downloaded: 0, failed: 0, installed: 0 };
+      }
+      resultSummary[k].active += newSummary[k].active;
+      resultSummary[k].downloaded += newSummary[k].downloaded;
+      resultSummary[k].failed += newSummary[k].failed;
+      resultSummary[k].installed += newSummary[k].installed;
+    }
+  }
+  return resultSummary;
+};
+
 export default (options, dao, upload, logger) => {
   const api = {};
   return Object.assign(api, {
@@ -586,22 +602,9 @@ export default (options, dao, upload, logger) => {
             deployment.key, new Date(result.lastRunTimeUTC), new Date(Date.now())
           ).then((metrics = []) => {
             const { label } = deployment.package || {};
-            logger.info({ deployment: deployment.name }, "fetched latest metrics by status and time");
             // cleanup and merge the results
             const latestSummary = doSummarize(metrics, label);
-            if (isValidObject(latestSummary)) {
-              for (const k in latestSummary) {
-                if (!summary[k]) {
-                  summary[k] = { active: 0, downloaded: 0, failed: 0, installed: 0 };
-                }
-                summary[k].active += latestSummary[k].active;
-                summary[k].downloaded += latestSummary[k].downloaded;
-                summary[k].failed += latestSummary[k].failed;
-                summary[k].installed += latestSummary[k].installed;
-              }
-            }
-
-            return summary;
+            return mergeMetricsSummary(summary, latestSummary);
           });
         }
         return this.getMetricsFromDatabase(deployment);
@@ -618,8 +621,6 @@ export default (options, dao, upload, logger) => {
     getMetricsFromDatabase(deployment) {
       return dao.metricsByStatus(deployment.key).then((metrics = []) => {
         const { label } = deployment.package || {};
-        //    "DeploymentSucceeded" |  "DeploymentFailed" |  "Downloaded";
-
         logger.info({ deployment: deployment.name }, "fetched metrics by status");
         return doSummarize(metrics, label);
       });
