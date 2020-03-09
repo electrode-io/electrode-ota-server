@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-model-app",
-  "version": "4.6.6",
+  "version": "4.6.7",
   "main": "lib/index.js",
   "license": "Apache-2.0",
   "scripts": {
@@ -11,17 +11,17 @@
   },
   "dependencies": {
     "bluebird": "^3.5.1",
-    "electrode-ota-server-diregister": "^4.6.6",
-    "electrode-ota-server-errors": "^4.6.6",
-    "electrode-ota-server-model-manifest": "^4.6.6",
-    "electrode-ota-server-util": "^4.6.6",
+    "electrode-ota-server-diregister": "^4.6.7",
+    "electrode-ota-server-errors": "^4.6.7",
+    "electrode-ota-server-model-manifest": "^4.6.7",
+    "electrode-ota-server-util": "^4.6.7",
     "semver": "^5.6.0"
   },
   "devDependencies": {
-    "electrode-ota-server-dao-cassandra": "^4.6.6",
-    "electrode-ota-server-dao-mariadb": "^4.6.6",
-    "electrode-ota-server-test-support": "^4.6.6",
-    "electrode-ota-server-util-dev": "^4.6.6",
+    "electrode-ota-server-dao-cassandra": "^4.6.7",
+    "electrode-ota-server-dao-mariadb": "^4.6.7",
+    "electrode-ota-server-test-support": "^4.6.7",
+    "electrode-ota-server-util-dev": "^4.6.7",
     "yazl": "^2.4.1"
   }
 }
