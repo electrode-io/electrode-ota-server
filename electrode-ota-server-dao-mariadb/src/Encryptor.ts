@@ -52,7 +52,11 @@ export default class Encryptor {
 
     encrypt(fieldName: string, val: string): string {
         if (this.encryptKey && (this.fields.indexOf(fieldName) >= 0) && val) {
-            return aes256Encrypt(this.encryptKey, val);
+            let value = val;
+            if (fieldName === "user.email") {
+                value = val.toLowerCase();
+            }
+            return aes256Encrypt(this.encryptKey, value);
         }
         return val;
     }
