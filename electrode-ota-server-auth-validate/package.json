@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-auth-validate",
-  "version": "4.6.7",
+  "version": "4.6.8",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -10,10 +10,10 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-diregister": "^4.6.7",
-    "electrode-ota-server-util": "^4.6.7"
+    "electrode-ota-server-diregister": "^4.6.8",
+    "electrode-ota-server-util": "^4.6.8"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^4.6.7"
+    "electrode-ota-server-util-dev": "^4.6.8"
   }
 }
