@@ -32,6 +32,11 @@ export const register = diregister({
                 console.log("error making update check ", request.query, e.message);
                 return reply(e);
             }
+            // default is Experiment-A(expA) => Non-cached dowload URL
+            // Experiment-B(expB) => Cached dowload URL (/foo_getp)
+            if (qs.absetup === "expB" && "downloadURL" in updatedInfo) {
+                updatedInfo.downloadURL = updatedInfo.downloadURL.replace("storagev2", "foo_getp");
+            }
             // if snake_case request? convert the response to the same
             const updateInfo = snakeCaseRequested ? keysToCamelOrSnake(updatedInfo) : updatedInfo;
             reply({ updateInfo });
