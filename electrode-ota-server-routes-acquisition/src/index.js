@@ -33,9 +33,9 @@ export const register = diregister({
                 return reply(e);
             }
             // default is Experiment-A(expA) => Non-cached dowload URL
-            // Experiment-B(expB) => Cached dowload URL (/foo_getp)
+            // Experiment-B(expB) => Cached dowload URL (/deltaPackage)
             if (qs.absetup === "expB" && "downloadURL" in updatedInfo) {
-                updatedInfo.downloadURL = updatedInfo.downloadURL.replace("storagev2", "foo_getp");
+                updatedInfo.downloadURL = updatedInfo.downloadURL.replace("storagev2", "deltaPackage");
             }
             // if snake_case request? convert the response to the same
             const updateInfo = snakeCaseRequested ? keysToCamelOrSnake(updatedInfo) : updatedInfo;
@@ -99,7 +99,7 @@ export const register = diregister({
             }
         },
         {
-            path: "/foo_getp/{packageHash}",
+            path: "/deltaPackage/{packageHash}",
             method: "GET",
             config: {
                 auth: false,
