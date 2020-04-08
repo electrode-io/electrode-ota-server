@@ -1,38 +1,56 @@
 // includes
-import requestValue from "@walmart/store-services-node-ccm-client";
+const { fetchJSON } = require("@walmart/electrode-fetch");
 
-const ONE_MIN = 60000;
+// 2(Min)*60(Sec)*1000(MilliSec)
+const FREQ_TIME = 120000;
+const STATUS_OK = "OK";
 
 //CCM Store
 class CCMStore {
     constructor(options) {
-        /* options {
-            ccm: { url: 'http://scm.stg.walmart.com', env: 'QA' };
-            serviceName: 'getting-started';
-            environment: 'QA | DEV';
-            cloudEnvironment: 'stg-dfw2 | dev';
-        }*/
         this._options = options || {};
         this._cache = {};
+        this.url = `${options.host}/scm-app/v2/services/${options.serviceName}/scopes/${options.env}/${options.cloudEnv}/configs/features`;
+        // start refreshing the cache
+        this.refresh();
     }
 
     getConfig(key) {
-        // key: 'disableServerRenderingConfig'
-        if (key) {
+        if (key && this._cache[key]) {
             return this._cache[key];
         }
-        return undefined;
+        return this._cache;
     }
 
     async req() {
-        const configs = await requestValue(this._options);
-        // eslint-disable-next-line no-console
-        console.log(JSON.stringify(configs));
+        //Ref: https://gecgithub01.walmart.com/electrode-client/electrode-ccm-client/blob/master/lib/ccm-client.js#L152
+        const headers = {
+            "WM_SEC.AUTH_TOKEN": "6KASDKKA-6JJS-6583-H435-8935JSDK4924"
+        };
+        try {
+            const { payload, status } = await fetchJSON(this.url, { headers });
+            if (status === STATUS_OK) {
+                Object.assign(this._cache, payload.configuration.properties);
+            } else {
+                console.log(`status: ${status}`, JSON.stringify(payload));
+            }
+        } catch (error) {
+            console.log(error);
+        }
+        console.log("<<<-- Cache -->>>");
+        console.log(this._cache);
     }
 
-    refresh() {
-        setInterval(async () => await this.req, ONE_MIN);
+    async refresh() {
+        if (!Object.keys(this._cache).length) {
+            await this.req();
+        }
+        this._timer = setInterval(this.req.bind(this), FREQ_TIME);
+    }
+
+    flush() {
+        clearInterval(this._timer);
     }
 }
 
-export default CCMStore;
+module.exports = CCMStore;

@@ -9,7 +9,6 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "@walmart/store-services-node-ccm-client": "^1.0.1",
-    "electrode-ota-server-util": "^4.6.9"
+    "@walmart/electrode-fetch": "^6.10.1"
   }
 }
