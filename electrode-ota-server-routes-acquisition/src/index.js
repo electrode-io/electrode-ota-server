@@ -1,6 +1,7 @@
 import { wrap, reqFields } from "electrode-ota-server-util";
 import diregister from "electrode-ota-server-diregister";
 import keysToCamelOrSnake from "./keys-to-camel-or-snake";
+import abBucket from "./ab-bucket";
 
 const HTTP_OK = 200;
 
@@ -11,9 +12,9 @@ const ok = reply => e => {
 
 export const register = diregister({
     name: "acquisitionRoute",
-    dependencies: ["electrode:route", "ota!acquisition", "ota!logger"]
+    dependencies: ["electrode:route", "ota!acquisition", "ota!logger", "ota!ccm"]
 // eslint-disable-next-line max-params
-}, (options, route, acquisition, logger) => {
+}, (options, route, acquisition, logger, ccm) => {
     const {
         download,
         updateCheck,
@@ -34,7 +35,8 @@ export const register = diregister({
             }
             // default is Experiment-A(expA) => Non-cached dowload URL
             // Experiment-B(expB) => Cached dowload URL (/deltaPackage)
-            if (qs.absetup === "expB" && "downloadURL" in updatedInfo) {
+            const abSetup = abBucket(qs.clientUniqueId, ccm.getConfig("abSetupPlan"));
+            if (abSetup.cached || (qs.absetup === "expB" && "downloadURL" in updatedInfo)) {
                 updatedInfo.downloadURL = updatedInfo.downloadURL.replace("storagev2", "deltaPackage");
             }
             // if snake_case request? convert the response to the same
