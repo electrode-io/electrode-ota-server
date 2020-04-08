@@ -8,9 +8,12 @@ const STATUS_OK = "OK";
 //CCM Store
 class CCMStore {
     constructor(options) {
+        // init defaults
         this._options = options || {};
         this._cache = {};
-        this.url = `${options.host}/scm-app/v2/services/${options.serviceName}/scopes/${options.env}/${options.cloudEnv}/configs/features`;
+        // build url
+        const ccmKey = options.ccmKey || "";
+        this.url = `${options.host}/scm-app/v2/services/${options.serviceName}/scopes/${options.env}/${options.cloudEnv}/configs/${ccmKey}`;
         // start refreshing the cache
         this.refresh();
     }
@@ -37,8 +40,6 @@ class CCMStore {
         } catch (error) {
             console.log(error);
         }
-        console.log("<<<-- Cache -->>>");
-        console.log(this._cache);
     }
 
     async refresh() {
