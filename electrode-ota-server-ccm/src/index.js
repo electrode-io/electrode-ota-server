@@ -1,5 +1,5 @@
 import diregister from "electrode-ota-server-diregister";
-import CCMStore from "./ccm-store";
+import CCMStore from "@walmart/electrode-ccm-store";
 
 let host = "http://scm.prod.walmart.com";
 if (process.env.NODE_ENV !== "production") {

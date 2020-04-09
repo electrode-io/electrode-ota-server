@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-ccm",
-  "version": "4.6.9",
+  "version": "1.0.0",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -9,6 +9,6 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "@walmart/electrode-fetch": "^6.10.1"
+    "@walmart/electrode-ccm-store": "^1.0.0"
   }
 }
