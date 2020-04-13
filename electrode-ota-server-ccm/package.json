@@ -9,6 +9,10 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "@walmart/electrode-ccm-store": "^1.0.0"
+    "@walmart/electrode-ccm-store": "^1.0.0",
+    "electrode-ota-server-diregister": "^4.6.9"
+  },
+  "devDependencies": {
+    "electrode-ota-server-util-dev": "^4.6.9"
   }
 }

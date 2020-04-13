@@ -18,7 +18,7 @@ const abBucket = (id, plan) => {
         const calculatedBucket = (Math.ceil((lastChar.toLowerCase().charCodeAt() % MOD_CHAR) / HALF_DIVIDER) * TENTH);
         result.bucket = calculatedBucket > LAST_BUCKET ? LAST_BUCKET : calculatedBucket;
     }
-    result.cached = parseInt(plan) === result.bucket;
+    result.cached = result.bucket <= parseInt(plan);
     return result;
 };
 

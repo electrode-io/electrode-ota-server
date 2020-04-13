@@ -35,7 +35,8 @@ export const register = diregister({
             }
             // default is Experiment-A(expA) => Non-cached dowload URL
             // Experiment-B(expB) => Cached dowload URL (/deltaPackage)
-            const abSetup = abBucket(qs.clientUniqueId, ccm.getConfig("abSetupPlan"));
+            // Also checks for cdnRampUp from CCM to switch url
+            const abSetup = abBucket(qs.clientUniqueId, ccm("cdnRampUp"));
             if ((abSetup.cached || qs.absetup === "expB") && "downloadURL" in updatedInfo) {
                 updatedInfo.downloadURL = updatedInfo.downloadURL.replace("storagev2", "deltaPackage");
             }
