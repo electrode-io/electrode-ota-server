@@ -1,13 +1,25 @@
 import { wrap, reqFields } from "electrode-ota-server-util";
 import diregister from "electrode-ota-server-diregister";
 import keysToCamelOrSnake from "./keys-to-camel-or-snake";
-import abBucket from "./ab-bucket";
 
 const HTTP_OK = 200;
 
 const ok = reply => e => {
     if (e) return reply(e);
     reply("OK").code(HTTP_OK);
+};
+
+const shouldSendCachedUrl = (id, plan) => {
+    const bucket = plan.toLowerCase();
+    const lastChar = id.substr(-1).toLowerCase();
+    // Unique Client ID is of HexaDecimal chars
+    //  the plan will have the chars from 0-F
+    //   if the last character of the id is present in the plan, send the cached url
+    //  eg: plan: "35cf", id: "c407bdf6613d0b85" / "2ABCBCA1-BF1D-4831-9D5F-C4107BFB9B6E"
+    //  the former id gets the cached url and the latter gets non-cadched url
+    //  also, if the plan is "*"/"all" all the requests get cached url
+    const toAll = (bucket === "*" || bucket === "all");
+    return toAll || bucket.indexOf(lastChar) >= 0;
 };
 
 export const register = diregister({
@@ -36,8 +48,8 @@ export const register = diregister({
             // default is Experiment-A(expA) => Non-cached dowload URL
             // Experiment-B(expB) => Cached dowload URL (/deltaPackage)
             // Also checks for cdnRampUp from CCM to switch url
-            const abSetup = abBucket(qs.clientUniqueId, ccm("cdnRampUp"));
-            if ((abSetup.cached || qs.absetup === "expB") && "downloadURL" in updatedInfo) {
+            const sendCachedUrl = shouldSendCachedUrl(qs.clientUniqueId, ccm("cdnRampUp"));
+            if ((sendCachedUrl || qs.absetup === "expB") && "downloadURL" in updatedInfo) {
                 updatedInfo.downloadURL = updatedInfo.downloadURL.replace("storagev2", "deltaPackage");
             }
             // if snake_case request? convert the response to the same
