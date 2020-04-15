@@ -35,10 +35,10 @@ export const HANDLERS = {
 };
 const resolveable = name => {
     const ret = {name};
-    ret.promise = new Promise(((_resolve, _reject) => {
+    ret.promise = new Promise((_resolve, _reject) => {
         ret.resolve = _resolve;
         ret.reject = _reject;
-    }));
+    });
     return ret;
 };
 
