@@ -1,4 +1,4 @@
-"use strict";
+/* eslint-disable max-params */
 /**
  * Use this to make registering plugins with hapi, less terrible.
  *
@@ -17,13 +17,13 @@
  *
  * ```
  *
- * @param obj
- * @param dep
+ * @param obj object
+ * @param dep string
  * @returns {*}
  */
 const result = (obj, dep) => {
-    if (!obj)return obj;
-    if (typeof obj[dep] === 'function') {
+    if (!obj) return obj;
+    if (typeof obj[dep] === "function") {
         return obj[dep].bind(obj);
     }
     return obj[dep];
@@ -33,16 +33,16 @@ const result = (obj, dep) => {
 export const HANDLERS = {
     electrode: (server, dep, options) => result(server, dep)
 };
-const resolveable = (name) => {
+const resolveable = name => {
     const ret = {name};
-    ret.promise = new Promise(function (_resolve, _reject) {
+    ret.promise = new Promise(((_resolve, _reject) => {
         ret.resolve = _resolve;
         ret.reject = _reject;
-    });
+    }));
     return ret;
 };
 
-const registerContext = (reg) => {
+const registerContext = reg => {
     if (reg.plugins.diregister) {
         return reg.plugins.diregister;
     }
@@ -52,23 +52,23 @@ const registerContext = (reg) => {
     const registering = [];
     const registered = [];
 
-    const notResolvedFilter = (dep) => !(/:/.test(dep) || (dep in MODULES));
+    const notResolvedFilter = dep => !(/:/.test(dep) || (dep in MODULES));
 
     const printNotResolved = ({name, dependencies = []}) => {
         let str = `\n${name}`;
         dependencies = dependencies.filter(notResolvedFilter);
         if (dependencies && dependencies.length) {
-            str += `\n\t-> unresolved[${dependencies.join(',')}]\n`;
+            str += `\n\t-> unresolved[${dependencies.join(",")}]\n`;
         }
         return str;
     };
 
-    reg.on('stop', () => {
+    reg.on("stop", () => {
         if (registering.length !== registered.length) {
             const delta = registering.filter(inflight => registered.indexOf(inflight.name) == -1);
             console.error(`\n\nThe following component(s) have not resolved\n%s\nregistered:\n %s\n`,
-                delta.map(printNotResolved).join('\n'),
-                registered.join('\n')
+                delta.map(printNotResolved).join("\n"),
+                registered.join("\n")
             );
         }
     });
@@ -76,7 +76,7 @@ const registerContext = (reg) => {
 
     const waitForModule = (name, parent) => {
         if (name in MODULES) {
-            return MODULES[name]
+            return MODULES[name];
         }
         const ref = PROMISES[name] || (PROMISES[name] = resolveable(name));
         if (parent) {
@@ -110,13 +110,13 @@ const registerContext = (reg) => {
     const resolve = (name, dependencies = [], fn, handlers, server, options, next) => {
         registering.push({name, dependencies});
         dependencies = dependencies || [];
-        Promise.all(dependencies.map((dep) => {
-            const [namespace, cmd] = dep.split(':', 2);
+        Promise.all(dependencies.map(dep => {
+            const [namespace, cmd] = dep.split(":", 2);
             if (cmd && handlers[namespace]) {
                 return handlers[namespace](server, cmd, options);
             }
             return waitForModule(dep, name);
-        })).then((args = [], next) => fn(options, ...args)).then((value) => {
+        })).then((args = [], next) => fn(options, ...args)).then(value => {
             registered.push(name);
             next();
             return resolveModule(name, value);
@@ -131,6 +131,7 @@ export default function diregister(attributes = {dependencies: []}, fn, handlers
 
 
     const name = attributes.name;
+    // eslint-disable-next-line no-nested-ternary
     const dependencies = attributes.dependencies ? Array.isArray(attributes.dependencies) ? attributes.dependencies : attributes.dependencies : [];
 
     const register = (server, options, next) => registerContext(server)(name, dependencies, fn, handlers, server, options, next);
@@ -139,4 +140,4 @@ export default function diregister(attributes = {dependencies: []}, fn, handlers
     //might just get rid of dependencies, as it seems kinda useless.
     register.attributes.dependencies = [];
     return register;
-};
+}

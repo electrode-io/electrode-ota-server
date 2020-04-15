@@ -1,11 +1,12 @@
-import path from 'path';
-import TTY from 'tty';
-const root = path.join.bind(path, __dirname, '..');
-const dao = process.env.DAO || 'cassandra';
+/* eslint-disable quote-props */
+import path from "path";
+import TTY from "tty";
+const root = path.join.bind(path, __dirname, "..");
+const dao = process.env.DAO || "cassandra";
 const _resolve = function (mod, lib) {
 
     const libResolve = require.resolve(mod);
-    const ret = !lib ? libResolve : path.join(libResolve, '..', lib);
+    const ret = !lib ? libResolve : path.join(libResolve, "..", lib);
     return ret;
 };
 
@@ -44,7 +45,7 @@ export default function () {
         },
         "routes": {
             "files": {
-                "relativeTo": _resolve("electrode-ota-server-public", '..', 'public')
+                "relativeTo": _resolve("electrode-ota-server-public", "..", "public")
             }
         },
         "plugins": {

@@ -48,7 +48,8 @@ export const register = diregister({
             // default is Experiment-A(expA) => Non-cached dowload URL
             // Experiment-B(expB) => Cached dowload URL (/deltaPackage)
             // Also checks for cdnRampUp from CCM to switch url
-            const sendCachedUrl = shouldSendCachedUrl(qs.clientUniqueId, ccm("cdnRampUp"));
+            const rampUpPlan = ccm("cdnRampUp");
+            const sendCachedUrl = shouldSendCachedUrl(qs.clientUniqueId, rampUpPlan);
             if ((sendCachedUrl || qs.absetup === "expB") && "downloadURL" in updatedInfo) {
                 updatedInfo.downloadURL = updatedInfo.downloadURL.replace("storagev2", "deltaPackage");
             }
