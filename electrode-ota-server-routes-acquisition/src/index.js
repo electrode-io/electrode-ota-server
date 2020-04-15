@@ -10,16 +10,20 @@ const ok = reply => e => {
 };
 
 const shouldSendCachedUrl = (id, plan) => {
-    const bucket = plan.toLowerCase();
-    const lastChar = id.substr(-1).toLowerCase();
-    // Unique Client ID is of HexaDecimal chars
-    //  the plan will have the chars from 0-F
-    //   if the last character of the id is present in the plan, send the cached url
-    //  eg: plan: "35cf", id: "c407bdf6613d0b85" / "2ABCBCA1-BF1D-4831-9D5F-C4107BFB9B6E"
-    //  the former id gets the cached url and the latter gets non-cadched url
-    //  also, if the plan is "*"/"all" all the requests get cached url
-    const toAll = (bucket === "*" || bucket === "all");
-    return toAll || bucket.indexOf(lastChar) >= 0;
+    if (id && plan) {
+        const bucket = plan.toLowerCase();
+        const lastChar = id.substr(-1).toLowerCase();
+        // Unique Client ID is of HexaDecimal chars
+        //  the plan will have the chars from 0-F
+        //   if the last character of the id is present in the plan, send the cached url
+        //  eg: plan: "35cf", id: "c407bdf6613d0b85" / "2ABCBCA1-BF1D-4831-9D5F-C4107BFB9B6E"
+        //  the former id gets the cached url and the latter gets non-cadched url
+        //  also, if the plan is "*"/"all" all the requests get cached url
+        const toAll = (bucket === "*" || bucket === "all");
+        return toAll || bucket.indexOf(lastChar) >= 0;
+    }
+    //default
+    return false;
 };
 
 export const register = diregister({
