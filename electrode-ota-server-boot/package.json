@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-boot",
-  "version": "4.6.9",
+  "version": "4.6.10-beta.0",
   "license": "Apache-2.0",
   "main": "lib/index.js",
   "bin": {
@@ -13,11 +13,11 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-util": "^4.6.9",
+    "electrode-ota-server-util": "^4.6.10-beta.0",
     "electrode-server": "^1.2.2",
     "packpath": "^0.1.0"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^4.6.9"
+    "electrode-ota-server-util-dev": "^4.6.10-beta.0"
   }
 }
