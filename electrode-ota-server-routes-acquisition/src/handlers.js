@@ -2,7 +2,7 @@
 
 import { reqFields } from "electrode-ota-server-util";
 import keysToCamelOrSnake from "./keys-to-camel-or-snake";
-import abTest from "./ab-test";
+import * as abTest from "./ab-test";
 
 const HTTP_OK = 200;
 const ok = reply => e => {
