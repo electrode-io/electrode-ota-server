@@ -18,7 +18,6 @@ const handles = {
         // if snake_case request? convert to camelCase
         const qs = snakeCaseRequested ? keysToCamelOrSnake(request.query) : request.query;
         updateCheck(qs, (e, updatedInfo) => {
-            console.log(updatedInfo);
             if (e) {
                 console.log("error making update check ", request.query, e.message);
                 return reply(e);
