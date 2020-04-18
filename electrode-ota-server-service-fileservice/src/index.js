@@ -3,5 +3,5 @@ export const register = diregister({
     name: "ota!fileservice",
     multiple: false,
     connections: false,
-    dependencies: ['ota!fileservice-upload']
+    dependencies: ["ota!fileservice-upload"]
 }, (options, upload) => upload);

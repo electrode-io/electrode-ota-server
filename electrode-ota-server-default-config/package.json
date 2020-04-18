@@ -13,6 +13,7 @@
     "electrode-ota-server-auth": "^4.6.9",
     "electrode-ota-server-auth-github": "^4.6.9",
     "electrode-ota-server-auth-validate": "^4.6.9",
+    "electrode-ota-server-ccm": "^1.0.0",
     "electrode-ota-server-dao-cassandra": "^4.6.9",
     "electrode-ota-server-dao-plugin": "^4.6.9",
     "electrode-ota-server-diregister": "^4.6.9",
