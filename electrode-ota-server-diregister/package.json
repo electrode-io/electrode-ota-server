@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-diregister",
-  "version": "4.6.9",
+  "version": "4.6.10",
   "description": "Additional Dependency for Electrode OTA",
   "main": "lib/index.js",
   "author": "",
@@ -11,6 +11,6 @@
     "prepublish": "npm run build"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^4.6.9"
+    "electrode-ota-server-util-dev": "^4.6.10"
   }
 }

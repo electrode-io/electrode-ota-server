@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-logger",
-  "version": "4.6.9",
+  "version": "4.6.10",
   "license": "Apache-2.0",
   "main": "lib/index.js",
   "scripts": {
@@ -10,13 +10,13 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-diregister": "^4.6.9",
-    "electrode-ota-server-util": "^4.6.9"
+    "electrode-ota-server-diregister": "^4.6.10",
+    "electrode-ota-server-util": "^4.6.10"
   },
   "devDependencies": {
     "bluebird": "^3.5.1",
-    "electrode-ota-server-test-support": "^4.6.9",
-    "electrode-ota-server-util-dev": "^4.6.9",
+    "electrode-ota-server-test-support": "^4.6.10",
+    "electrode-ota-server-util-dev": "^4.6.10",
     "intercept-stdout": "^0.1.2"
   }
 }
