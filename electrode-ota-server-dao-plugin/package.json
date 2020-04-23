@@ -10,7 +10,7 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "bluebird": "^3.5.1",
+    "bluebird": "^3.7.2",
     "electrode-ota-server-diregister": "^4.6.11",
     "electrode-ota-server-errors": "^4.6.11",
     "electrode-ota-server-logger": "^4.6.11",
