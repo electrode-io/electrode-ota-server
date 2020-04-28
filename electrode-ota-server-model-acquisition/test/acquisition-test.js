@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable max-nested-callbacks */
+/* eslint-disable max-statements */
 import initDao, { shutdown } from 'electrode-ota-server-test-support/lib/init-dao';
 import acquisition from 'electrode-ota-server-model-acquisition/lib/acquisition';
 import { loggerFactory } from 'electrode-ota-server-logger';
@@ -20,7 +23,7 @@ describe('model/acquisition', function () {
     let sandbox;
     this.timeout(50000);
     let i = 0;
-    const genRatio = (ratio) => {
+    const genRatio = ratio => {
         const ret = ratio % (i += 25) == 0;
         return ret;
     };
@@ -67,12 +70,11 @@ describe('model/acquisition', function () {
         });
 
         it("will return true if tags are involved", () => {
-            return ac.isUpdateAble("clientid", "190f09j9032", 0, ["TAG-1"]).then((result) => {
+            return ac.isUpdateAble("clientid", "190f09j9032", 0, ["TAG-1"]).then(result => {
                 expect(result).to.eq(true);
             });
         });
     });
-
 
     describe("updateCheck", () => {
         const email = 'test@unit-test.com';
@@ -82,8 +84,8 @@ describe('model/acquisition', function () {
         let clientUniqueId = '190jf09j2f01j10901';
 
         before(() => {
-            return appBL.createApp({ email, name }).then((a) => {
-                return dao.deploymentByApp(a.id, 'Staging').then((deployment) => {
+            return appBL.createApp({ email, name }).then(a => {
+                return dao.deploymentByApp(a.id, 'Staging').then(deployment => {
                     stagingKey = deployment.key;
                 });
             });
@@ -107,7 +109,7 @@ describe('model/acquisition', function () {
                     isCompanion: false,
                     label: 'v0',
                     clientUniqueId
-                }).then((result) => {
+                }).then(result => {
                     expect(result).not.to.be.undefined;
                     expect(result.isAvailable).to.eq(true);
                 });
@@ -132,7 +134,7 @@ describe('model/acquisition', function () {
                     isCompanion: false,
                     label: 'v0',
                     clientUniqueId
-                }).then((result) => {
+                }).then(result => {
                     expect(result).not.to.be.undefined;
                     expect(result.isAvailable).to.eq(false);
                 });
@@ -149,7 +151,7 @@ describe('model/acquisition', function () {
                     description: 'Got some tags',
                     tags: ['TAG-1', 'TAG-2']
                 }
-            }).then((pkg) => {
+            }).then(pkg => {
                 expect(pkg).not.to.be.undefined;
                 expect(pkg.packageHash).not.to.be.undefined;
 
@@ -161,7 +163,7 @@ describe('model/acquisition', function () {
                     label: 'v0',
                     clientUniqueId,
                     tags: ['TAG-1']
-                }).then((result) => {
+                }).then(result => {
                     expect(result).not.to.be.undefined;
                     expect(result.isAvailable).to.eq(true);
                     expect(result.packageHash).to.eq(pkg.packageHash);
@@ -179,7 +181,7 @@ describe('model/acquisition', function () {
                 label: 'v0',
                 clientUniqueId,
                 tags: ['SOME-OTHER-TAG', 'YET-ANOTHER-TAG']
-            }).then((result) => {
+            }).then(result => {
                 expect(result).not.to.be.undefined;
                 expect(result.isAvailable).to.eq(false);
             });
@@ -194,14 +196,14 @@ describe('model/acquisition', function () {
                 packageInfo: {
                     description: 'Some content'
                 }
-            }).then((pkg) => {
+            }).then(pkg => {
                 expect(pkg.appVersion).to.eql('1.0.0');
                 return ac.updateCheck({
                     deploymentKey: stagingKey,
                     appVersion: '1.0.1',
                     packageHash: 'ABCD',
                     clientUniqueId
-                }).then((result) => {
+                }).then(result => {
                     expect(result.isAvailable).to.eq(false);
                 });
             });
@@ -218,7 +220,7 @@ describe('model/acquisition', function () {
                     description: 'Content for v1.0.0',
                     appVersion: '1.0.0'
                 }
-            }).then((pkg) => {
+            }).then(pkg => {
                 pkg1_1 = pkg;
                 return appBL.upload({
                     app: name,
@@ -230,7 +232,7 @@ describe('model/acquisition', function () {
                         appVersion: '1.2.0'
                     }
                 })
-            }).then((pkg) => {
+            }).then(pkg => {
                 pkg1_2 = pkg;
                 return ac.updateCheck({
                     deploymentKey: stagingKey,
@@ -238,7 +240,7 @@ describe('model/acquisition', function () {
                     packageHash: 'ABCD',
                     clientUniqueId
                 });
-            }).then((result) => {
+            }).then(result => {
                 expect(result.isAvailable).to.be.true;
                 expect(result.packageHash).to.eq(pkg1_1.packageHash);
             })
@@ -254,14 +256,14 @@ describe('model/acquisition', function () {
                     isDisabled: true,
                     description: 'Some disabled package'
                 }
-            }).then((pkg) => {
+            }).then(pkg => {
                 expect(pkg.isDisabled).to.be.true;
                 return ac.updateCheck({
                     deploymentKey: stagingKey,
                     appVersion: '1.0.0',
                     packageHash: 'ABCD',
                     clientUniqueId
-                }).then((result) => {
+                }).then(result => {
                     expect(result.isAvailable).to.be.false;
                 })
             })
@@ -279,7 +281,7 @@ describe('model/acquisition', function () {
                   appVersion: "1.0.0"
                 }
               })
-              .then((pkg) => {
+              .then(pkg => {
                 return ac
                   .updateCheck({
                     deploymentKey: stagingKey,
@@ -287,7 +289,7 @@ describe('model/acquisition', function () {
                     packageHash: "ABCD",
                     clientUniqueId
                   })
-                  .then((result) => {
+                  .then(result => {
                     expect(result.isAvailable).true;
                     expect(result.packageHash).eq(pkg.packageHash);
                   });
@@ -304,14 +306,14 @@ describe('model/acquisition', function () {
                     description: "Package info desc",
                     appVersion: "19.14"
                 }
-            }).then((pkg) => {
+            }).then(pkg => {
                 return ac.updateCheck({
                     deploymentKey: stagingKey,
                     appVersion: "19.14",
                     packageHash: "ABCD",
                     clientUniqueId
                 })
-                .then((result) => {
+                .then(result => {
                     expect(result.isAvailable).true;
                     expect(result.packageHash).eq(pkg.packageHash);
                     expect(result.appVersion).eq("19.14");
@@ -410,6 +412,60 @@ describe('model/acquisition', function () {
         });
     });
 
+    describe("updateCheck with --targetBinaryVersion in semver", () => {
+        const email = 'test@unit-test.com';
+        const name = 'TestSemverApp';
+        let stagingKey = '';
+        let productionKey = '';
+        let clientUniqueId = '190jf09j2f01j10901';
+
+        before(() => {
+            return appBL.createApp({ email, name }).then(a => {
+                return dao.deploymentByApp(a.id, 'Staging').then(deployment => {
+                    stagingKey = deployment.key;
+                });
+            });
+        });
+
+        it("should target any minor version", () => {
+            return appBL
+              .upload({
+                app: name,
+                email,
+                package: "Some package content",
+                deployment: "Staging",
+                packageInfo: {
+                  description: "Some package",
+                  appVersion: "^1.0.0"
+                }
+              })
+              .then(pkg => {
+                return ac
+                  .updateCheck({
+                    deploymentKey: stagingKey,
+                    appVersion: "2.2.0",
+                    packageHash: "ABCD",
+                    clientUniqueId
+                  })
+                  .then(result => {
+                    expect(result.isAvailable).false;
+                  });
+              })
+              .then(pkg => {
+                return ac
+                  .updateCheck({
+                    deploymentKey: stagingKey,
+                    appVersion: "1.14.1",
+                    packageHash: "ABCD",
+                    clientUniqueId
+                  })
+                  .then(result => {
+                    expect(result.isAvailable).true;
+                  });
+              });
+        });
+    });
+
     describe("deployReportStatus", () => {
         const email = 'test@unit-test.com';
         const name = 'TestDeployStatusApp';
@@ -417,8 +473,8 @@ describe('model/acquisition', function () {
         let clientUniqueId = '198u2irjwekhr1j901';
 
         before(() => {
-            return appBL.createApp({ email, name }).then((a) => {
-                return dao.deploymentByApp(a.id, 'Staging').then((deployment) => {
+            return appBL.createApp({ email, name }).then(a => {
+                return dao.deploymentByApp(a.id, 'Staging').then(deployment => {
                     stagingKey = deployment.key;
                 });
             });

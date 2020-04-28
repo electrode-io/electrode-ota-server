@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 /* eslint-disable max-params */
 import { missingParameter } from "electrode-ota-server-errors";
 import version from "semver";
@@ -52,12 +53,12 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         };
                     }
                 }
-                const pkgAppVersion = version.coerce(pkg.appVersion, true).toString();
+                // don't coerce the targetVersion, it'll remove the range
+                const pkgAppVersion = pkg.appVersion;//version.coerce(pkg.appVersion, true).toString();
                 const paramAppVersion = version.coerce(params.appVersion, true).toString();
-
-                const isNotAvailable = pkg.packageHash == params.packageHash || !("clientUniqueId" in params)
-                    || version.gt(paramAppVersion, pkgAppVersion)
-                    || pkg.isDisabled;
+                const isTargetBinaryVersion = version.satisfies(paramAppVersion, pkgAppVersion);
+                const isNotAvailable = pkg.packageHash === params.packageHash || !("clientUniqueId" in params)
+                    || !isTargetBinaryVersion || pkg.isDisabled;
 
                 // eslint-disable-next-line func-style
                 function makeReturn(isAvailable) {
@@ -72,7 +73,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         packageHash: pkg.packageHash,
                         description: pkg.description,
                         // true == there is an update but it requires a newer binary version.
-                        updateAppVersion: version.lt(paramAppVersion, pkgAppVersion),
+                        updateAppVersion: isTargetBinaryVersion,
                         //TODO - find out what this should be
                         shouldRunBinaryVersion: false
                     };
