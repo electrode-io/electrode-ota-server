@@ -40,8 +40,9 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         shouldRunBinaryVersion: false
                     };
                 }
-
-                pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags, params.appVersion);
+                // would the client ever send in a range as version?
+                const paramAppVersion = version.coerce(params.appVersion, true).toString();
+                pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags, paramAppVersion);
                 if (!pkg) {
                     // no package match, use latest version that matches tag
                     pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags);
@@ -54,8 +55,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                     }
                 }
                 // don't coerce the targetVersion, it'll remove the range
-                const pkgAppVersion = pkg.appVersion;//version.coerce(pkg.appVersion, true).toString();
-                const paramAppVersion = version.coerce(params.appVersion, true).toString();
+                const pkgAppVersion = pkg.appVersion;
                 const isTargetBinaryVersion = version.satisfies(paramAppVersion, pkgAppVersion);
                 const isNotAvailable = pkg.packageHash === params.packageHash || !("clientUniqueId" in params)
                     || !isTargetBinaryVersion || pkg.isDisabled;
@@ -73,7 +73,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         packageHash: pkg.packageHash,
                         description: pkg.description,
                         // true == there is an update but it requires a newer binary version.
-                        updateAppVersion: isTargetBinaryVersion,
+                        updateAppVersion: version.ltr(paramAppVersion, pkgAppVersion),
                         //TODO - find out what this should be
                         shouldRunBinaryVersion: false
                     };

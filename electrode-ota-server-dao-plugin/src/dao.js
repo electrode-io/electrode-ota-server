@@ -2,6 +2,7 @@ import { promiseMap, reducer, remove, toJSON } from "electrode-ota-server-util";
 import { alreadyExistsMsg } from "electrode-ota-server-errors";
 import UDTS from "./models/UDTS.json";
 import { find } from "lodash";
+import semver from "semver";
 
 const historySort = history =>
   history &&
@@ -103,9 +104,6 @@ const matchTags = (desiredTags, currentTags) => {
   }
   return false;
 };
-
-const matchVersions = (wantVersion, existingVersion) =>
-  !wantVersion || wantVersion === existingVersion;
 
 export default class DaoExpressCassandra {
   //these are just here for autocomplete.
@@ -345,7 +343,7 @@ export default class DaoExpressCassandra {
       for (let i = 0; i < packages.length; i++) {
         let pkg = packages[i];
         let tagsDoMatch = matchTags(tags, pkg.tags);
-        let versionsDoMatch = matchVersions(appVersion, pkg.appVersion);
+        let versionsDoMatch = semver.satisfies(appVersion, pkg.appVersion);
         if (tagsDoMatch && versionsDoMatch) {
           return pkg;
         }

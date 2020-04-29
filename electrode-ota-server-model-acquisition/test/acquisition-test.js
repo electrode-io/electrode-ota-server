@@ -1,22 +1,22 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable max-nested-callbacks */
 /* eslint-disable max-statements */
-import initDao, { shutdown } from 'electrode-ota-server-test-support/lib/init-dao';
-import acquisition from 'electrode-ota-server-model-acquisition/lib/acquisition';
-import { loggerFactory } from 'electrode-ota-server-logger';
-import { fileservice as uploadFactory } from 'electrode-ota-server-fileservice-upload';
-import { fileservice as downloadFactory } from 'electrode-ota-server-fileservice-download';
-import { diffPackageMapCurrent } from 'electrode-ota-server-model-manifest/lib/manifest';
-import appFactory from 'electrode-ota-server-model-app/lib/app';
-import { expect } from 'chai';
-import fs from 'fs';
-import sinon from 'sinon';
-import path from 'path';
+import initDao, { shutdown } from "electrode-ota-server-test-support/lib/init-dao";
+import acquisition from "electrode-ota-server-model-acquisition/lib/acquisition";
+import { loggerFactory } from "electrode-ota-server-logger";
+import { fileservice as uploadFactory } from "electrode-ota-server-fileservice-upload";
+import { fileservice as downloadFactory } from "electrode-ota-server-fileservice-download";
+import { diffPackageMapCurrent } from "electrode-ota-server-model-manifest/lib/manifest";
+import appFactory from "electrode-ota-server-model-app/lib/app";
+import { expect } from "chai";
+import fs from "fs";
+import sinon from "sinon";
+import path from "path";
 
 const fixture = path.join.bind(path, __dirname, "fixture");
 const readFixture = file => fs.readFileSync(fixture(file));
 
-describe('model/acquisition', function () {
+describe("model/acquisition", function () {
     let ac;
     let appBL;
     let dao;
@@ -46,10 +46,10 @@ describe('model/acquisition', function () {
     })
 
     describe("isUpdateAble", () => {
-        it('should be 50% rollout', () => {
+        it("should be 50% rollout", () => {
             const result = [];
-            const update = (uniqueClientId = 'uniqueClientId',
-                packageHash = 'packageHash',
+            const update = (uniqueClientId = "uniqueClientId",
+                packageHash = "packageHash",
                 ratio = 50) => () => ac.isUpdateAble(uniqueClientId, packageHash, ratio).then(r => result.push(r));
             const first = update();
             return first().then(first).then(first).then(_ => {
@@ -58,9 +58,9 @@ describe('model/acquisition', function () {
                 expect(r1).to.be.true;
                 expect(r2).to.be.true;
                 result.length = 0;
-            }).then(update('id1', 'hash', 3))
-                .then(update('id1', 'hash', 3))
-                .then(update('id1', 'hash', 99))
+            }).then(update("id1", "hash", 3))
+                .then(update("id1", "hash", 3))
+                .then(update("id1", "hash", 99))
                 .then(_ => {
                     const [r0, r1, r2] = result;
                     expect(r0).to.be.false;
@@ -77,37 +77,37 @@ describe('model/acquisition', function () {
     });
 
     describe("updateCheck", () => {
-        const email = 'test@unit-test.com';
-        const name = 'TestApp';
-        let stagingKey = '';
-        let productionKey = '';
-        let clientUniqueId = '190jf09j2f01j10901';
+        const email = "test@unit-test.com";
+        const name = "TestApp";
+        let stagingKey = "";
+        let productionKey = "";
+        let clientUniqueId = "190jf09j2f01j10901";
 
         before(() => {
             return appBL.createApp({ email, name }).then(a => {
-                return dao.deploymentByApp(a.id, 'Staging').then(deployment => {
+                return dao.deploymentByApp(a.id, "Staging").then(deployment => {
                     stagingKey = deployment.key;
                 });
             });
         });
 
-        it('will return package available for rollout 100 and no tags', () => {
+        it("will return package available for rollout 100 and no tags", () => {
             return appBL.upload({
                 app: name,
                 email,
-                package: 'stuff-stuff-stuff-stuff-stuff',
-                deployment: 'Staging',
+                package: "stuff-stuff-stuff-stuff-stuff",
+                deployment: "Staging",
                 packageInfo: {
-                    description: 'release without tags initially',
+                    description: "release without tags initially",
                     rollout: 100
                 }
             }).then(() => {
                 return ac.updateCheck({
                     deploymentKey: stagingKey,
-                    appVersion: '1.0.0',
-                    packageHash: 'junk',
+                    appVersion: "1.0.0",
+                    packageHash: "junk",
                     isCompanion: false,
-                    label: 'v0',
+                    label: "v0",
                     clientUniqueId
                 }).then(result => {
                     expect(result).not.to.be.undefined;
@@ -116,23 +116,23 @@ describe('model/acquisition', function () {
             });
         });
 
-        it('will return package not available for rollout 0 and no tags', () => {
+        it("will return package not available for rollout 0 and no tags", () => {
             return appBL.upload({
                 app: name,
                 email,
-                package: 'more-stuff-stuff-stuff-stuff',
-                deployment: 'Staging',
+                package: "more-stuff-stuff-stuff-stuff",
+                deployment: "Staging",
                 packageInfo: {
-                    description: 'another release without tags',
+                    description: "another release without tags",
                     rollout: 0
                 }
             }).then(() => {
                 return ac.updateCheck({
                     deploymentKey: stagingKey,
-                    appVersion: '1.0.0',
-                    packageHash: 'junk',
+                    appVersion: "1.0.0",
+                    packageHash: "junk",
                     isCompanion: false,
-                    label: 'v0',
+                    label: "v0",
                     clientUniqueId
                 }).then(result => {
                     expect(result).not.to.be.undefined;
@@ -141,15 +141,15 @@ describe('model/acquisition', function () {
             });
         });
 
-        it('will return package available if there are matching tags', () => {
+        it("will return package available if there are matching tags", () => {
             return appBL.upload({
                 app: name,
                 email,
-                package: 'even-more-stuff-stuff-stuff-stuff-stuff',
-                deployment: 'Staging',
+                package: "even-more-stuff-stuff-stuff-stuff-stuff",
+                deployment: "Staging",
                 packageInfo: {
-                    description: 'Got some tags',
-                    tags: ['TAG-1', 'TAG-2']
+                    description: "Got some tags",
+                    tags: ["TAG-1", "TAG-2"]
                 }
             }).then(pkg => {
                 expect(pkg).not.to.be.undefined;
@@ -157,12 +157,12 @@ describe('model/acquisition', function () {
 
                 return ac.updateCheck({
                     deploymentKey: stagingKey,
-                    appVersion: '1.0.0',
-                    packageHash: 'junk',
+                    appVersion: "1.0.0",
+                    packageHash: "junk",
                     isCompanion: false,
-                    label: 'v0',
+                    label: "v0",
                     clientUniqueId,
-                    tags: ['TAG-1']
+                    tags: ["TAG-1"]
                 }).then(result => {
                     expect(result).not.to.be.undefined;
                     expect(result.isAvailable).to.eq(true);
@@ -171,37 +171,37 @@ describe('model/acquisition', function () {
             });
         });
 
-        it('will return package not available if there are no matching tags', () => {
+        it("will return package not available if there are no matching tags", () => {
             // depends on the previous tests
             return ac.updateCheck({
                 deploymentKey: stagingKey,
-                appVersion: '1.0.0',
-                packageHash: 'junk',
+                appVersion: "1.0.0",
+                packageHash: "junk",
                 isCompanion: false,
-                label: 'v0',
+                label: "v0",
                 clientUniqueId,
-                tags: ['SOME-OTHER-TAG', 'YET-ANOTHER-TAG']
+                tags: ["SOME-OTHER-TAG", "YET-ANOTHER-TAG"]
             }).then(result => {
                 expect(result).not.to.be.undefined;
                 expect(result.isAvailable).to.eq(false);
             });
         });
 
-        it('no update if package version is greater than latest package', () => {
+        it("no update if package version is greater than latest package", () => {
             return appBL.upload({
                 app: name,
                 email,
-                package: 'Some awesome package content',
-                deployment: 'Staging',
+                package: "Some awesome package content",
+                deployment: "Staging",
                 packageInfo: {
-                    description: 'Some content'
+                    description: "Some content"
                 }
             }).then(pkg => {
-                expect(pkg.appVersion).to.eql('1.0.0');
+                expect(pkg.appVersion).to.eql("1.0.0");
                 return ac.updateCheck({
                     deploymentKey: stagingKey,
-                    appVersion: '1.0.1',
-                    packageHash: 'ABCD',
+                    appVersion: "1.0.1",
+                    packageHash: "ABCD",
                     clientUniqueId
                 }).then(result => {
                     expect(result.isAvailable).to.eq(false);
@@ -209,35 +209,35 @@ describe('model/acquisition', function () {
             });
         });
 
-        it('pick the appropriate package for the given appversion', () => {
+        it("pick the appropriate package for the given appversion", () => {
             let pkg1_1, pkg1_2;
             return appBL.upload({
                 app: name,
                 email,
-                package: 'Package Content v1.0.0 goes here',
-                deployment: 'Staging',
+                package: "Package Content v1.0.0 goes here",
+                deployment: "Staging",
                 packageInfo: {
-                    description: 'Content for v1.0.0',
-                    appVersion: '1.0.0'
+                    description: "Content for v1.0.0",
+                    appVersion: "1.0.0"
                 }
             }).then(pkg => {
                 pkg1_1 = pkg;
                 return appBL.upload({
                     app: name,
                     email,
-                    package: 'Package Content v1.2.0 goes here',
-                    deployment: 'Staging',
+                    package: "Package Content v1.2.0 goes here",
+                    deployment: "Staging",
                     packageInfo: {
-                        description: 'Content for v1.2.0',
-                        appVersion: '1.2.0'
+                        description: "Content for v1.2.0",
+                        appVersion: "1.2.0"
                     }
                 })
             }).then(pkg => {
                 pkg1_2 = pkg;
                 return ac.updateCheck({
                     deploymentKey: stagingKey,
-                    appVersion: '1.0.0',
-                    packageHash: 'ABCD',
+                    appVersion: "1.0.0",
+                    packageHash: "ABCD",
                     clientUniqueId
                 });
             }).then(result => {
@@ -246,22 +246,22 @@ describe('model/acquisition', function () {
             })
         });
 
-        it('no update if package is disabled', () => {
+        it("no update if package is disabled", () => {
             return appBL.upload({
                 app: name,
                 email,
-                package: 'Some disabled package',
-                deployment: 'Staging',
+                package: "Some disabled package",
+                deployment: "Staging",
                 packageInfo: {
                     isDisabled: true,
-                    description: 'Some disabled package'
+                    description: "Some disabled package"
                 }
             }).then(pkg => {
                 expect(pkg.isDisabled).to.be.true;
                 return ac.updateCheck({
                     deploymentKey: stagingKey,
-                    appVersion: '1.0.0',
-                    packageHash: 'ABCD',
+                    appVersion: "1.0.0",
+                    packageHash: "ABCD",
                     clientUniqueId
                 }).then(result => {
                     expect(result.isAvailable).to.be.false;
@@ -413,15 +413,15 @@ describe('model/acquisition', function () {
     });
 
     describe("updateCheck with --targetBinaryVersion in semver", () => {
-        const email = 'test@unit-test.com';
-        const name = 'TestSemverApp';
-        let stagingKey = '';
-        let productionKey = '';
-        let clientUniqueId = '190jf09j2f01j10901';
+        const email = "test@unit-test.com";
+        const name = "TestSemverApp";
+        let stagingKey = "";
+        let productionKey = "";
+        let clientUniqueId = "190jf09j2f01j10901";
 
         before(() => {
             return appBL.createApp({ email, name }).then(a => {
-                return dao.deploymentByApp(a.id, 'Staging').then(deployment => {
+                return dao.deploymentByApp(a.id, "Staging").then(deployment => {
                     stagingKey = deployment.key;
                 });
             });
@@ -467,14 +467,14 @@ describe('model/acquisition', function () {
     });
 
     describe("deployReportStatus", () => {
-        const email = 'test@unit-test.com';
-        const name = 'TestDeployStatusApp';
-        let stagingKey = '';
-        let clientUniqueId = '198u2irjwekhr1j901';
+        const email = "test@unit-test.com";
+        const name = "TestDeployStatusApp";
+        let stagingKey = "";
+        let clientUniqueId = "198u2irjwekhr1j901";
 
         before(() => {
             return appBL.createApp({ email, name }).then(a => {
-                return dao.deploymentByApp(a.id, 'Staging').then(deployment => {
+                return dao.deploymentByApp(a.id, "Staging").then(deployment => {
                     stagingKey = deployment.key;
                 });
             });
