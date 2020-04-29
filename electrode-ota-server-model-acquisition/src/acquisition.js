@@ -31,6 +31,8 @@ export default (options, dao, weighted, _download, manifest, logger) => {
 
             return dao.deploymentForKey(params.deploymentKey).then(async deployment => {
                 let pkg = deployment && deployment.package;
+                let pkgAppVersion;
+                let isTargetBinaryVersion;
                 if (!pkg) {
                     /**
                      * If no packages have been published just return this.
@@ -42,21 +44,30 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                 }
                 // would the client ever send in a range as version?
                 const paramAppVersion = version.coerce(params.appVersion, true).toString();
+                // First try to getNewestApplicablePackage(), matches the incoming appVersion/tag to any of the latest release
+                //  Note that now supporting semver in --targetBinaryVersion, this may not yield desired result
                 pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags, paramAppVersion);
                 if (!pkg) {
-                    // no package match, use latest version that matches tag
+                    // Second try to getNewestApplicablePackage(), use latest version that matches tag
                     pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags);
-                    if (!pkg) {
+                    // don't coerce the targetVersion, it'll remove the range
+                    pkgAppVersion = pkg.appVersion;
+                    // though we get a result, still better to validate against the semver(--targetBinaryVersion)
+                    isTargetBinaryVersion = version.satisfies(paramAppVersion, pkg.appVersion);
+                    if (!pkg || !isTargetBinaryVersion) {
                         // no package matching tag
                         return {
                             isAvailable: false,
                             shouldRunBinaryVersion: false
                         };
                     }
+                } else {
+                    // don't coerce the targetVersion, it'll remove the range
+                    pkgAppVersion = pkg.appVersion;
+                    isTargetBinaryVersion = version.satisfies(paramAppVersion, pkg.appVersion);
                 }
-                // don't coerce the targetVersion, it'll remove the range
-                const pkgAppVersion = pkg.appVersion;
-                const isTargetBinaryVersion = version.satisfies(paramAppVersion, pkgAppVersion);
+
+                // should we send the update?
                 const isNotAvailable = pkg.packageHash === params.packageHash || !("clientUniqueId" in params)
                     || !isTargetBinaryVersion || pkg.isDisabled;
 
