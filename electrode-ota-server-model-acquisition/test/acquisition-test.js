@@ -574,6 +574,22 @@ describe("model/acquisition", function () {
               });
         });
 
+        it("should upload two packages and test the semver criteria, ^6.0.0, ^7.0.0", () => {
+            return appBL
+              .upload(myPackage("^6.0.0", "Some package content, foo bar, label-6 for v6"))
+              .then(pkg => {
+                return appBL
+                  .upload(myPackage("^7.0.0", "Some exclusive package content and foo-bar, foo bar, label-7 for v7"))
+                  .then(pkg => {
+                    return ac
+                      .updateCheck(params("6.0.2", "ZAXBYCDPQR"))
+                      .then(result => {
+                        expect(result.isAvailable).false;
+                      });
+                  });
+              });
+        });
+
         it("should target any device configured to consume updates, *", () => {
             return appBL
               .upload(myPackage("*", "Some-package-content, foo-bar-1-**-foobar"))
