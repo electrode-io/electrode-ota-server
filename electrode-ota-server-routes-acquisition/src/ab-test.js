@@ -1,7 +1,7 @@
 /* eslint-disable max-params */
 // should I send Cached URL in ther response?
 const shouldSendCachedUrl = (id, plan) => {
-    if (id && plan) {
+    if (id && plan && typeof plan === "string") {
         const bucket = plan.toLowerCase();
         const lastChar = id.substr(-1).toLowerCase();
         // Unique Client ID is of HexaDecimal chars

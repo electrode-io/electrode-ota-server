@@ -80,8 +80,8 @@ describe("model/acquisition", function () {
         const email = "test@unit-test.com";
         const name = "TestApp";
         let stagingKey = "";
-        let productionKey = "";
-        let clientUniqueId = "190jf09j2f01j10901";
+        const productionKey = "";
+        const clientUniqueId = "190jf09j2f01j10901";
 
         before(() => {
             return appBL.createApp({ email, name }).then(a => {
@@ -416,8 +416,15 @@ describe("model/acquisition", function () {
         const email = "test@unit-test.com";
         const name = "TestSemverApp";
         let stagingKey = "";
-        let productionKey = "";
-        let clientUniqueId = "190jf09j2f01j10901";
+        const clientUniqueId = "190jf09j2f01j10901";
+        const myPackage = (appVersion, pkg) => ({
+            email,
+            app: name,
+            deployment: "Staging",
+            package: pkg,
+            packageInfo: { appVersion, description: "Some package" }
+        });
+        const params = (appVersion, packageHash) => ({ appVersion, clientUniqueId, packageHash, deploymentKey: stagingKey });
 
         before(() => {
             return appBL.createApp({ email, name }).then(a => {
@@ -427,38 +434,159 @@ describe("model/acquisition", function () {
             });
         });
 
-        it("should target any minor version", () => {
+        it("should target only specific version, 1.2.3", () => {
             return appBL
-              .upload({
-                app: name,
-                email,
-                package: "Some package content",
-                deployment: "Staging",
-                packageInfo: {
-                  description: "Some package",
-                  appVersion: "^1.0.0"
-                }
-              })
+              .upload(myPackage("1.2.3", "Some-package-content, foo-bar-1"))
               .then(pkg => {
                 return ac
-                  .updateCheck({
-                    deploymentKey: stagingKey,
-                    appVersion: "2.2.0",
-                    packageHash: "ABCD",
-                    clientUniqueId
-                  })
+                  .updateCheck(params("1.2.5", "ABCD"))
                   .then(result => {
                     expect(result.isAvailable).false;
                   });
               })
               .then(pkg => {
                 return ac
-                  .updateCheck({
-                    deploymentKey: stagingKey,
-                    appVersion: "1.14.1",
-                    packageHash: "ABCD",
-                    clientUniqueId
-                  })
+                  .updateCheck(params("1.2.3", "ABCD"))
+                  .then(result => {
+                    expect(result.isAvailable).true;
+                  });
+              });
+        });
+
+        it("should target any device configured to consume updates, *", () => {
+            return appBL
+              .upload(myPackage("*", "Some-package-content, foo-bar-1-**-foobar"))
+              .then(pkg => {
+                return ac
+                  .updateCheck(params("1.2.5", "ABCD"))
+                  .then(result => {
+                    expect(result.isAvailable).true;
+                  });
+              })
+              .then(pkg => {
+                return ac
+                  .updateCheck(params("1.2.3", "ABCD"))
+                  .then(result => {
+                    expect(result.isAvailable).true;
+                  });
+              });
+        });
+
+        it("should target any patch version but fixed major/minor version, 1.2.x", () => {
+            return appBL
+              .upload(myPackage("1.2.x", "Some package content, foo-bar, foobar-222"))
+              .then(pkg => {
+                return ac
+                  .updateCheck(params("1.1.5", "ABCD"))
+                  .then(result => {
+                    expect(result.isAvailable).false;
+                  });
+              })
+              .then(pkg => {
+                return ac
+                  .updateCheck(params("1.2.9", "ABCD"))
+                  .then(result => {
+                    expect(result.isAvailable).true;
+                  });
+              });
+        });
+
+        it("should target specific range: 1.2.3 - 1.2.7", () => {
+            return appBL
+              .upload(myPackage("1.2.3 - 1.2.7", "foo-bar, Some package content, foobar"))
+              .then(pkg => {
+                return ac
+                  .updateCheck(params("1.2.2", "ABCDEF"))
+                  .then(result => {
+                    expect(result.isAvailable).false;
+                  });
+              })
+              .then(pkg => {
+                return ac
+                  .updateCheck(params("1.2.7", "ABCDEFGH"))
+                  .then(result => {
+                    expect(result.isAvailable).true;
+                  });
+              });
+        });
+
+        it("should target specific range: >=1.2.3 <1.2.7", () => {
+            return appBL
+              .upload(myPackage(">=1.2.3 <1.2.7", "Some package content"))
+              .then(pkg => {
+                return ac
+                  .updateCheck(params("1.2.7", "ABCDE"))
+                  .then(result => {
+                    expect(result.isAvailable).false;
+                  });
+              })
+              .then(pkg => {
+                return ac
+                  .updateCheck(params("1.2.3", "ABCDFG"))
+                  .then(result => {
+                    expect(result.isAvailable).true;
+                  });
+              });
+        });
+
+        it("should target any patch version, 1.2", () => {
+            return appBL
+              .upload(myPackage("1.2", "Some package content"))
+              .then(pkg => {
+                return ac
+                  .updateCheck(params("1.3", "ABCDI"))
+                  .then(result => {
+                    expect(result.isAvailable).false;
+                  });
+              })
+              .then(pkg => {
+                return ac
+                  .updateCheck(params("1.2.45", "ABCDH"))
+                  .then(result => {
+                    expect(result.isAvailable).true;
+                  });
+              });
+        });
+
+        it("should target specific minor but any patch version, ~1.2.3", () => {
+            return appBL
+              .upload(myPackage("~1.2.3", "Some package content"))
+              .then(pkg => {
+                return ac
+                  .updateCheck(params("1.3.3", "ABCDXY"))
+                  .then(result => {
+                    expect(result.isAvailable).false;
+                  });
+              })
+              .then(pkg => {
+                return ac
+                  .updateCheck(params("1.2.35", "ABCDZKL"))
+                  .then(result => {
+                    expect(result.isAvailable).true;
+                  });
+              });
+        });
+
+        it("should target any minor/patch version, ^1.2.3", () => {
+            return appBL
+              .upload(myPackage("^1.2.3", "Some package content"))
+              .then(pkg => {
+                return ac
+                  .updateCheck(params("2.2.3", "ABCD"))
+                  .then(result => {
+                    expect(result.isAvailable).false;
+                  });
+              })
+              .then(pkg => {
+                return ac
+                  .updateCheck(params("1.25.75", "ABCDPQR"))
+                  .then(result => {
+                    expect(result.isAvailable).true;
+                  });
+              })
+              .then(pkg => {
+                return ac
+                  .updateCheck(params("1.70.5", "ABCDPLXC"))
                   .then(result => {
                     expect(result.isAvailable).true;
                   });
@@ -470,7 +598,7 @@ describe("model/acquisition", function () {
         const email = "test@unit-test.com";
         const name = "TestDeployStatusApp";
         let stagingKey = "";
-        let clientUniqueId = "198u2irjwekhr1j901";
+        const clientUniqueId = "198u2irjwekhr1j901";
 
         before(() => {
             return appBL.createApp({ email, name }).then(a => {

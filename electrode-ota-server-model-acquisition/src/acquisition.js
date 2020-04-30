@@ -43,7 +43,11 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                     };
                 }
                 // would the client ever send in a range as version?
-                const paramAppVersion = version.coerce(params.appVersion, true).toString();
+                let paramAppVersion = version.coerce(params.appVersion, true)
+                // if an invalid string is sent, coerce() would return null eg: "1.7.05"
+                if (paramAppVersion) {
+                    paramAppVersion = paramAppVersion.toString();
+                }
                 // First try to getNewestApplicablePackage(), matches the incoming appVersion/tag to any of the latest release
                 //  Note that now supporting semver in --targetBinaryVersion, this may not yield desired result
                 pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags, paramAppVersion);
