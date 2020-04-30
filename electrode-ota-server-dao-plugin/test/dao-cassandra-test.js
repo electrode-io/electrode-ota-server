@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable max-nested-callbacks */
+/* eslint-disable max-statements */
 import initDao, {
   shutdown
 } from "electrode-ota-server-test-support/lib/init-dao";
@@ -7,6 +10,7 @@ import { expect } from "chai";
 function alwaysFail() {
   throw new Error(`should have failed`);
 }
+
 describe("dao/cassandra", function() {
   this.timeout(200000);
   let dao;
@@ -316,7 +320,7 @@ describe("dao/cassandra", function() {
       });
     });
 
-    it("will return a release with no tags if none of the incoming tags match", () => {
+    it("will return the latest release if none of the incoming tags match", () => {
       pkg2 = {
         appVersion: "1.0.0",
         blobUrl: "http://stuff.com/package2",
@@ -337,7 +341,7 @@ describe("dao/cassandra", function() {
           .getNewestApplicablePackage(stagingKey, undefined)
           .then(newest => {
             expect(newest).not.to.be.undefined;
-            expect(newest.packageHash).to.eq(pkg1.packageHash);
+            expect(newest.packageHash).to.eq(pkg2.packageHash);
           })
           .then(() => {
             return dao
