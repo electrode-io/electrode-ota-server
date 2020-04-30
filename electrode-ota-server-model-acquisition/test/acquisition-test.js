@@ -453,25 +453,6 @@ describe("model/acquisition", function () {
               });
         });
 
-        it("should target any device configured to consume updates, *", () => {
-            return appBL
-              .upload(myPackage("*", "Some-package-content, foo-bar-1-**-foobar"))
-              .then(pkg => {
-                return ac
-                  .updateCheck(params("1.2.5", "ABCD"))
-                  .then(result => {
-                    expect(result.isAvailable).true;
-                  });
-              })
-              .then(pkg => {
-                return ac
-                  .updateCheck(params("1.2.3", "ABCD"))
-                  .then(result => {
-                    expect(result.isAvailable).true;
-                  });
-              });
-        });
-
         it("should target any patch version but fixed major/minor version, 1.2.x", () => {
             return appBL
               .upload(myPackage("1.2.x", "Some package content, foo-bar, foobar-222"))
@@ -491,102 +472,121 @@ describe("model/acquisition", function () {
               });
         });
 
-        it("should target specific range: 1.2.3 - 1.2.7", () => {
+        it("should target specific range: 1.3.3 - 1.3.7", () => {
             return appBL
-              .upload(myPackage("1.2.3 - 1.2.7", "foo-bar, Some package content, foobar"))
+              .upload(myPackage("1.3.3 - 1.3.7", "foo-bar, Some package content, foobar"))
               .then(pkg => {
                 return ac
-                  .updateCheck(params("1.2.2", "ABCDEF"))
+                  .updateCheck(params("1.3.2", "ABCDEF"))
                   .then(result => {
                     expect(result.isAvailable).false;
                   });
               })
               .then(pkg => {
                 return ac
-                  .updateCheck(params("1.2.7", "ABCDEFGH"))
+                  .updateCheck(params("1.3.7", "ABCDEFGH"))
                   .then(result => {
                     expect(result.isAvailable).true;
                   });
               });
         });
 
-        it("should target specific range: >=1.2.3 <1.2.7", () => {
+        it("should target specific range: >=2.4.3 <2.4.7", () => {
             return appBL
-              .upload(myPackage(">=1.2.3 <1.2.7", "Some package content"))
+              .upload(myPackage(">=2.4.3 <2.4.7", "Some package content"))
               .then(pkg => {
                 return ac
-                  .updateCheck(params("1.2.7", "ABCDE"))
+                  .updateCheck(params("2.4.7", "ABCDE"))
                   .then(result => {
                     expect(result.isAvailable).false;
                   });
               })
               .then(pkg => {
                 return ac
-                  .updateCheck(params("1.2.3", "ABCDFG"))
+                  .updateCheck(params("2.4.3", "ABCDFG"))
                   .then(result => {
                     expect(result.isAvailable).true;
                   });
               });
         });
 
-        it("should target any patch version, 1.2", () => {
+        it("should target any patch version, 3.2", () => {
             return appBL
-              .upload(myPackage("1.2", "Some package content"))
+              .upload(myPackage("3.2", "Some package content"))
               .then(pkg => {
                 return ac
-                  .updateCheck(params("1.3", "ABCDI"))
+                  .updateCheck(params("3.3", "ABCDI"))
                   .then(result => {
                     expect(result.isAvailable).false;
                   });
               })
               .then(pkg => {
                 return ac
-                  .updateCheck(params("1.2.45", "ABCDH"))
+                  .updateCheck(params("3.2.45", "ABCDH"))
                   .then(result => {
                     expect(result.isAvailable).true;
                   });
               });
         });
 
-        it("should target specific minor but any patch version, ~1.2.3", () => {
+        it("should target specific minor but any patch version, ~4.2.3", () => {
             return appBL
-              .upload(myPackage("~1.2.3", "Some package content"))
+              .upload(myPackage("~4.2.3", "Some package content"))
               .then(pkg => {
                 return ac
-                  .updateCheck(params("1.3.3", "ABCDXY"))
+                  .updateCheck(params("4.3.3", "ABCDXY"))
                   .then(result => {
                     expect(result.isAvailable).false;
                   });
               })
               .then(pkg => {
                 return ac
-                  .updateCheck(params("1.2.35", "ABCDZKL"))
+                  .updateCheck(params("4.2.35", "ABCDZKL"))
                   .then(result => {
                     expect(result.isAvailable).true;
                   });
               });
         });
 
-        it("should target any minor/patch version, ^1.2.3", () => {
+        it("should target any minor/patch version, ^5.2.3", () => {
             return appBL
-              .upload(myPackage("^1.2.3", "Some package content"))
+              .upload(myPackage("^5.2.3", "Some package content"))
               .then(pkg => {
                 return ac
-                  .updateCheck(params("2.2.3", "ABCD"))
+                  .updateCheck(params("5.1.3", "ABCDMLO"))
                   .then(result => {
                     expect(result.isAvailable).false;
                   });
               })
               .then(pkg => {
                 return ac
-                  .updateCheck(params("1.25.75", "ABCDPQR"))
+                  .updateCheck(params("5.25.75", "ABCDPQR"))
                   .then(result => {
                     expect(result.isAvailable).true;
                   });
               })
               .then(pkg => {
                 return ac
-                  .updateCheck(params("1.70.5", "ABCDPLXC"))
+                  .updateCheck(params("5.70.5", "ABCDPLXC"))
+                  .then(result => {
+                    expect(result.isAvailable).true;
+                  });
+              });
+        });
+
+        it("should target any device configured to consume updates, *", () => {
+            return appBL
+              .upload(myPackage("*", "Some-package-content, foo-bar-1-**-foobar"))
+              .then(pkg => {
+                return ac
+                  .updateCheck(params("7.2.15", "ABCDUVRE"))
+                  .then(result => {
+                    expect(result.isAvailable).true;
+                  });
+              })
+              .then(pkg => {
+                return ac
+                  .updateCheck(params("9.22.3", "ABCDYUG"))
                   .then(result => {
                     expect(result.isAvailable).true;
                   });
