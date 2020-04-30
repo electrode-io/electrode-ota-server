@@ -342,7 +342,6 @@ export default class DaoExpressCassandra {
     console.log("<<<-= dao::getNewestApplicablePackage =->>>");
     console.log("deploymentKey: ", deploymentKey, " || tags: ", tags, " || appVersion: ", appVersion);
     const packageHashes = await this._historyForDeployment(deploymentKey);
-    console.log(packageHashes);
     if (packageHashes && packageHashes.length > 0) {
       let packages = await this.Package.findAsync({
         id_: within(packageHashes)
@@ -351,6 +350,7 @@ export default class DaoExpressCassandra {
 
       for (let i = 0; i < packages.length; i++) {
         const pkg = packages[i];
+        console.log(`packageHash: ${JSON.stringify(pkg)}`);
         const tagsDoMatch = matchTags(tags, pkg.tags);
         const versionsDoMatch = matchVersions(appVersion, pkg.appVersion);
         console.log(`(${tags}, ${pkg.tags}): ${tagsDoMatch} || (${appVersion}, ${pkg.appVersion}): ${versionsDoMatch}`);

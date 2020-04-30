@@ -341,7 +341,7 @@ describe("dao/cassandra", function() {
           .getNewestApplicablePackage(stagingKey, undefined)
           .then(newest => {
             expect(newest).not.to.be.undefined;
-            expect(newest.packageHash).to.eq(pkg2.packageHash);
+            expect(newest.packageHash).to.eq(pkg1.packageHash);
           })
           .then(() => {
             return dao
