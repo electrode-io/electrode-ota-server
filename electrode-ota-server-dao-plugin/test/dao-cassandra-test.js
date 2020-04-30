@@ -320,7 +320,7 @@ describe("dao/cassandra", function() {
       });
     });
 
-    it("will return the latest release if none of the incoming tags match", () => {
+    it("will return a release with no tags if none of the incoming tags match", () => {
       pkg2 = {
         appVersion: "1.0.0",
         blobUrl: "http://stuff.com/package2",
