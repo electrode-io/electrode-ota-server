@@ -1,3 +1,6 @@
+/* eslint-disable max-params */
+/* eslint-disable max-statements */
+/* eslint-disable consistent-return */
 import { promiseMap, reducer, remove, toJSON } from "electrode-ota-server-util";
 import { alreadyExistsMsg } from "electrode-ota-server-errors";
 import UDTS from "./models/UDTS.json";
@@ -341,9 +344,10 @@ export default class DaoExpressCassandra {
       packages = historySort(packages);
 
       for (let i = 0; i < packages.length; i++) {
-        let pkg = packages[i];
-        let tagsDoMatch = matchTags(tags, pkg.tags);
-        let versionsDoMatch = semver.satisfies(appVersion, pkg.appVersion);
+        const pkg = packages[i];
+        const tagsDoMatch = matchTags(tags, pkg.tags);
+        // this is to match packages only by tags
+        const versionsDoMatch = appVersion ? semver.satisfies(appVersion, pkg.appVersion) : true;
         if (tagsDoMatch && versionsDoMatch) {
           return pkg;
         }
@@ -558,7 +562,7 @@ export default class DaoExpressCassandra {
 
   metricsByStatus(deploymentkey) {
     return this.Metric.findAsync({ deploymentkey }).then((metrics = []) => {
-      let grouped = metrics.reduce((accumulator, val) => {
+      const grouped = metrics.reduce((accumulator, val) => {
         // group by status, label, appversion, previouslydeploymentkey, previouslabeyorappversion
         const key = `${val.status}:${val.label}:${val.appversion}:${
           val.previousdeploymentkey
