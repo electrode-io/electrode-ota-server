@@ -339,26 +339,22 @@ export default class DaoExpressCassandra {
    * @param {*} appVersion string - appVersion of package to match
    */
   async getNewestApplicablePackage(deploymentKey, tags, appVersion) {
-    console.log("<<<-= dao::getNewestApplicablePackage =->>>");
-    console.log("deploymentKey: ", deploymentKey, " || tags: ", tags, " || appVersion: ", appVersion);
     const packageHashes = await this._historyForDeployment(deploymentKey);
     if (packageHashes && packageHashes.length > 0) {
       let packages = await this.Package.findAsync({
         id_: within(packageHashes)
       });
       packages = historySort(packages);
-      console.log(packages.map(p => p.appVersion));
 
       for (let i = 0; i < packages.length; i++) {
         const pkg = packages[i];
         const tagsDoMatch = matchTags(tags, pkg.tags);
         const versionsDoMatch = matchVersions(appVersion, pkg.appVersion);
-        console.log(`(${tags}, ${pkg.tags}): ${tagsDoMatch} || (${appVersion}, ${pkg.appVersion}): ${versionsDoMatch}`);
         if (tagsDoMatch && versionsDoMatch) {
           return pkg;
         }
       }
-      console.log("last-cdn: ", (!tags || tags.length === 0) && !appVersion);
+
       if ((!tags || tags.length === 0) && !appVersion) {
         // if no tag or version, return latest
         return packages[0];
