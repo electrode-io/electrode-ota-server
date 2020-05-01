@@ -584,7 +584,8 @@ describe("model/acquisition", function () {
                     return ac
                       .updateCheck(params("6.0.2", "ZAXBYCDPQR"))
                       .then(result => {
-                        expect(result.isAvailable).false;
+                        expect(result.isAvailable).true;
+                        expect(result.appVersion).to.be.eq("^6.0.0");
                       });
                   });
               });
