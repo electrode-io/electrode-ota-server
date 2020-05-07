@@ -19,7 +19,7 @@ export const PackageQueries = {
                         FROM package
                         WHERE id = ?`,
 
-    getMostRecentPackageIdByDeploymentAndTags : `SELECT dph.package_id, p.create_time
+    getMostRecentPackageIdByDeploymentAndTags : `SELECT dph.package_id, p.create_time, p.app_version
                                     FROM deployment_package_history dph, package_tag pt, package p
                                     WHERE dph.deployment_id = ?
                                     AND p.id = dph.package_id
@@ -28,7 +28,7 @@ export const PackageQueries = {
 
                                     UNION
 
-                                    SELECT dph.package_id, p.create_time
+                                    SELECT dph.package_id, p.create_time, p.app_version
                                     FROM deployment_package_history dph, package p
                                     WHERE dph.deployment_id = ?
                                     AND dph.package_id = p.id
@@ -103,4 +103,14 @@ export const PackageQueries = {
                     WHERE id = ?`,
 
     updatePackageTime : `UPDATE package SET update_time = CURRENT_TIMESTAMP(3) WHERE id = ?`,
+
+    getMostRecentPackageIdByDeployment : `SELECT dph.package_id, p.create_time, p.app_version
+                                                FROM deployment_package_history dph, package p
+                                                WHERE dph.deployment_id = ?
+                                                AND dph.package_id = p.id
+                                                AND NOT EXISTS
+                                                (SELECT 1
+                                                FROM package_tag pt
+                                                WHERE dph.package_id = pt.package_id)
+                                                ORDER BY 2 DESC`,
 };

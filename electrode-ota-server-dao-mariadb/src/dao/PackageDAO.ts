@@ -17,6 +17,7 @@ import {
 
 import { difference, find } from "lodash";
 import { connect } from "net";
+import semver from "semver";
 
 import Encryptor from "../Encryptor";
 
@@ -62,6 +63,38 @@ export default class PackageDAO extends BaseDAO {
     }
 
     public static async getNewestApplicablePackage(connection: IConnection, deploymentKey: string,
+        tags: string[] | undefined, appVersion: string | undefined): Promise<PackageDTO | void> {
+        const deployment = await DeploymentDAO.deploymentForKey(connection, deploymentKey);
+        const deploymentId = deployment.id;
+
+        const isTagsRequested = tags && tags.length > 0;
+        const key = isTagsRequested ? "tags" : "notags";
+        const allQueries:{[key:string]: string;} = {
+            "tags": PackageQueries.getMostRecentPackageIdByDeploymentAndTags,
+            "notags": PackageQueries.getMostRecentPackageIdByDeployment
+        }
+        const allParams:{[key:string]:any} = {
+            "tags": [deploymentId, tags, deploymentId],
+            "notags": [deploymentId]
+        }
+        const packages = await PackageDAO.query(connection, allQueries[key], allParams[key]);
+        if (packages && packages.length > 0) {
+            if (appVersion) {
+                for (let i = 0; i < packages.length; i++) {
+                    if (semver.satisfies(appVersion, packages[i].appVersion)) {
+                        return await PackageDAO.packageById(connection, packages[i].package_id);
+                    }
+                  }
+            } else {
+                // if either tags only or no-tag/version requested
+                return await PackageDAO.packageById(connection, packages[0].package_id);
+            }
+        }
+
+        return undefined;
+    }
+
+    public static async getNewestApplicablePackageByNonSemver(connection: IConnection, deploymentKey: string,
         tags: string[] | undefined, appVersion: string | undefined): Promise<PackageDTO | void> {
 
         const deployment = await DeploymentDAO.deploymentForKey(connection, deploymentKey);

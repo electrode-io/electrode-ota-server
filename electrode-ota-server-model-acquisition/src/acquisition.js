@@ -31,8 +31,8 @@ export default (options, dao, weighted, _download, manifest, logger) => {
 
             return dao.deploymentForKey(params.deploymentKey).then(async deployment => {
                 let pkg = deployment && deployment.package;
-                let pkgAppVersion;
                 let isTargetBinaryVersion;
+                let pkgAppVersion;
                 if (!pkg) {
                     /**
                      * If no packages have been published just return this.
@@ -48,17 +48,11 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                 if (paramAppVersion) {
                     paramAppVersion = paramAppVersion.toString();
                 }
-                // First try to getNewestApplicablePackage(), matches the incoming appVersion/tag to any of the latest release
-                //  Note that now supporting semver in --targetBinaryVersion, this may not yield desired result
+
                 pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags, paramAppVersion);
                 if (!pkg) {
-                    // Second try to getNewestApplicablePackage(), use latest version that matches tag
                     pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags);
-                    // don't coerce the targetVersion, it'll remove the range
-                    pkgAppVersion = pkg.appVersion;
-                    // though we get a result, still better to validate against the semver(--targetBinaryVersion)
-                    isTargetBinaryVersion = version.satisfies(paramAppVersion, pkg.appVersion);
-                    if (!pkg || !isTargetBinaryVersion) {
+                    if (!pkg) {
                         // no package matching tag
                         return {
                             isAvailable: false,
