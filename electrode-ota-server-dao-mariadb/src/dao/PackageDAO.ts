@@ -71,7 +71,7 @@ export default class PackageDAO extends BaseDAO {
         const key = isTagsRequested ? "tags" : "notags";
         const allQueries:{[key:string]: string;} = {
             "tags": PackageQueries.getMostRecentPackageIdByDeploymentAndTags,
-            "notags": PackageQueries.getMostRecentPackageIdByDeployment
+            "notags": PackageQueries.getMostRecentPackageIdByDeploymentNoTags
         }
         const allParams:{[key:string]:any} = {
             "tags": [deploymentId, tags, deploymentId],
