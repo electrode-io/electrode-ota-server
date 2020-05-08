@@ -338,6 +338,10 @@ describe("model/acquisition", function () {
                     packageHash: "ABCD",
                     clientUniqueId
                 }).then(result => {
+                    /*eslint-disable*/
+                    console.log("<<-- result -->");
+                    console.log(JSON.stringify(result));
+                    /*eslint-disable*/
                     expect(result.updateAppVersion).to.be.undefined;
                     expect(result.isAvailable).to.be.false;
                 })
