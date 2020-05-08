@@ -338,14 +338,10 @@ describe("model/acquisition", function () {
                     packageHash: "ABCD",
                     clientUniqueId
                 }).then(result => {
-                    /*eslint-disable*/
-                    console.log("<<-- result -->");
-                    console.log(JSON.stringify(result));
-                    /*eslint-disable*/
-                    expect(result.updateAppVersion).to.be.undefined;
-                    expect(result.isAvailable).to.be.false;
-                })
-            })
+                    expect(result.updateAppVersion).true;
+                    expect(result.appVersion).eq("20.2.1");
+                });
+            });
         });
 
         it("does not updatePackage if packageHash is not in deployment", () => {
