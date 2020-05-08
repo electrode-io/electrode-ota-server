@@ -102,5 +102,5 @@ export const PackageQueries = {
                     update_time = CURRENT_TIMESTAMP(3)
                     WHERE id = ?`,
 
-    updatePackageTime : `UPDATE package SET update_time = CURRENT_TIMESTAMP(3) WHERE id = ?`
+    updatePackageTime : `UPDATE package SET update_time = CURRENT_TIMESTAMP(3) WHERE id = ?`,
 };
