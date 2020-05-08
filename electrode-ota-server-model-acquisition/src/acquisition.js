@@ -1,5 +1,3 @@
-/* eslint-disable no-undef */
-/* eslint-disable no-console */
 /* eslint-disable max-statements */
 /* eslint-disable max-params */
 import { missingParameter } from "electrode-ota-server-errors";
@@ -30,13 +28,9 @@ export default (options, dao, weighted, _download, manifest, logger) => {
 
             missingParameter(params.deploymentKey, `Deployment key missing`);
             missingParameter(params.appVersion, `appVersion missing`);
-            console.log("<<- acquisition::updateCheck ->>");
-            console.log(params);
 
             return dao.deploymentForKey(params.deploymentKey).then(async deployment => {
                 let pkg = deployment && deployment.package;
-                let isTargetBinaryVersion;
-                let pkgAppVersion;
                 if (!pkg) {
                     /**
                      * If no packages have been published just return this.
@@ -52,7 +46,6 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                 if (paramAppVersion) {
                     paramAppVersion = paramAppVersion.toString();
                 }
-                console.log("paramAppVersion: ", paramAppVersion);
 
                 pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags, paramAppVersion);
                 if (!pkg) {
@@ -64,14 +57,10 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                             shouldRunBinaryVersion: false
                         };
                     }
-                } else {
-                    // don't coerce the targetVersion, it'll remove the range
-                    pkgAppVersion = pkg.appVersion;
-                    isTargetBinaryVersion = version.satisfies(paramAppVersion, pkgAppVersion);
-                    console.log("pkgAppVersion--11: ", pkgAppVersion);
-                    console.log("isTargetBinaryVersion: ", isTargetBinaryVersion);
                 }
-
+                // don't coerce the targetVersion, it'll remove the range
+                const pkgAppVersion = pkg.appVersion;
+                const isTargetBinaryVersion = version.satisfies(paramAppVersion, pkgAppVersion);
                 // should we send the update?
                 const isNotAvailable = pkg.packageHash === params.packageHash || !("clientUniqueId" in params)
                     || !isTargetBinaryVersion || pkg.isDisabled;
@@ -79,11 +68,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                 // eslint-disable-next-line func-style
                 function makeReturn(isAvailable) {
                     const packageSize = pkg && pkg.size && (pkg.size - 0) || 0;
-                    let updateAppVersion = false;
-                    console.log("paramAppVersion, pkgAppVersion <=> ", paramAppVersion, pkgAppVersion);
-                    if (paramAppVersion && pkgAppVersion) {
-                        updateAppVersion = version.ltr(paramAppVersion, pkgAppVersion);
-                    }
+                    const updateAppVersion = version.ltr(paramAppVersion, pkgAppVersion);
                     const ret = {
                         downloadURL: pkg.blobUrl,
                         isAvailable,
