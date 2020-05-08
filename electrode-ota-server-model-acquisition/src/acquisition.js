@@ -43,7 +43,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                     };
                 }
                 // would the client ever send in a range as version?
-                let paramAppVersion = version.coerce(params.appVersion, true)
+                let paramAppVersion = version.coerce(params.appVersion, true);
                 // if an invalid string is sent, coerce() would return null eg: "1.7.05"
                 if (paramAppVersion) {
                     paramAppVersion = paramAppVersion.toString();
@@ -62,7 +62,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                 } else {
                     // don't coerce the targetVersion, it'll remove the range
                     pkgAppVersion = pkg.appVersion;
-                    isTargetBinaryVersion = version.satisfies(paramAppVersion, pkg.appVersion);
+                    isTargetBinaryVersion = version.satisfies(paramAppVersion, pkgAppVersion);
                 }
 
                 // should we send the update?
@@ -72,6 +72,10 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                 // eslint-disable-next-line func-style
                 function makeReturn(isAvailable) {
                     const packageSize = pkg && pkg.size && (pkg.size - 0) || 0;
+                    let updateAppVersion = false;
+                    if (paramAppVersion && pkgAppVersion) {
+                        updateAppVersion = version.ltr(paramAppVersion, pkgAppVersion);
+                    }
                     const ret = {
                         downloadURL: pkg.blobUrl,
                         isAvailable,
@@ -82,7 +86,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         packageHash: pkg.packageHash,
                         description: pkg.description,
                         // true == there is an update but it requires a newer binary version.
-                        updateAppVersion: version.ltr(paramAppVersion, pkgAppVersion),
+                        updateAppVersion,
                         //TODO - find out what this should be
                         shouldRunBinaryVersion: false
                     };
