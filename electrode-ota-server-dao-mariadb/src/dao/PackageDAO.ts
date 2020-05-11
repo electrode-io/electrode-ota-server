@@ -17,7 +17,7 @@ import {
 
 import { difference, find } from "lodash";
 import { connect } from "net";
-import semver from "semver";
+import * as semver from "semver";
 
 import Encryptor from "../Encryptor";
 
@@ -77,11 +77,12 @@ export default class PackageDAO extends BaseDAO {
             "tags": [deploymentId, tags, deploymentId],
             "notags": [deploymentId]
         }
+
         const packages = await PackageDAO.query(connection, allQueries[key], allParams[key]);
         if (packages && packages.length > 0) {
             if (appVersion) {
                 for (let i = 0; i < packages.length; i++) {
-                    if (semver.satisfies(appVersion, packages[i].appVersion)) {
+                    if (semver.satisfies(appVersion, packages[i].app_version)) {
                         return await PackageDAO.packageById(connection, packages[i].package_id);
                     }
                   }
