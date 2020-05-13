@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 /* eslint-disable max-statements */
 /* eslint-disable max-params */
 import { missingParameter } from "electrode-ota-server-errors";
@@ -30,15 +31,12 @@ export default (options, dao, weighted, _download, manifest, logger) => {
             missingParameter(params.appVersion, `appVersion missing`);
 
             return dao.deploymentForKey(params.deploymentKey).then(async deployment => {
+                // If no packages have been published just return this.
+                const noPackage = { isAvailable: false, shouldRunBinaryVersion: false };
+
                 let pkg = deployment && deployment.package;
                 if (!pkg) {
-                    /**
-                     * If no packages have been published just return this.
-                     */
-                    return {
-                        isAvailable: false,
-                        shouldRunBinaryVersion: false
-                    };
+                    return noPackage;
                 }
                 // would the client ever send in a range as version?
                 let paramAppVersion = version.coerce(params.appVersion, true);
@@ -46,17 +44,11 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                 if (paramAppVersion) {
                     paramAppVersion = paramAppVersion.toString();
                 }
-
+                // separate call for tags-only not required
+                //  it'll return latest tag-only match if no taggedVersion matches
                 pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags, paramAppVersion);
                 if (!pkg) {
-                    pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags);
-                    if (!pkg) {
-                        // no package matching tag
-                        return {
-                            isAvailable: false,
-                            shouldRunBinaryVersion: false
-                        };
-                    }
+                    return noPackage;
                 }
                 // don't coerce the targetVersion, it'll remove the range
                 const pkgAppVersion = pkg.appVersion;

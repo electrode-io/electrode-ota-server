@@ -85,7 +85,12 @@ export default class PackageDAO extends BaseDAO {
                     if (semver.satisfies(appVersion, packages[i].app_version)) {
                         return await PackageDAO.packageById(connection, packages[i].package_id);
                     }
-                  }
+                }
+                // if taggedVersion request and no version is matched
+                //   return the latest from tagged matches
+                if (key === "tags") {
+                    return await PackageDAO.packageById(connection, packages[0].package_id);
+                }
             } else {
                 // if either tags only or no-tag/version requested
                 return await PackageDAO.packageById(connection, packages[0].package_id);
