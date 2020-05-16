@@ -148,7 +148,7 @@ const mergeMetricsSummary = (srcSummary, newSummary) => {
   return resultSummary;
 };
 
-export default (options, dao, upload, logger) => {
+export default (options, dao, upload, logger, ccm) => {
   const api = {};
   return Object.assign(api, {
     findApp({ email, app }) {
@@ -597,15 +597,20 @@ export default (options, dao, upload, logger) => {
       return this.getMetricsFromCache(deployment).then(result => {
         if (result && result.summaryJson) {
           const summary = JSON.parse(result.summaryJson);
-          // fetch latest metrics data
-          return dao.metricsByStatusAndTime(
-            deployment.key, new Date(result.lastRunTimeUTC), new Date(Date.now())
-          ).then((metrics = []) => {
-            const { label } = deployment.package || {};
-            // cleanup and merge the results
-            const latestSummary = doSummarize(metrics, label);
-            return mergeMetricsSummary(summary, latestSummary);
-          });
+          const doRealTimeMetrics = ccm("doRealTimeMetrics");
+          if (doRealTimeMetrics) {
+            // fetch latest real-time metrics
+            return dao.metricsByStatusAfterSpecificTime(deployment.key, result.lastRunTimeUTC)
+            .then((metrics = []) => {
+              const { label } = deployment.package || {};
+              // cleanup and merge the results
+              const latestSummary = doSummarize(metrics, label);
+              return mergeMetricsSummary(summary, latestSummary);
+            });
+          }
+          // return the cached summary if real-time metrics
+          //  retrieval is turned off
+          return summary;
         }
         return this.getMetricsFromDatabase(deployment);
       });

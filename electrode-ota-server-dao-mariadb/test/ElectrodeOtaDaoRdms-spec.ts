@@ -1649,7 +1649,6 @@ describe("Data Access via RDBMS", function() {
 
     describe("history-related methods", () => {
       describe("history", () => {
-        
         it("will throw an error if app not found", () => {
           return dao.history(-100, "stuff").catch(err => {
             expect(err).not.to.be.undefined;
@@ -2052,6 +2051,34 @@ describe("Data Access via RDBMS", function() {
               return dao.metricsByStatusAndTime(metricDeploymentKey, midTime, endTime);
             }).then(metrics => {
               expect(metrics.length).eq(4);
+            });
+        });
+
+        it("fetch summary of metrics by status, after given specific time", () => {
+          const metricData = [
+            { label: "v1", appVersion: "1.0.0", status:"DeploymentSucceeded"},
+            { label: "v1", appVersion: "1.0.0", status:"Downloaded"},
+            { label: "v2", appVersion: "1.2.0", status:"Downloaded"},
+            { label: "v2", appVersion: "1.2.5", status:"DeploymentFailed"},
+            { label: "v3", appVersion: "1.3.0", status:"DeploymentFailed"},
+            { label: "v3", appVersion: "1.3.5", status:"Downloaded"}
+          ]
+          let phase1 = createMetricInDTOs(metricDeploymentKey, metricData.slice(0,2));
+          let phase2 = createMetricInDTOs(metricDeploymentKey, metricData.slice(2,6));
+
+          const startTime = new Date(Date.now() - 1000);
+          return Promise.all(phase1.map(d => dao.insertMetric(d)))
+            .then(() => {
+              return new Promise(resolve => setTimeout(resolve, 2000));
+            })
+            .then(() => {
+              return Promise.all(phase2.map(d => dao.insertMetric(d)));
+            })
+            .then(() => {
+              return dao.metricsByStatusAfterSpecificTime(metricDeploymentKey, startTime)
+            })
+            .then(metrics => {
+              expect(metrics.length).eq(6);
             });
         });
       });

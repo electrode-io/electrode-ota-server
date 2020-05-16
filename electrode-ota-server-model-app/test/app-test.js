@@ -33,6 +33,9 @@ let metricSummaryApp = {
   email: "cached_summary@walmart.com",
   deploymentType: "Staging"
 };
+// simulate ccm
+const ccm = () => true;
+
 
 describe("model/app", function() {
   this.timeout(50000);
@@ -65,7 +68,7 @@ describe("model/app", function() {
     let w = 0;
     account = accountFactory({}, dao, console);
     const up = upload({}, dao);
-    ac = appFactory({}, dao, up, console);
+    ac = appFactory({}, dao, up, console, ccm);
     await createAccount(APP.email, "test");
   });
 
