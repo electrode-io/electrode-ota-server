@@ -598,7 +598,7 @@ export default (options, dao, upload, logger, ccm) => {
         if (result && result.summaryJson) {
           const summary = JSON.parse(result.summaryJson);
           const doRealTimeMetrics = ccm("doRealTimeMetrics");
-          if (doRealTimeMetrics) {
+          if (doRealTimeMetrics === "true") {
             // fetch latest real-time metrics
             return dao.metricsByStatusAfterSpecificTime(deployment.key, result.lastRunTimeUTC)
             .then((metrics = []) => {

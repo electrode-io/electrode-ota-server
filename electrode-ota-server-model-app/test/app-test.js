@@ -34,7 +34,7 @@ let metricSummaryApp = {
   deploymentType: "Staging"
 };
 // simulate ccm
-const ccm = () => true;
+const ccm = () => "true";
 
 
 describe("model/app", function() {
