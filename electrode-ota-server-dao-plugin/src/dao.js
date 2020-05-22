@@ -353,12 +353,13 @@ export default class DaoExpressCassandra {
         }
         // if taggedVersion request and no version is matched
         //   return the latest from tagged matches
-        if (tags && tags.length > 0) {
-          return packages[0];
-        }
-      } else {
+        // if (tags && tags.length > 0) {
+        //   return packages[0];
+        // }
+      }/* else {
         return packages[0];
-      }
+      }*/
+      return packages[0];
     }
   }
 
