@@ -1618,14 +1618,14 @@ describe("Data Access via RDBMS", function() {
             "v2"
           );
         });
-        it.skip("will return no release for matching tag but not appVersion", () => {
+        it("will return release for matching tag if not matching appVersion", () => {
           return matchPackage(
             [{ appVersion: "2.9.0", label: "v23", tags: ["MATCHME"] }],
             { appVersion: "3.1.0", tags: ["MATCHME"] },
-            null
+            "v23"
           );
         });
-        it.skip("will return no release for matching appVersion but not tag", () => {
+        it("will return a untagged release if matching appVersion but not tag", () => {
           const appVersion = "4.0.4";
           return matchPackage(
             [
@@ -1633,10 +1633,10 @@ describe("Data Access via RDBMS", function() {
               { appVersion, label: "v34", tags: ["GOFISH"] }
             ],
             { appVersion, tags: ["NOGAMES"] },
-            null
+            "v2"
           );
         });
-        it.skip("will return no release for matching appVersion against tagged release", () => {
+        it("will return no release for matching appVersion against tagged release", () => {
           const appVersion = "5.0.5";
           return matchPackage(
             [{ tags: ["TOYOTA"], label: "v44", appVersion }],

@@ -345,16 +345,7 @@ export default class DaoExpressCassandra {
         id_: within(packageHashes)
       });
       packages = historySort(packages);
-
-      // for (let i = 0; i < packages.length; i++) {
-      //   const pkg = packages[i];
-      //   const tagsDoMatch = matchTags(tags, pkg.tags);
-      //   const versionsDoMatch = matchVersions(appVersion, pkg.appVersion);
-      //   if (tagsDoMatch && versionsDoMatch) {
-      //     return pkg;
-      //   }
-      // }
-
+      // filter tag/untagged releases based on incoming request
       packages = packages.filter(p => matchTags(tags, p.tags) ? p : null);
       if (appVersion) {
         for (let i = 0; i < packages.length; i++) {
