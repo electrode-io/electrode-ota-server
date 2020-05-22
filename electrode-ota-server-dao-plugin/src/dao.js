@@ -346,17 +346,29 @@ export default class DaoExpressCassandra {
       });
       packages = historySort(packages);
 
-      for (let i = 0; i < packages.length; i++) {
-        const pkg = packages[i];
-        const tagsDoMatch = matchTags(tags, pkg.tags);
-        const versionsDoMatch = matchVersions(appVersion, pkg.appVersion);
-        if (tagsDoMatch && versionsDoMatch) {
-          return pkg;
-        }
-      }
+      // for (let i = 0; i < packages.length; i++) {
+      //   const pkg = packages[i];
+      //   const tagsDoMatch = matchTags(tags, pkg.tags);
+      //   const versionsDoMatch = matchVersions(appVersion, pkg.appVersion);
+      //   if (tagsDoMatch && versionsDoMatch) {
+      //     return pkg;
+      //   }
+      // }
 
-      if ((!tags || tags.length === 0) && !appVersion) {
-        // if no tag or version, return latest
+      packages = packages.filter(p => matchTags(tags, p.tags) ? p : null);
+      if (appVersion) {
+        for (let i = 0; i < packages.length; i++) {
+          const versionsDoMatch = matchVersions(appVersion, packages[i].appVersion);
+          if (versionsDoMatch) {
+            return packages[i];
+          }
+        }
+        // if taggedVersion request and no version is matched
+        //   return the latest from tagged matches
+        if (tags && tags.length > 0) {
+          return packages[0];
+        }
+      } else {
         return packages[0];
       }
     }
