@@ -263,9 +263,9 @@ describe("PackageDAO", function() {
     });
 
     it("should upload two packages and test the semver criteria, ^6.0.0, ^7.0.0", () => {
-        return dao.addPackage(stageDeploymentKey, myPackage("^6.0.0", "Some package content, foo bar, label-6 for v6", "v8"))
+        return dao.addPackage(stageDeploymentKey, myPackage("^6.0.0", "Some package content, foo bar, label-8 for v8", "v8"))
           .then(() => {
-            return dao.addPackage(stageDeploymentKey, myPackage("^7.0.0", "Some exclusive package content and foo-bar, foo bar, label-7 for v7", "v8"))
+            return dao.addPackage(stageDeploymentKey, myPackage("^7.0.0", "Some exclusive package content and foo-bar, foo bar, label-9 for v9", "v9"))
               .then(() => {
                 return dao.getNewestApplicablePackage(stageDeploymentKey, [], "6.0.2")
                   .then(result => {
@@ -279,13 +279,13 @@ describe("PackageDAO", function() {
     });
 
     it("should target any device configured to consume updates, *", () => {
-        return dao.addPackage(stageDeploymentKey, myPackage("*", "Some-package-content, foo-bar-1-**-foobar", "v9"))
+        return dao.addPackage(stageDeploymentKey, myPackage("*", "Some-package-content, foo-bar-1-**-foobar", "v10"))
           .then(() => {
             return dao.getNewestApplicablePackage(stageDeploymentKey, [], "7.2.15")
               .then(result => {
                 expect(result).not.to.be.undefined;
                 if (result) {
-                    expect(result.label).to.be.eq("v9");
+                    expect(result.label).to.be.eq("v10");
                 }
               });
           })
@@ -294,7 +294,7 @@ describe("PackageDAO", function() {
               .then(result => {
                 expect(result).not.to.be.undefined;
                 if (result) {
-                    expect(result.label).to.be.eq("v9");
+                    expect(result.label).to.be.eq("v10");
                 }
               });
           });
