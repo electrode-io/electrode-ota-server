@@ -351,14 +351,8 @@ export default class DaoExpressCassandra {
             return packages[i];
           }
         }
-        // if taggedVersion request and no version is matched
-        //   return the latest from tagged matches
-        // if (tags && tags.length > 0) {
-        //   return packages[0];
-        // }
-      }/* else {
-        return packages[0];
-      }*/
+      }
+      // always, by default return latest release
       return packages[0];
     }
   }

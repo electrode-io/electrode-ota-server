@@ -123,12 +123,6 @@ describe("PackageDAO", function() {
     it("should target only specific version, 1.2.3", () => {
         return dao.addPackage(stageDeploymentKey, myPackage("1.2.3", "Some-package-content, foo-bar-1", "v1"))
             .then(() => {
-                return dao.getNewestApplicablePackage(stageDeploymentKey, [], "1.2.5")
-                .then(result => {
-                    expect(result).to.be.undefined;
-                });
-            })
-            .then(() => {
                 return dao.getNewestApplicablePackage(stageDeploymentKey, [], "1.2.3")
                 .then(result => {
                     expect(result).not.to.be.undefined;
@@ -141,12 +135,6 @@ describe("PackageDAO", function() {
 
     it("should target any patch version but fixed major/minor version, 1.2.x", () => {
         return dao.addPackage(stageDeploymentKey, myPackage("1.2.x", "Some package content, foo-bar, foobar-222", "v2"))
-          .then(() => {
-            return dao.getNewestApplicablePackage(stageDeploymentKey, [], "1.1.5")
-              .then(result => {
-                expect(result).to.be.undefined;
-              });
-          })
           .then(() => {
             return dao.getNewestApplicablePackage(stageDeploymentKey, [], "1.2.9")
               .then(result => {
@@ -161,12 +149,6 @@ describe("PackageDAO", function() {
     it("should target specific range: 1.3.3 - 1.3.7", () => {
         return dao.addPackage(stageDeploymentKey, myPackage("1.3.3 - 1.3.7", "foo-bar, Some package content, foobar", "v3"))
           .then(() => {
-            return dao.getNewestApplicablePackage(stageDeploymentKey, [], "1.3.2")
-              .then(result => {
-                expect(result).to.be.undefined;
-              });
-          })
-          .then(() => {
             return dao.getNewestApplicablePackage(stageDeploymentKey, [], "1.3.7")
               .then(result => {
                 expect(result).not.to.be.undefined;
@@ -179,12 +161,6 @@ describe("PackageDAO", function() {
 
     it("should target specific range: >=2.4.3 <2.4.7", () => {
         return dao.addPackage(stageDeploymentKey, myPackage(">=2.4.3 <2.4.7", "Some package content", "v4"))
-          .then(() => {
-            return dao.getNewestApplicablePackage(stageDeploymentKey, [], "2.4.7")
-              .then(result => {
-                expect(result).to.be.undefined;
-              });
-          })
           .then(() => {
             return dao.getNewestApplicablePackage(stageDeploymentKey, [], "2.4.3")
               .then(result => {
@@ -199,12 +175,6 @@ describe("PackageDAO", function() {
     it("should target any patch version, 3.2", () => {
         return dao.addPackage(stageDeploymentKey, myPackage("3.2", "Some package content", "v5"))
           .then(() => {
-            return dao.getNewestApplicablePackage(stageDeploymentKey, [], "3.3.0")
-              .then(result => {
-                expect(result).to.be.undefined;
-              });
-          })
-          .then(() => {
             return dao.getNewestApplicablePackage(stageDeploymentKey, [], "3.2.45")
               .then(result => {
                 expect(result).not.to.be.undefined;
@@ -218,12 +188,6 @@ describe("PackageDAO", function() {
     it("should target specific minor but any patch version, ~4.2.3", () => {
         return dao.addPackage(stageDeploymentKey, myPackage("~4.2.3", "Some package content", "v6"))
           .then(() => {
-            return dao.getNewestApplicablePackage(stageDeploymentKey, [], "4.3.3")
-              .then(result => {
-                expect(result).to.be.undefined;
-              });
-          })
-          .then(() => {
             return dao.getNewestApplicablePackage(stageDeploymentKey, [], "4.2.35")
               .then(result => {
                 expect(result).not.to.be.undefined;
@@ -236,12 +200,6 @@ describe("PackageDAO", function() {
 
     it("should target any minor/patch version, ^5.2.3", () => {
         return dao.addPackage(stageDeploymentKey, myPackage("^5.2.3", "Some package content", "v7"))
-          .then(() => {
-            return dao.getNewestApplicablePackage(stageDeploymentKey, [], "5.1.3")
-              .then(result => {
-                expect(result).to.be.undefined;
-              });
-          })
           .then(() => {
             return dao.getNewestApplicablePackage(stageDeploymentKey, [], "5.25.75")
               .then(result => {

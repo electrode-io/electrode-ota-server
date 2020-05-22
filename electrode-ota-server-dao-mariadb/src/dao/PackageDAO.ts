@@ -86,13 +86,7 @@ export default class PackageDAO extends BaseDAO {
                         return await PackageDAO.packageById(connection, packages[i].package_id);
                     }
                 }
-                // if taggedVersion request and no version is matched
-                //   return the latest from tagged matches
-                if (key === "tags") {
-                    return await PackageDAO.packageById(connection, packages[0].package_id);
-                }
-            } else {
-                // if either tags only or no-tag/version requested
+                // always, by default return latest release
                 return await PackageDAO.packageById(connection, packages[0].package_id);
             }
         }
