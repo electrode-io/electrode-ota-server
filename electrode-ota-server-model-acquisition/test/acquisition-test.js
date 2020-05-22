@@ -338,7 +338,8 @@ describe("model/acquisition", function () {
                     packageHash: "ABCD",
                     clientUniqueId
                 }).then(result => {
-                    expect(result.isAvailable).false;
+                    expect(result.updateAppVersion).true;
+                    expect(result.appVersion).eq("20.2.1");
                 });
             });
         });

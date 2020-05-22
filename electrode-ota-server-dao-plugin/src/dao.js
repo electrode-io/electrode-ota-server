@@ -1,6 +1,3 @@
-/* eslint-disable max-params */
-/* eslint-disable max-statements */
-/* eslint-disable consistent-return */
 import { promiseMap, reducer, remove, toJSON } from "electrode-ota-server-util";
 import { alreadyExistsMsg } from "electrode-ota-server-errors";
 import UDTS from "./models/UDTS.json";

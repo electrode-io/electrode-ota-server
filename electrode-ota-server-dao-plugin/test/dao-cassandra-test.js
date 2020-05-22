@@ -1,6 +1,3 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable max-nested-callbacks */
-/* eslint-disable max-statements */
 import initDao, {
   shutdown
 } from "electrode-ota-server-test-support/lib/init-dao";
