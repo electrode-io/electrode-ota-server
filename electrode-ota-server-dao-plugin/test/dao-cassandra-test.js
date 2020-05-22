@@ -489,7 +489,7 @@ describe("dao/cassandra", function() {
             });
         });
     });
-    it("will return undefined for unmatched appVersion", () => {
+    it("will return latest release for unmatched appVersion", () => {
       const versionToCheck = "1.8.0";
       const v1pkg = Object.assign({}, pkg1, {
         appVersion: "1.7.0",
