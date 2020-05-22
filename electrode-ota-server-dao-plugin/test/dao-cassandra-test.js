@@ -510,7 +510,8 @@ describe("dao/cassandra", function() {
           return dao
             .getNewestApplicablePackage(stagingKey, [], versionToCheck)
             .then(release => {
-              expect(release).to.be.undefined;
+              expect(release).not.be.undefined;
+              expect(release.packageHash).to.eq(v2pkg.packageHash);
             });
         });
     });
