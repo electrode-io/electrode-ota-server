@@ -299,6 +299,12 @@ export default class ElectrodeOtaDaoRdbms implements IElectrodeOtaDao {
         })
     }
 
+    public async metricsByStatusAfterSpecificTime(deploymentKey: string, specificDateUTC: Date): Promise<MetricByStatusOutDTO[]> {
+        return this.connectAndExecute((connection) => {
+            return MetricDAO.metricsByStatusAfterSpecificTime(connection, deploymentKey, specificDateUTC);
+        })
+    }
+
     public async getMetricSummary(deploymentKey: string): Promise<MetricSummaryDTO | undefined> {
         return this.connectAndExecute((connection) => {
             return MetricSummaryDAO.getMetricSummary(connection, deploymentKey);
