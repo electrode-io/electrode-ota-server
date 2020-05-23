@@ -352,7 +352,7 @@ export default class DaoExpressCassandra {
           }
         }
       }
-      // always, by default return latest release
+      // always return latest release if version doesn't matches
       return packages[0];
     }
   }
