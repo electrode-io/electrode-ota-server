@@ -7,6 +7,7 @@ import { expect } from "chai";
 function alwaysFail() {
   throw new Error(`should have failed`);
 }
+
 describe("dao/cassandra", function() {
   this.timeout(200000);
   let dao;
@@ -488,7 +489,7 @@ describe("dao/cassandra", function() {
             });
         });
     });
-    it("will return undefined for unmatched appVersion", () => {
+    it("will return latest release for unmatched appVersion", () => {
       const versionToCheck = "1.8.0";
       const v1pkg = Object.assign({}, pkg1, {
         appVersion: "1.7.0",
@@ -509,7 +510,8 @@ describe("dao/cassandra", function() {
           return dao
             .getNewestApplicablePackage(stagingKey, [], versionToCheck)
             .then(release => {
-              expect(release).to.be.undefined;
+              expect(release).not.be.undefined;
+              expect(release.packageHash).to.eq(v2pkg.packageHash);
             });
         });
     });

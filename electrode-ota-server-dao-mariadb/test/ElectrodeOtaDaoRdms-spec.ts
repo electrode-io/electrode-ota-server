@@ -1550,7 +1550,7 @@ describe("Data Access via RDBMS", function() {
                 });
             });
         });
-        it("will return undefined for unmatched appVersion", () => {
+        it("will return latest release for unmatched appVersion", () => {
           const versionToCheck = "1.8.0";
           let v1pkg = new PackageDTO();
           Object.assign(v1pkg, pkg1DTO, {
@@ -1573,7 +1573,10 @@ describe("Data Access via RDBMS", function() {
               return dao
                 .getNewestApplicablePackage(deplKey, [], versionToCheck)
                 .then(release => {
-                  expect(release).is.undefined;
+                  expect(release).not.be.undefined;
+                  if (release) {
+                    expect(release.packageHash).to.eq(v2pkg.packageHash);
+                  }
                 });
             });
         });
@@ -1618,14 +1621,14 @@ describe("Data Access via RDBMS", function() {
             "v2"
           );
         });
-        it("will return no release for matching tag but not appVersion", () => {
+        it("will return release for matching tag if not matching appVersion", () => {
           return matchPackage(
             [{ appVersion: "2.9.0", label: "v23", tags: ["MATCHME"] }],
             { appVersion: "3.1.0", tags: ["MATCHME"] },
-            null
+            "v23"
           );
         });
-        it("will return no release for matching appVersion but not tag", () => {
+        it("will return a untagged release if matching appVersion but not tag", () => {
           const appVersion = "4.0.4";
           return matchPackage(
             [
@@ -1633,15 +1636,15 @@ describe("Data Access via RDBMS", function() {
               { appVersion, label: "v34", tags: ["GOFISH"] }
             ],
             { appVersion, tags: ["NOGAMES"] },
-            null
+            "v2"
           );
         });
-        it("will return no release for matching appVersion against tagged release", () => {
+        it("will return a untagged release for matching appVersion against tagged release", () => {
           const appVersion = "5.0.5";
           return matchPackage(
             [{ tags: ["TOYOTA"], label: "v44", appVersion }],
             { tags: [], appVersion },
-            null
+            "v2"
           );
         });
       });

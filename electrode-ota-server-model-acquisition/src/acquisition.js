@@ -1,3 +1,5 @@
+/* eslint-disable complexity */
+/* eslint-disable max-statements */
 /* eslint-disable max-params */
 import { missingParameter } from "electrode-ota-server-errors";
 import version from "semver";
@@ -29,39 +31,36 @@ export default (options, dao, weighted, _download, manifest, logger) => {
             missingParameter(params.appVersion, `appVersion missing`);
 
             return dao.deploymentForKey(params.deploymentKey).then(async deployment => {
+                // If no packages have been published just return this.
+                const noPackage = { isAvailable: false, shouldRunBinaryVersion: false };
+
                 let pkg = deployment && deployment.package;
                 if (!pkg) {
-                    /**
-                     * If no packages have been published just return this.
-                     */
-                    return {
-                        isAvailable: false,
-                        shouldRunBinaryVersion: false
-                    };
+                    return noPackage;
                 }
-
-                pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags, params.appVersion);
+                // would the client ever send in a range as version?
+                let paramAppVersion = version.coerce(params.appVersion, true);
+                // if an invalid string is sent, coerce() would return null eg: "1.7.05"
+                if (paramAppVersion) {
+                    paramAppVersion = paramAppVersion.toString();
+                }
+                // separate call for tags-only not required
+                //  it'll return latest tag-only match if no taggedVersion matches
+                pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags, paramAppVersion);
                 if (!pkg) {
-                    // no package match, use latest version that matches tag
-                    pkg = await dao.getNewestApplicablePackage(params.deploymentKey, params.tags);
-                    if (!pkg) {
-                        // no package matching tag
-                        return {
-                            isAvailable: false,
-                            shouldRunBinaryVersion: false
-                        };
-                    }
+                    return noPackage;
                 }
-                const pkgAppVersion = version.coerce(pkg.appVersion, true).toString();
-                const paramAppVersion = version.coerce(params.appVersion, true).toString();
-
-                const isNotAvailable = pkg.packageHash == params.packageHash || !("clientUniqueId" in params)
-                    || version.gt(paramAppVersion, pkgAppVersion)
-                    || pkg.isDisabled;
+                // don't coerce the targetVersion, it'll remove the range
+                const pkgAppVersion = pkg.appVersion;
+                const isTargetBinaryVersion = version.satisfies(paramAppVersion, pkgAppVersion);
+                // should we send the update?
+                const isNotAvailable = pkg.packageHash === params.packageHash || !("clientUniqueId" in params)
+                    || !isTargetBinaryVersion || pkg.isDisabled;
 
                 // eslint-disable-next-line func-style
                 function makeReturn(isAvailable) {
                     const packageSize = pkg && pkg.size && (pkg.size - 0) || 0;
+                    const updateAppVersion = version.ltr(paramAppVersion, pkgAppVersion);
                     const ret = {
                         downloadURL: pkg.blobUrl,
                         isAvailable,
@@ -72,7 +71,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         packageHash: pkg.packageHash,
                         description: pkg.description,
                         // true == there is an update but it requires a newer binary version.
-                        updateAppVersion: version.lt(paramAppVersion, pkgAppVersion),
+                        updateAppVersion,
                         //TODO - find out what this should be
                         shouldRunBinaryVersion: false
                     };
