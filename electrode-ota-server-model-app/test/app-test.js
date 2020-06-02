@@ -11,6 +11,7 @@ import { manifestHash } from "electrode-ota-server-model-manifest/lib/manifest";
 import { shasum } from "electrode-ota-server-util";
 import { expect } from "chai";
 import step0Manifest from "./fixtures/step.0.manifest.json";
+import createZip from "electrode-ota-server-test-support/lib/create-zip";
 
 const ONE_MIN = 1000; //in millisecond
 const ONE_SECOND = 60;
@@ -46,21 +47,6 @@ describe("model/app", function() {
       profile: { email, name },
       provider: "GitHub"
     });
-  };
-
-  const createZip = content => {
-    let zf = new yazl.ZipFile();
-    let output = [];
-    zf.outputStream.on("data", c => output.push(c));
-    let piss = new Promise(resolve => {
-      zf.outputStream.on("end", () => {
-        const buf = Buffer.concat(output);
-        resolve(buf);
-      });
-    });
-    zf.addBuffer(Buffer.from(content), "yo.txt");
-    zf.end();
-    return piss;
   };
 
   before(async () => {
