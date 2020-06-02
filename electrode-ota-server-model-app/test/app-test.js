@@ -3,7 +3,6 @@ import initDao, { shutdown } from "electrode-ota-server-test-support/lib/init-ma
 import eql from "electrode-ota-server-test-support/lib/eql";
 import path from "path";
 import fs from "fs";
-import yazl from "yazl";
 import appFactory from "electrode-ota-server-model-app/lib/app";
 import accountFactory from "electrode-ota-server-model-account/lib/account";
 import { fileservice as upload } from "electrode-ota-server-fileservice-upload";
