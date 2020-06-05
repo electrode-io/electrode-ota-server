@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { expect } from "chai";
 import appFactory from "electrode-ota-server-model-app/lib/app";
 import accountFactory from "electrode-ota-server-model-account/lib/account";
@@ -7,6 +9,18 @@ import { fileservice as downloadFactory } from "electrode-ota-server-fileservice
 import { diffPackageMapCurrent } from "electrode-ota-server-model-manifest/lib/manifest";
 import initDao, { shutdown } from "electrode-ota-server-test-support/lib/init-maria-dao";
 import createZip from "electrode-ota-server-test-support/lib/create-zip";
+
+const fixture = path.join.bind(path, __dirname, "fixture");
+const readFile = (file, options = {}) => {
+  return new Promise((resolve, reject) => {
+      fs.readFile(file, options, (err, buffer) => {
+          if (err) return reject(err);
+          resolve(buffer);
+      });
+  });
+};
+const readFixture = (file, options) => readFile(fixture(file), options);
+
 
 const testDBConfig = {
     clusterConfig: {
@@ -44,8 +58,9 @@ const noLogger = {
   info: noop
 };
 
-describe("model/acquisition", function () {
+describe("Package delta, duplicate entry scenario", function () {
     this.timeout(50000);
+    let stagingKey;
     let account;
     let acquisition;
     let appBL;
@@ -59,6 +74,16 @@ describe("model/acquisition", function () {
       return account.createToken({
         profile: { email, name },
         provider: "GitHub"
+      });
+    };
+    const doUpdateCheck = async (clientUniqueId, packageHash = "", label = "v0") => {
+      return await acquisition.updateCheck({
+        clientUniqueId,
+        label,
+        packageHash,
+        deploymentKey: stagingKey,
+        appVersion: "1.0.0",
+        isCompanion: false
       });
     };
     before(async () => {
@@ -76,11 +101,10 @@ describe("model/acquisition", function () {
     });
     after(shutdown);
 
-    describe("Package delta, duplicate entry scenario", () => {
+    describe("With simple strings as content", () => {
         const { email, name } = APP;
         const clientA = "190jf09j2f01j10901";
         const clientB = "DEF222";
-        let stagingKey;
         let pkg1;
         let pkg2;
 
@@ -95,17 +119,6 @@ describe("model/acquisition", function () {
               description,
               appVersion: "1.0.0"
             }
-          });
-        };
-
-        const doUpdateCheck = async (clientUniqueId, packageHash = "", label = "v0") => {
-          return await acquisition.updateCheck({
-            clientUniqueId,
-            label,
-            packageHash,
-            deploymentKey: stagingKey,
-            appVersion: "1.0.0",
-            isCompanion: false
           });
         };
 
@@ -152,4 +165,61 @@ describe("model/acquisition", function () {
           expect(result.description).eq("third package");
         });
     });
+
+    describe("With actual RN app", () => {
+      const { email, name } = APP;
+      const clientA = "190jf09j2f01j10901abc";
+      const clientB = "DEF222-95F";
+      let pkg1;
+      let pkg2;
+
+      const releaseApp = async (file, description) => {
+        const pack = await readFixture(file);
+        return await appBL.upload({
+          email,
+          app: name,
+          package: pack,
+          deployment: "Staging",
+          packageInfo: {
+            description,
+            appVersion: "1.0.0"
+          }
+        });
+      };
+
+      it("clients A & B receive First Bundle", async () => {
+        pkg1 = await releaseApp("demo-app1.zip", "first package");
+
+        let result = await doUpdateCheck(clientA);
+        expect(result.isAvailable).eq(true);
+        expect(result.description).eq("first package");
+
+        result = await doUpdateCheck(clientB);
+        expect(result.isAvailable).eq(true);
+        expect(result.description).eq("first package");
+      });
+
+      it("client A receives Second Bundle", async () => {
+        pkg2 = await releaseApp("demo-app2.zip", "second package");
+
+        const result = await doUpdateCheck(clientA, pkg1.packageHash, pkg1.label);
+        expect(result.isAvailable).eq(true);
+        expect(result.description).eq("second package");
+      });
+
+      it("client A receives Third Bundle", async () => {
+        // eslint-disable-next-line no-unused-vars
+        const pkg3 = await releaseApp("demo-app3.zip", "third package");
+
+        const result = await doUpdateCheck(clientA, pkg2.packageHash, pkg2.label);
+        expect(result.isAvailable).eq(true);
+        expect(result.description).eq("third package");
+      });
+
+      it("client B on First Bundle, should receive Third Bundle", async () => {
+        const result = await doUpdateCheck(clientB, pkg1.packageHash, pkg2.label);
+        expect(result.isAvailable).eq(true);
+        expect(result.description).eq("third package");
+      });
+  });
 });
