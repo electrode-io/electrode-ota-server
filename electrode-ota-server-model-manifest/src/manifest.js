@@ -189,7 +189,7 @@ export const delta = (manifest, buffer) => {
             zipfile.once("end", function () {
                 const deletedFiles = Object.keys(manifest).filter(v => seen.indexOf(v) == -1).sort();
                 const jsonContent = JSON.stringify({ deletedFiles });
-                retFile.addBuffer(new Buffer(jsonContent), "hotcodepush.json", { mtime: MTIME });
+                retFile.addBuffer(Buffer.from(jsonContent), "hotcodepush.json", { mtime: MTIME });
                 zipfile.close();
                 retFile.end({}, (totalSize) => {
                     resolve({

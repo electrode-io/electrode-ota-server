@@ -15,7 +15,8 @@
     "lerna": "yarn run rebuild",
     "test": "yarn run lerna && mocha --compilers js:./electrode-ota-server-util-dev/babelhook ./electrode-ota-server*/test/*-test.js",
     "lint": "./node_modules/.bin/eslint ./**/*.js",
-    "coverage": "./node_modules/.bin/nyc --sourceMap=false --reportDir=./coverage --instrument=false --all --include=./electrode-ota-server*/src/**/*.js mocha --compilers js:./electrode-ota-server-util-dev/babelhook-coverage  ./electrode-ota-server*/test/*-test.js  && nyc report --reporter=html"
+    "coverage": "./node_modules/.bin/nyc --sourceMap=false --reportDir=./coverage --instrument=false --all --include=./electrode-ota-server*/src/**/*.js mocha --require ./electrode-ota-server-util-dev/babelhook-coverage  ./electrode-ota-server*/test/*-test.js  && nyc report --reporter=html",
+    "mariadb-tests": "mocha --require ./electrode-ota-server-util-dev/babelhook ./electrode-ota-server*/test/*-spec.js"
   },
   "bin": {
     "electrode-ota-server": "./index.js"
