@@ -247,12 +247,8 @@ export default class PackageDAO extends BaseDAO {
     }
 
     public static async savePackageContent(connection: IConnection, packageHash: string,
-        content: Buffer): Promise<void> {
-        const contentResult = await PackageDAO.getPackageContentFromDB(connection, packageHash);
-        if (contentResult && contentResult.length > 0) {
-            return contentResult[0];
-        }
-        return PackageDAO.insertPackageContent(connection, packageHash, content);
+        content: Buffer): Promise<any> {
+        return await PackageDAO.insertPackageContent(connection, packageHash, content);
     }
 
     public static async getPackageContent(connection: IConnection, packageHash: string): Promise<Buffer> {

@@ -1,5 +1,5 @@
 import diregister from "electrode-ota-server-diregister";
-import {shasum} from 'electrode-ota-server-util';
+import { shasum } from "electrode-ota-server-util";
 /**
  * The fileservice is meant to be plugable.
  *
@@ -9,18 +9,21 @@ import {shasum} from 'electrode-ota-server-util';
  *
  */
 export const fileservice = ({downloadUrl}, dao) => {
-    downloadUrl = downloadUrl && downloadUrl.replace(/\/+?$/, '');
-    return (file, packageHash=null) => {
+    downloadUrl = downloadUrl && downloadUrl.replace(/\/+?$/, "");
+    return (file, packageHash = null) => {
         if (packageHash === null) {
             packageHash = shasum(file);
         }
-        return dao.upload(packageHash, file).then(() => ({
+        const blobObj = {
             packageHash,
             size: file.length,
             blobUrl: downloadUrl ? `${downloadUrl}/${packageHash}` : packageHash
-        }), (err) => {
-            console.log('upload error', err);
-            throw err;
+        };
+        return dao.download(packageHash).then(() => blobObj, () => {
+            return dao.upload(packageHash, file).then(() => blobObj, err => {
+                console.log("upload error", err);
+                throw err;
+            });
         });
     };
 };
@@ -29,6 +32,6 @@ export const register = diregister({
     name: "ota!fileservice-upload",
     multiple: false,
     connections: false,
-    dependencies: ['ota!dao']
+    dependencies: ["ota!dao"]
 }, fileservice);
 
