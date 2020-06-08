@@ -6,6 +6,7 @@ import MetricOutDTO from "./MetricOutDTO";
 import MetricByStatusOutDTO from "./MetricByStatusOutDTO";
 import MetricSummaryDTO from "./MetricSummaryDTO";
 import PackageDTO from "./PackageDTO";
+import QueryOkPacketDTO from "./QueryOkPacketDTO";
 import UserDTO from "./UserDTO";
 
 export {
@@ -17,5 +18,6 @@ export {
     MetricByStatusOutDTO,
     MetricSummaryDTO,
     PackageDTO,
+    QueryOkPacketDTO,
     UserDTO,
 };

@@ -4,7 +4,7 @@ import BaseDAO from "./BaseDAO";
 import DeploymentDAO from "./DeploymentDAO";
 import HistoryDAO from "./HistoryDAO";
 
-import { PackageDTO } from "../dto";
+import { PackageDTO, QueryOkPacketDTO } from "../dto";
 
 import {
     ClientRatioQueries,
@@ -247,8 +247,13 @@ export default class PackageDAO extends BaseDAO {
     }
 
     public static async savePackageContent(connection: IConnection, packageHash: string,
-        content: Buffer): Promise<void> {
-        return PackageDAO.insertPackageContent(connection, packageHash, content);
+        content: Buffer): Promise<any> {
+        const contentResult = await PackageDAO.getPackageContentFromDB(connection, packageHash);
+        if (contentResult && contentResult.length > 0) {
+            return PackageDAO.transformOkPacket({});
+        }
+        const result = await PackageDAO.insertPackageContent(connection, packageHash, content);
+        return PackageDAO.transformOkPacket(result);
     }
 
     public static async getPackageContent(connection: IConnection, packageHash: string): Promise<Buffer> {
@@ -412,5 +417,19 @@ export default class PackageDAO extends BaseDAO {
             };
             return obj;
         }, {} as any);
+    }
+
+    private static transformOkPacket(result: any): QueryOkPacketDTO {
+        const okPacket = new QueryOkPacketDTO();
+        okPacket.fieldCount = 0;
+        okPacket.affectedRows = 0;
+        okPacket.insertId = 0;
+        okPacket.serverStatus = 2;
+        okPacket.warningCount = 0;
+        okPacket.message = "";
+        okPacket.protocol41 = true;
+        okPacket.changedRows = 0;
+
+        return Object.assign(okPacket, result);
     }
 }
