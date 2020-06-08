@@ -1,4 +1,5 @@
 import diregister from "electrode-ota-server-diregister";
+
 /**
  * The fileservice is meant to be plugable.
  *
@@ -10,14 +11,14 @@ import diregister from "electrode-ota-server-diregister";
 
 export const fileservice = (options, dao) => {
     return (packageHash, url, type) => {
-        const hash = packageHash
-            || url.split('/').pop();
+        const hash = packageHash || url.split("/").pop();
         const p = dao.download(hash);
 
-        return p.then((resp) => {
-            if (type == 'application/json') {
+        return p.then(resp => {
+            console.log("resp-len: ", resp.length, " | type: ", type);
+            if (type === "application/json") {
                 return {
-                    content: JSON.parse(resp + ''),
+                    content: JSON.parse(`${resp }`),
                     length: resp.length
                 };
             } else {
@@ -33,5 +34,5 @@ export const register = diregister({
     name: "ota!fileservice-download",
     multiple: false,
     connections: false,
-    dependencies: ['ota!dao']
+    dependencies: ["ota!dao"]
 }, fileservice);
