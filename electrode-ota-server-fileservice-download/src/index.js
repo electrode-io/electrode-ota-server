@@ -15,7 +15,6 @@ export const fileservice = (options, dao) => {
         const p = dao.download(hash);
 
         return p.then(resp => {
-            console.log("resp-len: ", resp.length, " | type: ", type);
             if (type === "application/json") {
                 return {
                     content: JSON.parse(`${resp }`),
