@@ -50,6 +50,7 @@ const handles = {
             const { content, length } = o;
             reply(content)
                 .header("Cache-Control", "s-maxage=31536000, max-age=0")
+                .header("Vary", "Accept-Encoding")
                 .type("application/octet-stream")
                 .bytes(length);
         });
