@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-dao-mariadb",
-  "version": "4.7.1",
+  "version": "4.7.2",
   "description": "Electrode OTA - MariaDB driver",
   "author": "Anthony Helms <awhelms@wal-mart.com>",
   "license": "Apache-2.0",
@@ -65,8 +65,8 @@
   "dependencies": {
     "@types/node": "^8.0.24",
     "bluebird": "^3.5.1",
-    "electrode-ota-server-diregister": "^4.7.1",
-    "electrode-ota-server-util": "^4.7.1",
+    "electrode-ota-server-diregister": "^4.7.2",
+    "electrode-ota-server-util": "^4.7.2",
     "lodash": ">=4.17.11",
     "mysql": "^2.14.1"
   }

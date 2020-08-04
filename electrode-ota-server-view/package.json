@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-view",
-  "version": "4.7.1",
+  "version": "4.7.2",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -9,11 +9,11 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-diregister": "^4.7.1",
-    "electrode-ota-server-util": "^4.7.1",
+    "electrode-ota-server-diregister": "^4.7.2",
+    "electrode-ota-server-util": "^4.7.2",
     "vision": "^4.1.1"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^4.7.1"
+    "electrode-ota-server-util-dev": "^4.7.2"
   }
 }
