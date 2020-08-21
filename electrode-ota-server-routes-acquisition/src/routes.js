@@ -28,6 +28,16 @@ export default (options, route, acquisition, logger, ccm) => {
             }
         },
         {
+            method: "GET",
+            path: "/auth/updateCheck",
+            config: {
+                handler(request, reply) {
+                    handles.updateCheck(request, reply, logger, ccm, acquisitionUpdateCheck);
+                },
+                tags: ["api"]
+            }
+        },
+        {
             path: "/storagev2/{packageHash}",
             method: "GET",
             config: {
