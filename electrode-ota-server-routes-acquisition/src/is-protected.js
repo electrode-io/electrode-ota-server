@@ -1,6 +1,7 @@
+import  { isEmpty } from "lodash/";
 // check if incoming deployment key is in the protected packages list
 const isProtected = (key, protectedPacks) => {
-    if (key && protectedPacks && typeof protectedPacks === "string") {
+    if (!isEmpty(key) && typeof protectedPacks === "string" && !isEmpty(protectedPacks)) {
         const packs = protectedPacks.split(",");
         return packs && packs.includes(key);
     }

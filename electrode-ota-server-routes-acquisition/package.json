@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "electrode-ota-server-diregister": "^4.7.2",
-    "electrode-ota-server-util": "^4.7.2"
+    "electrode-ota-server-util": "^4.7.2",
+    "lodash": "^4.17.20"
   },
   "devDependencies": {
     "electrode-ota-server-util-dev": "^4.7.2"
