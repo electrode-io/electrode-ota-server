@@ -1,5 +1,5 @@
 /* eslint-disable max-params */
-
+import { missingParameter, notAuthorized } from "electrode-ota-server-errors";
 import { reqFields } from "electrode-ota-server-util";
 import keysToCamelOrSnake from "./keys-to-camel-or-snake";
 import * as abTest from "./ab-test";
@@ -19,13 +19,16 @@ const handles = {
         const snakeCaseRequested = /update_check/.test(action);
         // if snake_case request? convert to camelCase
         const qs = snakeCaseRequested ? keysToCamelOrSnake(request.query) : request.query;
+        // validate query-parameters
+        missingParameter(qs.deploymentKey, `Deployment key missing`);
+        missingParameter(qs.appVersion, `appVersion missing`);
         // retrieve the protected packages list
         const packsProtected = ccm("packsProtected");
         const isProtectedPack = isProtected(qs.deploymentKey, packsProtected);
         // check if the request is through authenticated api?
         //  if so, check if the requested package is protected?
-        if (/auth\/updateCheck/.test(action) && isProtectedPack) {
-            return reply().code(HTTP_UNAUTHORIZED);
+        if (/^updateCheck|update_check/.test(action) && isProtectedPack) {
+            notAuthorized(null, "Unauthorized");
         }
         // invoke acquisition model updateCheck
         acquisitionUpdateCheck(qs, (e, updatedInfo) => {
