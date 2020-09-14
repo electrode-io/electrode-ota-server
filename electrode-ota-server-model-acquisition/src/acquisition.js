@@ -27,7 +27,7 @@ export default (options, dao, weighted, _download, manifest, logger) => {
          */
         updateCheck(params) {
 
-            missingParameter(params.deploymentKey, `Deployment key missing`);
+            //missingParameter(params.deploymentKey, `Deployment key missing`);
             missingParameter(params.appVersion, `appVersion missing`);
 
             return dao.deploymentForKey(params.deploymentKey).then(async deployment => {
