@@ -6,7 +6,6 @@ import * as abTest from "./ab-test";
 import isProtected from "./is-protected";
 
 const HTTP_OK = 200;
-const HTTP_UNAUTHORIZED = 401;
 const ok = reply => e => {
     if (e) return reply(e);
     reply("OK").code(HTTP_OK);

@@ -29,8 +29,10 @@ describe("isProtected() Test", function() {
     });
 
     it("deploymentKey should be case-sensitive", () => {
-        let protectedPacks = "foo-bar,blah-blah-meh-blah,f0o-Blah-bAr-m3h";
+        const protectedPacks = "foo-bar,blah-blah-meh-blah,f0o-Blah-bAr-m3h";
         expect(isProtected("Foo-Bar", protectedPacks)).to.be.equal(false);
+        expect(isProtected("f0o-Blah-bAr-m3H", protectedPacks)).to.be.equal(false);
+        expect(isProtected("foo-bar, blah-blah-meh-blah, f0o-Blah-bAr-m3h", protectedPacks)).to.be.equal(false);
         expect(isProtected("f0o-Blah-bAr-m3h", protectedPacks)).to.be.equal(true);
     });
 });
