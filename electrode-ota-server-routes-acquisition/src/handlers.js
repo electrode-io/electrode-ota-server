@@ -18,8 +18,9 @@ const handles = {
         const snakeCaseRequested = /update_check/.test(action);
         // if snake_case request? convert to camelCase
         const qs = snakeCaseRequested ? keysToCamelOrSnake(request.query) : request.query;
-        // validate deployment key
+        // validate query-parameters
         missingParameter(qs.deploymentKey, `Deployment key missing`);
+        missingParameter(qs.appVersion, `appVersion missing`);
         // retrieve the protected packages list
         const packsProtected = ccm("packsProtected");
         const isProtectedPack = isProtected(qs.deploymentKey, packsProtected);
