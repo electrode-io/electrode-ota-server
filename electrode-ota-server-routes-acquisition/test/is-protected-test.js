@@ -37,5 +37,6 @@ describe("isProtected() Test", function() {
         // valid cases
         expect(isProtected("foo-bar", protectedPacks)).to.be.equal(true);
         expect(isProtected("f0o-Blah-bAr-m3h", protectedPacks)).to.be.equal(true);
+        expect(isProtected("blah-blah-meh-blah", "foo-bar, blah-blah-meh-blah, f0o-Blah-bAr-m3h")).to.be.equal(true);
     });
 });

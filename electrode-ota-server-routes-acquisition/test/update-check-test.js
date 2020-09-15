@@ -96,19 +96,4 @@ describe("updateCheck() Test for Protected Packages", function() {
         };
         handlers.updateCheck(request, reply, logger, ccm, acquisitionUpdateCheck);
     });
-
-    it("should return a valid response for /auth/update_check request", () => {
-        request.url.pathname = "auth/update_check";
-        request.query = {
-            app_version: "1.2.3",
-            client_unique_id: "abcd45",
-            deployment_key: deploymentKey
-        };
-        ccm = () => "";
-        reply = result => {
-            expect(result.updateInfo.is_available).to.be.false;
-            expect(result.updateInfo.should_run_binary_version).to.be.false;
-        };
-        handlers.updateCheck(request, reply, logger, ccm, acquisitionUpdateCheck);
-    });
 });
