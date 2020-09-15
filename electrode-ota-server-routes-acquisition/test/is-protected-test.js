@@ -30,9 +30,12 @@ describe("isProtected() Test", function() {
 
     it("deploymentKey should be case-sensitive", () => {
         const protectedPacks = "foo-bar,blah-blah-meh-blah,f0o-Blah-bAr-m3h";
+        // invalid cases
         expect(isProtected("Foo-Bar", protectedPacks)).to.be.equal(false);
         expect(isProtected("f0o-Blah-bAr-m3H", protectedPacks)).to.be.equal(false);
         expect(isProtected("foo-bar, blah-blah-meh-blah, f0o-Blah-bAr-m3h", protectedPacks)).to.be.equal(false);
+        // valid cases
+        expect(isProtected("foo-bar", protectedPacks)).to.be.equal(true);
         expect(isProtected("f0o-Blah-bAr-m3h", protectedPacks)).to.be.equal(true);
     });
 });
