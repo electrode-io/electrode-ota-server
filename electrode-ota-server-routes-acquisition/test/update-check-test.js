@@ -31,7 +31,7 @@ describe("updateCheck() Test for Protected Packages", function() {
             },
             method: "GET",
             url: {
-                pathname: "updateCheck"
+                pathname: "/updateCheck"
             },
             query: {
                 appVersion: "1.2.3",
@@ -56,7 +56,7 @@ describe("updateCheck() Test for Protected Packages", function() {
     });
 
     it("should throw Unauthorized for /update_check asking for a protected package", () => {
-        request.url.pathname = "update_check";
+        request.url.pathname = "/update_check";
         request.query = {
             app_version: "1.2.3",
             client_unique_id: "abcd45",
@@ -74,7 +74,7 @@ describe("updateCheck() Test for Protected Packages", function() {
     });
 
     it("should return a valid response for /update_check request", () => {
-        request.url.pathname = "update_check";
+        request.url.pathname = "/update_check";
         request.query = {
             app_version: "1.2.3",
             client_unique_id: "abcd45",
@@ -89,7 +89,7 @@ describe("updateCheck() Test for Protected Packages", function() {
     });
 
     it("should return a valid response for /auth/updateCheck request", () => {
-        request.url.pathname = "auth/updateCheck";
+        request.url.pathname = "/auth/updateCheck";
         ccm = () => "";
         reply = result => {
             expect(result.updateInfo).to.equal(updateInfo);

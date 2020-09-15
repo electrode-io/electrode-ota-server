@@ -24,9 +24,9 @@ const handles = {
         // retrieve the protected packages list
         const packsProtected = ccm("packsProtected");
         const isProtectedPack = isProtected(qs.deploymentKey, packsProtected);
-        // check if the request is through authenticated api?
-        //  if so, check if the requested package is protected?
-        if (/^updateCheck|update_check/.test(action) && isProtectedPack) {
+        // is the request for external api?
+        //  and is the requested package protected? then throw exception
+        if (/^(\/updateCheck|\/update_check)/.test(action) && isProtectedPack) {
             notAuthorized(null, "Unauthorized");
         }
         // invoke acquisition model updateCheck
