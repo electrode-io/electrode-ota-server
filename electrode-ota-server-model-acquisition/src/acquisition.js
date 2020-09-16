@@ -27,9 +27,6 @@ export default (options, dao, weighted, _download, manifest, logger) => {
          */
         updateCheck(params) {
 
-            missingParameter(params.deploymentKey, `Deployment key missing`);
-            missingParameter(params.appVersion, `appVersion missing`);
-
             return dao.deploymentForKey(params.deploymentKey).then(async deployment => {
                 // If no packages have been published just return this.
                 const noPackage = { isAvailable: false, shouldRunBinaryVersion: false };
