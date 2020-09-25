@@ -103,4 +103,6 @@ export const PackageQueries = {
                     WHERE id = ?`,
 
     updatePackageTime : `UPDATE package SET update_time = CURRENT_TIMESTAMP(3) WHERE id = ?`,
+
+    getMostRecentlyPromotedVersions : `SELECT app_version FROM package WHERE release_method IN ('Promote') ORDER BY update_time DESC LIMIT 3`,
 };

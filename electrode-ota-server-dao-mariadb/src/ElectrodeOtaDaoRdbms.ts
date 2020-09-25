@@ -231,6 +231,11 @@ export default class ElectrodeOtaDaoRdbms implements IElectrodeOtaDao {
         });
     }
 
+    public async getMostRecentlyPromotedVersions(): Promise<any> {
+        return this.connectAndExecute<any>((conection) => {
+            return PackageDAO.getMostRecentlyPromotedVersions(conection);
+        });
+    }
     // HISTORY functions ==================
 
     public async history(appId: number, deploymentName: string): Promise<PackageDTO[]> {
