@@ -1950,6 +1950,43 @@ describe("Data Access via RDBMS", function() {
             }
           });
         });
+
+        it("will return release matching specified appVersion", () => {
+          const deplKey: string = "3290fnf20jf02jfjwf0ij20fj209fj20j";
+          const email = "test@tests.com";
+          const newPkg = new PackageDTO();
+          newPkg.appVersion = "1.5.0";
+          newPkg.blobUrl = "http://stuff.com/package1/..";
+          newPkg.packageHash = "2930fj2j923892f9h9f831899182889hfa5b";
+          newPkg.isDisabled = false;
+          newPkg.isMandatory = false;
+          newPkg.label = "v5";
+          newPkg.manifestBlobUrl = "http://stuff.com/manifest1/...";
+          newPkg.rollout = 100;
+          newPkg.size = 1500;
+          newPkg.releaseMethod = "Promote";
+          newPkg.releasedBy = email;
+
+          const metricData = [
+            { label: "v5", appVersion: "1.5.0", status:"DeploymentSucceeded"},
+            { label: "v5", appVersion: "1.5.0", status:"Downloaded"},
+            { label: "v3", appVersion: "1.3.5", status:"Downloaded"}
+          ]
+          let metricsData = createMetricInDTOs(metricDeploymentKey, metricData);
+
+          const startTime = new Date(Date.now() - 1000);
+          return dao.addPackage(deplKey, newPkg)
+            .then(() => {
+              return Promise.all(metricsData.map(d => dao.insertMetric(d)));
+            })
+            .then(() => {
+              return dao.metricsByStatusAfterSpecificTime(metricDeploymentKey, startTime)
+            })
+            .then(metrics => {
+              expect(metrics.length).eq(2);
+            });
+        });
+
       });
 
       describe("metrics summary", () => {
