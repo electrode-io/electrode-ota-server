@@ -15,9 +15,9 @@ const handles = {
     updateCheck(request, reply, logger, ccm, acquisitionUpdateCheck) {
         const action = request.url.pathname;
         logger.info(reqFields(request), `${action} request`);
-        const snakeCaseRequested = /update_check/.test(action);
-        // if snake_case request? convert to camelCase
-        const qs = snakeCaseRequested ? keysToCamelOrSnake(request.query) : request.query;
+        const snakeCaseParams = /deployment_key/.test(request.url.path);
+        // if snake_case requested? convert to camelCase
+        const qs = snakeCaseParams ? keysToCamelOrSnake(request.query) : request.query;
         // validate query-parameters
         missingParameter(qs.deploymentKey, `Deployment key missing`);
         missingParameter(qs.appVersion, `appVersion missing`);
@@ -26,7 +26,7 @@ const handles = {
         const isProtectedPack = isProtected(qs.deploymentKey, packsProtected);
         // is the request for external api?
         //  and is the requested package protected? then throw exception
-        if (/^(\/updateCheck|\/update_check)/.test(action) && isProtectedPack) {
+        if (/^(\/updateCheck|\/v0.1\/public\/codepush\/update_check)/.test(action) && isProtectedPack) {
             notAuthorized(null, "Unauthorized");
         }
         // invoke acquisition model updateCheck
@@ -40,7 +40,7 @@ const handles = {
                 updatedInfo.downloadURL = abTest.buildUrl(updatedInfo.downloadURL, qs.clientUniqueId, rampUpPlan, qs.absetup);
             }
             // if snake_case request? convert the response to the same
-            const updateInfo = snakeCaseRequested ? keysToCamelOrSnake(updatedInfo) : updatedInfo;
+            const updateInfo = snakeCaseParams ? keysToCamelOrSnake(updatedInfo) : updatedInfo;
             reply({ updateInfo });
         });
     },

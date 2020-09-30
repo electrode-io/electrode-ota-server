@@ -31,7 +31,8 @@ describe("updateCheck() Test for Protected Packages", function() {
             },
             method: "GET",
             url: {
-                pathname: "/updateCheck"
+                pathname: "/updateCheck",
+                path: "/updateCheck?deploymentKey=ibaijfbaiwjef"
             },
             query: {
                 appVersion: "1.2.3",
@@ -56,7 +57,8 @@ describe("updateCheck() Test for Protected Packages", function() {
     });
 
     it("should throw Unauthorized for /update_check asking for a protected package", () => {
-        request.url.pathname = "/update_check";
+        request.url.path = `/v0.1/public/codepush/update_check?deployment_key=${deploymentKey}`;
+        request.url.pathname = "/v0.1/public/codepush/update_check";
         request.query = {
             app_version: "1.2.3",
             client_unique_id: "abcd45",
@@ -74,7 +76,8 @@ describe("updateCheck() Test for Protected Packages", function() {
     });
 
     it("should return a valid response for /update_check request", () => {
-        request.url.pathname = "/update_check";
+        request.url.path = `/v0.1/public/codepush/update_check?deployment_key=${deploymentKey}`;
+        request.url.pathname = "/v0.1/public/codepush/update_check";
         request.query = {
             app_version: "1.2.3",
             client_unique_id: "abcd45",
@@ -93,6 +96,22 @@ describe("updateCheck() Test for Protected Packages", function() {
         ccm = () => "";
         reply = result => {
             expect(result.updateInfo).to.equal(updateInfo);
+        };
+        handlers.updateCheck(request, reply, logger, ccm, acquisitionUpdateCheck);
+    });
+
+    it("should return a valid response for /auth/updateCheck with snake_case params 'deployment_key' request", () => {
+        request.url.path = `/auth/updateCheck?deployment_key=${deploymentKey}`;
+        request.url.pathname = "/auth/updateCheck";
+        request.query = {
+            app_version: "1.2.3",
+            client_unique_id: "abcd45",
+            deployment_key: deploymentKey
+        };
+        ccm = () => "";
+        reply = result => {
+            expect(result.updateInfo.is_available).to.be.false;
+            expect(result.updateInfo.should_run_binary_version).to.be.false;
         };
         handlers.updateCheck(request, reply, logger, ccm, acquisitionUpdateCheck);
     });

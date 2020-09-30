@@ -18,7 +18,7 @@ export default (options, route, acquisition, logger, ccm) => {
         },
         {
             method: "GET",
-            path: "/update_check",
+            path: "/v0.1/public/codepush/update_check",
             config: {
                 auth: false,
                 handler(request, reply) {
@@ -71,7 +71,7 @@ export default (options, route, acquisition, logger, ccm) => {
             }
         },
         {
-            path: "/report_status/deploy",
+            path: "/v0.1/public/codepush/report_status/deploy",
             method: "POST",
             config: {
                 auth: false,
@@ -93,7 +93,7 @@ export default (options, route, acquisition, logger, ccm) => {
             }
         },
         {
-            path: "/report_status/download",
+            path: "/v0.1/public/codepush/report_status/download",
             method: "POST",
             config: {
                 auth: false,
