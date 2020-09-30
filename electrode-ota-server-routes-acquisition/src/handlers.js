@@ -40,7 +40,7 @@ const handles = {
                 updatedInfo.downloadURL = abTest.buildUrl(updatedInfo.downloadURL, qs.clientUniqueId, rampUpPlan, qs.absetup);
             }
             // if snake_case request? convert the response to the same
-            const updateInfo = snakeCaseRequested ? keysToCamelOrSnake(updatedInfo) : updatedInfo;
+            const updateInfo = snakeCaseParams ? keysToCamelOrSnake(updatedInfo) : updatedInfo;
             reply({ updateInfo });
         });
     },
