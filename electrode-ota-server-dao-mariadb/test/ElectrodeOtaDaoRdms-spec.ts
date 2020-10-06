@@ -1925,21 +1925,6 @@ describe("Data Access via RDBMS", function() {
       });
 
       describe("metrics", () => {
-        const deplKey: string = "3290fnf20jf02jfjwf0ij20fj209fj20j";
-        const email = "test@tests.com";
-        const newPkg = new PackageDTO();
-        newPkg.appVersion = "1.5.0";
-        newPkg.blobUrl = "http://stuff.com/package1/..";
-        newPkg.packageHash = "2930fj2j923892f9h9f831899182889hfa5b";
-        newPkg.isDisabled = false;
-        newPkg.isMandatory = false;
-        newPkg.label = "v5";
-        newPkg.manifestBlobUrl = "http://stuff.com/manifest1/...";
-        newPkg.rollout = 100;
-        newPkg.size = 1500;
-        newPkg.releaseMethod = "Promote";
-        newPkg.releasedBy = email;
-
         it("will throw an error if the deployment key is not found", () => {
           return dao.metrics("SomeJunkKey").catch(err => {
             expect(err).not.to.be.undefined;
