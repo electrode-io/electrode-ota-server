@@ -92,16 +92,24 @@ export default class MetricDAO extends BaseDAO {
             throw new Error("Not found. no deployment found for key [" + deploymentKey + "]");
         }
 
-        const latestVersions = await PackageDAO.getMostRecentlyPromotedVersions(connection);
-        const isPromotedRecently = latestVersions && latestVersions.length > 0;
+        const deploymentId = depResults[0].id;
+        const latestVersions = await PackageDAO.getMostRecentlyPromotedVersions(connection, deploymentId);
+        const qKey = latestVersions && latestVersions.length > 0 ? latestVersions.length : 0;
+        const timeAndVersionQueries = [
+            MetricQueries.getMetricsByStatusAfterSpecificTimeAndVersion1,
+            MetricQueries.getMetricsByStatusAfterSpecificTimeAndVersions2,
+            MetricQueries.getMetricsByStatusAfterSpecificTimeAndVersions3
+        ];
+
+        const isPromotedRecently = Boolean(qKey);
         const key = isPromotedRecently ? "version" : "noversion";
         const allQueries:{[key:string]: string;} = {
-            "version": MetricQueries.getMetricsByStatusAfterSpecificTimeAndVersion,
+            "version": timeAndVersionQueries[qKey-1],
             "noversion": MetricQueries.getMetricsByStatusAfterSpecificTime
         }
         const allParams:{[key:string]:any} = {
-            "version": [depResults[0].id, specificDate, ...latestVersions],
-            "noversion": [depResults[0].id, specificDate]
+            "version": [deploymentId, specificDate, ...latestVersions],
+            "noversion": [deploymentId, specificDate]
         }
 
         const metricResults = await MetricDAO.query(connection, allQueries[key], allParams[key]);

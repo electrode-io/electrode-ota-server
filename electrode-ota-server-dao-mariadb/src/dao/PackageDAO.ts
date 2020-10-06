@@ -123,8 +123,8 @@ export default class PackageDAO extends BaseDAO {
         return undefined;
     }
 
-    public static async getMostRecentlyPromotedVersions(connection: IConnection): Promise<any> {
-        const result = await PackageDAO.query(connection, PackageQueries.getMostRecentlyPromotedVersions, []);
+    public static async getMostRecentlyPromotedVersions(connection: IConnection, deploymentId: number): Promise<any> {
+        const result = await PackageDAO.query(connection, PackageQueries.getMostRecentlyPromotedVersions, [deploymentId]);
         if (result && result.length > 0) {
             return result.map((pack: any) => pack.app_version);
         }

@@ -28,7 +28,15 @@ export const MetricQueries = {
                     previous_label_or_app_version, status FROM metric WHERE deployment_id = ? AND create_time >= ?
                     GROUP BY status, label, app_version, previous_deployment_key, previous_label_or_app_version`,
 
-    getMetricsByStatusAfterSpecificTimeAndVersion : `SELECT count(*) as total, app_version, label, previous_deployment_key,
+    getMetricsByStatusAfterSpecificTimeAndVersion1 : `SELECT count(*) as total, app_version, label, previous_deployment_key,
                     previous_label_or_app_version, status FROM metric WHERE deployment_id = ? AND create_time >= ? AND app_version IN (?)
+                    GROUP BY status, label, app_version, previous_deployment_key, previous_label_or_app_version`,
+
+    getMetricsByStatusAfterSpecificTimeAndVersions2 : `SELECT count(*) as total, app_version, label, previous_deployment_key,
+                    previous_label_or_app_version, status FROM metric WHERE deployment_id = ? AND create_time >= ? AND app_version IN (?, ?)
+                    GROUP BY status, label, app_version, previous_deployment_key, previous_label_or_app_version`,
+
+    getMetricsByStatusAfterSpecificTimeAndVersions3 : `SELECT count(*) as total, app_version, label, previous_deployment_key,
+                    previous_label_or_app_version, status FROM metric WHERE deployment_id = ? AND create_time >= ? AND app_version IN (?, ?, ?)
                     GROUP BY status, label, app_version, previous_deployment_key, previous_label_or_app_version`,
 };
