@@ -2085,6 +2085,155 @@ describe("Data Access via RDBMS", function() {
             });
         });
       });
+
+      describe("real-time metrics", () => {
+        const deplKey: string = "3290fnf20jf02jfjwf0ij20fj209fj20j";
+        const metricDeplKey: string = "cJ3PGiq4Z3SQ3IEpivV4VuXF5lTDylmdMNeY1CALJrw=";
+        const email = "test@tests.com";
+        const newPkg = new PackageDTO();
+        newPkg.appVersion = "1.5.0";
+        newPkg.blobUrl = "http://stuff.com/package1/..";
+        newPkg.packageHash = "2930fj2j923892f9h9f831899182889hfa5b";
+        newPkg.isDisabled = false;
+        newPkg.isMandatory = false;
+        newPkg.label = "v5";
+        newPkg.manifestBlobUrl = "http://stuff.com/manifest1/...";
+        newPkg.rollout = 100;
+        newPkg.size = 1500;
+        newPkg.releaseMethod = "Promote";
+        newPkg.releasedBy = email;
+
+        const add6PacksOfApp1 = () => {
+          let v1pkg = new PackageDTO();
+          Object.assign(v1pkg, newPkg, {
+            appVersion: "1.6.0",
+            packageHash: "ACEBDF13524678",
+            label: "v6"
+          });
+          let v2pkg = new PackageDTO();
+          Object.assign(v2pkg, newPkg, {
+            appVersion: "1.7.0",
+            packageHash: "A1C3E5B2D4F687",
+            label: "v7"
+          });
+          let v3pkg = new PackageDTO();
+          Object.assign(v3pkg, newPkg, {
+            appVersion: "1.8.0",
+            packageHash: "ACEBDF13524786",
+            label: "v8"
+          });
+          let v4pkg = new PackageDTO();
+          Object.assign(v4pkg, newPkg, {
+            appVersion: "1.9.0",
+            packageHash: "A1C3E5B2D4F876",
+            label: "v9"
+          });
+          let v5pkg = new PackageDTO();
+          Object.assign(v5pkg, newPkg, {
+            appVersion: "1.10.0",
+            packageHash: "ACEBDF135246789",
+            label: "v10"
+          });
+          let v6pkg = new PackageDTO();
+          Object.assign(v6pkg, newPkg, {
+            appVersion: "1.11.0",
+            packageHash: "A1C3E5B2D4F6987",
+            label: "v11"
+          });
+
+          return Promise.all([v1pkg,v2pkg,v3pkg,v4pkg,v5pkg,v6pkg].map(p => dao.addPackage(deplKey, p)));
+        }
+
+        const add2PacksOfApp2 = () => {
+          let v1pkg = new PackageDTO();
+          Object.assign(v1pkg, newPkg, {
+            appVersion: "2.1.0",
+            packageHash: "ACEBDF1352467852",
+            label: "v21"
+          });
+          let v2pkg = new PackageDTO();
+          Object.assign(v2pkg, newPkg, {
+            appVersion: "2.2.0",
+            packageHash: "A1C3E5B2D4F68725",
+            label: "v22"
+          });
+
+          return Promise.all([v1pkg,v2pkg].map(p => dao.addPackage(metricDeplKey, p)));
+        }
+
+        it("should retrieve real time metrics for last promoted version", () => {
+          const metricData = [
+            { label: "v5", appVersion: "1.5.0", status:"DeploymentSucceeded"},
+            { label: "v5", appVersion: "1.5.0", status:"Downloaded"},
+            { label: "v3", appVersion: "1.3.5", status:"Downloaded"}
+          ]
+          let metricsData = createMetricInDTOs(deplKey, metricData);
+
+          const startTime = new Date(Date.now() - 1000);
+          return dao.addPackage(deplKey, newPkg)
+            .then(() => {
+              return Promise.all(metricsData.map(d => dao.insertMetric(d)));
+            })
+            .then(() => {
+              return dao.metricsByStatusAfterSpecificTime(deplKey, startTime)
+            })
+            .then(metrics => {
+              expect(metrics.length).eq(2);
+            });
+        });
+
+        it("should retrieve real time metrics for multiple recently promoted versions", () => {
+          const metricData1 = [
+            { label: "v6", appVersion: "1.6.0", status:"DeploymentSucceeded"},
+            { label: "v6", appVersion: "1.6.0", status:"Downloaded"},
+            { label: "v7", appVersion: "1.7.0", status:"DeploymentSucceeded"},
+            { label: "v7", appVersion: "1.7.0", status:"Downloaded"},
+            { label: "v8", appVersion: "1.8.0", status:"DeploymentSucceeded"},
+            { label: "v8", appVersion: "1.8.0", status:"Downloaded"},
+            { label: "v9", appVersion: "1.9.0", status:"DeploymentSucceeded"},
+            { label: "v9", appVersion: "1.9.0", status:"Downloaded"},
+            { label: "v10", appVersion: "1.10.0", status:"DeploymentSucceeded"},
+            { label: "v10", appVersion: "1.10.0", status:"Downloaded"},
+            { label: "v11", appVersion: "1.11.0", status:"DeploymentSucceeded"},
+            { label: "v11", appVersion: "1.11.0", status:"Downloaded"}
+          ];
+          const metricData2 = [
+            { label: "v21", appVersion: "2.1.0", status:"DeploymentSucceeded"},
+            { label: "v21", appVersion: "2.1.0", status:"Downloaded"},
+            { label: "v22", appVersion: "2.2.0", status:"DeploymentSucceeded"},
+            { label: "v22", appVersion: "2.2.0", status:"Downloaded"}
+          ];
+
+          let metricsData1 = createMetricInDTOs(deplKey, metricData1);
+          let metricsData2 = createMetricInDTOs(metricDeplKey, metricData2);
+
+          const startTime = new Date(Date.now() - 1000);
+          return add6PacksOfApp1()
+            .then(() => {
+              return add2PacksOfApp2();
+            })
+            .then(() => {
+              return Promise.all(metricsData1.map(d => dao.insertMetric(d)));
+            })
+            .then(() => {
+              return Promise.all(metricsData2.map(d => dao.insertMetric(d)));
+            })
+            .then(() => {
+              return dao.metricsByStatusAfterSpecificTime(deplKey, startTime)
+            })
+            .then(metrics => {
+              expect(metrics.length).eq(6);
+            })
+            .then(() => {
+              return dao.metricsByStatusAfterSpecificTime(metricDeplKey, startTime)
+            })
+            .then(metrics => {
+              expect(metrics.length).eq(4);
+            });
+        });
+
+      });
+
     });
 
     describe("upload / download methods", () => {
