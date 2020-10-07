@@ -94,21 +94,14 @@ export default class MetricDAO extends BaseDAO {
 
         const deploymentId = depResults[0].id;
         const latestVersions = await PackageDAO.getMostRecentlyPromotedVersions(connection, deploymentId);
-        const qKey = latestVersions && latestVersions.length > 0 ? latestVersions.length : 0;
-        const timeAndVersionQueries = [
-            MetricQueries.getMetricsByStatusAfterSpecificTimeAndVersion1,
-            MetricQueries.getMetricsByStatusAfterSpecificTimeAndVersions2,
-            MetricQueries.getMetricsByStatusAfterSpecificTimeAndVersions3
-        ];
-
-        const isPromotedRecently = Boolean(qKey);
+        const isPromotedRecently = latestVersions && latestVersions.length > 0;
         const key = isPromotedRecently ? "version" : "noversion";
         const allQueries:{[key:string]: string;} = {
-            "version": timeAndVersionQueries[qKey-1],
+            "version": MetricQueries.getMetricsByStatusAfterSpecificTimeAndVersion,
             "noversion": MetricQueries.getMetricsByStatusAfterSpecificTime
         }
         const allParams:{[key:string]:any} = {
-            "version": [deploymentId, specificDate, ...latestVersions],
+            "version": [deploymentId, specificDate, latestVersions],
             "noversion": [deploymentId, specificDate]
         }
 
