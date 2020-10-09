@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-test-support",
-  "version": "4.8.1",
+  "version": "4.8.2",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -12,7 +12,7 @@
     "bluebird": "^3.5.1",
     "boom": "^4.3.1",
     "chai": "^3.5.0",
-    "electrode-ota-server-util": "^4.8.1",
+    "electrode-ota-server-util": "^4.8.2",
     "supertest": "^3.0.0",
     "yazl": "^2.4.1"
   },
@@ -22,6 +22,6 @@
     "electrode-ota-server-dao-mariadb": "^4.5.0"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^4.8.1"
+    "electrode-ota-server-util-dev": "^4.8.2"
   }
 }

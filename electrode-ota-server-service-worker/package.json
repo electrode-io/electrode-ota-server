@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-service-worker",
-  "version": "4.8.1",
+  "version": "4.8.2",
   "description": "Electrode OTA service worker",
   "author": "Dat Vong <Dat.Vong@walmartlabs.com>",
   "homepage": "https://github.com/electrode-io/electrode-ota-server/tree/master/electrode-ota-service-worker#readme",
@@ -23,18 +23,18 @@
   "dependencies": {
     "@types/node": "^8.0.24",
     "electrode-confippet": "^1.5.0",
-    "electrode-ota-server-dao-mariadb": "^4.8.1",
-    "electrode-ota-server-default-config": "^4.8.1",
-    "electrode-ota-server-diregister": "^4.8.1",
-    "electrode-ota-server-logger": "^4.8.1",
-    "electrode-ota-server-util": "^4.8.1",
+    "electrode-ota-server-dao-mariadb": "^4.8.2",
+    "electrode-ota-server-default-config": "^4.8.2",
+    "electrode-ota-server-diregister": "^4.8.2",
+    "electrode-ota-server-logger": "^4.8.2",
+    "electrode-ota-server-util": "^4.8.2",
     "minimist": "^1.2.0"
   },
   "devDependencies": {
     "@types/chai": "^3.5.0",
     "@types/mocha": "^2.2.42",
     "@types/sinon": "4.3.3",
-    "electrode-ota-server-util-dev": "^4.8.1",
+    "electrode-ota-server-util-dev": "^4.8.2",
     "nyc": "^14.1.1",
     "sinon": "^7.4.1",
     "ts-node": "^3.3.0",
