@@ -85,8 +85,8 @@ describe("updateCheck() Test for Protected Packages", function() {
         };
         ccm = () => "";
         reply = result => {
-            expect(result.updateInfo.is_available).to.be.false;
-            expect(result.updateInfo.should_run_binary_version).to.be.false;
+            expect(result.update_info.is_available).to.be.false;
+            expect(result.update_info.should_run_binary_version).to.be.false;
         };
         handlers.updateCheck(request, reply, logger, ccm, acquisitionUpdateCheck);
     });
@@ -110,8 +110,8 @@ describe("updateCheck() Test for Protected Packages", function() {
         };
         ccm = () => "";
         reply = result => {
-            expect(result.updateInfo.is_available).to.be.false;
-            expect(result.updateInfo.should_run_binary_version).to.be.false;
+            expect(result.update_info.is_available).to.be.false;
+            expect(result.update_info.should_run_binary_version).to.be.false;
         };
         handlers.updateCheck(request, reply, logger, ccm, acquisitionUpdateCheck);
     });

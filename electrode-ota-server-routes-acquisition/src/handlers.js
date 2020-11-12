@@ -30,18 +30,18 @@ const handles = {
             notAuthorized(null, "Unauthorized");
         }
         // invoke acquisition model updateCheck
-        acquisitionUpdateCheck(qs, (e, updatedInfo) => {
+        acquisitionUpdateCheck(qs, (e, updateInfo) => {
             if (e) {
                 console.log("error making update check ", request.query, e.message);
                 return reply(e);
             }
             const rampUpPlan = ccm("cdnRampUp");
-            if ("downloadURL" in updatedInfo) {
-                updatedInfo.downloadURL = abTest.buildUrl(updatedInfo.downloadURL, qs.clientUniqueId, rampUpPlan, qs.absetup);
+            if ("downloadURL" in updateInfo) {
+                updateInfo.downloadURL = abTest.buildUrl(updateInfo.downloadURL, qs.clientUniqueId, rampUpPlan, qs.absetup);
             }
             // if snake_case request? convert the response to the same
-            const updateInfo = snakeCaseParams ? keysToCamelOrSnake(updatedInfo) : updatedInfo;
-            reply({ updateInfo });
+            const result = snakeCaseParams ? keysToCamelOrSnake({ updateInfo }) : { updateInfo };
+            reply(result);
         });
     },
 

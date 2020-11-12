@@ -81,7 +81,7 @@ describe('electrode-ota-server', function () {
     it('should respond to newly updated service "/update_check" with modified params', request({
         url: '/v0.1/public/codepush/update_check?deployment_key=evHVNrwuJDVdTvpSouLxKpEyowtcxyWcyVCxnsFD&app_version=1.2.3&package_hash=&is_companion=&label=&client_unique_id=76451410-77F2-423C-836C-623AA5F586B5'
     }, body({
-        updateInfo: {
+        update_info: {
             is_available: false,
             should_run_binary_version: false
         }
@@ -96,7 +96,7 @@ describe('electrode-ota-server', function () {
         }
     })));
 
-    it('should respond to newly updated service "/update_check" with modified params', request({
+    it('should respond with bad token for "/auth/updateCheck" if invalid token is sent', request({
         url: '/auth/updateCheck?deployment_key=evHVNrwuJDVdTvpSouLxKpEyowtcxyWcyVCxnsFD&app_version=1.2.3&package_hash=&is_companion=&label=&client_unique_id=76451410-77F2-423C-836C-623AA5F586B5',
         headers: {
             authorization: `Bearer blahblahblahblahblahblahmehblahblah`
