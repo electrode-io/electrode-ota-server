@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-routes-acquisition",
-  "version": "4.8.2",
+  "version": "4.8.3",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -9,11 +9,11 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-diregister": "^4.8.2",
-    "electrode-ota-server-util": "^4.8.2",
+    "electrode-ota-server-diregister": "^4.8.3",
+    "electrode-ota-server-util": "^4.8.3",
     "lodash": "^4.17.20"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^4.8.2"
+    "electrode-ota-server-util-dev": "^4.8.3"
   }
 }

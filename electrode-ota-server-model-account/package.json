@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-model-account",
-  "version": "4.8.2",
+  "version": "4.8.3",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -10,13 +10,13 @@
   },
   "dependencies": {
     "bluebird": "^3.5.1",
-    "electrode-ota-server-diregister": "^4.8.2",
-    "electrode-ota-server-errors": "^4.8.2",
-    "electrode-ota-server-util": "^4.8.2"
+    "electrode-ota-server-diregister": "^4.8.3",
+    "electrode-ota-server-errors": "^4.8.3",
+    "electrode-ota-server-util": "^4.8.3"
   },
   "devDependencies": {
-    "electrode-ota-server-dao-cassandra": "^4.8.2",
-    "electrode-ota-server-test-support": "^4.8.2",
-    "electrode-ota-server-util-dev": "^4.8.2"
+    "electrode-ota-server-dao-cassandra": "^4.8.3",
+    "electrode-ota-server-test-support": "^4.8.3",
+    "electrode-ota-server-util-dev": "^4.8.3"
   }
 }
