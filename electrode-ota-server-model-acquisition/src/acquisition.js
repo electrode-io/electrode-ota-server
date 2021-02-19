@@ -61,8 +61,9 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                     const ret = {
                         downloadURL: pkg.blobUrl,
                         isAvailable,
+                        isDisabled: pkg.isDisabled,
                         isMandatory: pkg.isMandatory,
-                        appVersion: pkg.appVersion,
+                        targetBinaryRange: pkgAppVersion,
                         label: pkg.label,
                         packageSize,
                         packageHash: pkg.packageHash,
