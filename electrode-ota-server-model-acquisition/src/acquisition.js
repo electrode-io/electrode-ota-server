@@ -63,7 +63,6 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         isAvailable,
                         isDisabled: pkg.isDisabled,
                         isMandatory: pkg.isMandatory,
-                        targetBinaryRange: pkgAppVersion,
                         label: pkg.label,
                         packageSize,
                         packageHash: pkg.packageHash,
@@ -73,6 +72,14 @@ export default (options, dao, weighted, _download, manifest, logger) => {
                         //TODO - find out what this should be
                         shouldRunBinaryVersion: false
                     };
+                    // for latest RN-CP plugin the request is for new /update_check service
+                    if (params.snakeCaseParams) {
+                        ret.targetBinaryRange = pkgAppVersion;
+                    } else {
+                        // older version of RN-CP plugin that has /updateCheck service
+                        ret.appVersion = pkgAppVersion;
+                    }
+                    // now if a new package is available
                     if (isAvailable) {
                         if (pkg.manifestBlobUrl && params.packageHash) {
                             const diffPackageMap = pkg.diffPackageMap || {};
