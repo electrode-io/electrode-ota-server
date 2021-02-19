@@ -441,14 +441,18 @@ describe("model/acquisition", function () {
                 return ac
                   .updateCheck(params("1.2.5", "ABCD"))
                   .then(result => {
+                    console.log("1.2.5 >> ", result);
                     expect(result.isAvailable).false;
+                    expect(result.targetBinaryRange).to.be.undefined;
                   });
               })
               .then(pkg => {
                 return ac
                   .updateCheck(params("1.2.3", "ABCD"))
                   .then(result => {
+                    console.log("1.2.3 >> ", result);
                     expect(result.isAvailable).true;
+                    expect(result.targetBinaryRange).eq("1.2.3");
                   });
               });
         });
