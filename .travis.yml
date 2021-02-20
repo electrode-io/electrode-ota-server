@@ -16,8 +16,8 @@ addons:
 
 before_install:
   - java -version
-  - wget http://mirrors.gigenet.com/apache/cassandra/3.11.9/apache-cassandra-3.11.9-bin.tar.gz && tar -xvzf apache-cassandra-3.11.9-bin.tar.gz
-  - sudo sh ./apache-cassandra-3.11.9/bin/cassandra -R
+  - wget http://mirrors.gigenet.com/apache/cassandra/3.11.10/apache-cassandra-3.11.10-bin.tar.gz && tar -xvzf apache-cassandra-3.11.10-bin.tar.gz
+  - sudo sh ./apache-cassandra-3.11.10/bin/cassandra -R
   - sleep 20
 
 script:

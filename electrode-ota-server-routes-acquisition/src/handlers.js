@@ -18,6 +18,7 @@ const handles = {
         const snakeCaseParams = /deployment_key/.test(request.url.path);
         // if snake_case requested? convert to camelCase
         const qs = snakeCaseParams ? keysToCamelOrSnake(request.query) : request.query;
+        qs.snakeCaseParams = snakeCaseParams;
         // validate query-parameters
         missingParameter(qs.deploymentKey, `Deployment key missing`);
         missingParameter(qs.appVersion, `appVersion missing`);
