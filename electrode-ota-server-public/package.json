@@ -1,6 +1,6 @@
 {
   "name": "electrode-ota-server-public",
-  "version": "4.8.3",
+  "version": "4.8.4",
   "main": "lib/index.js",
   "scripts": {
     "test": "ota-mocha",
@@ -9,11 +9,11 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "electrode-ota-server-diregister": "^4.8.3",
-    "electrode-ota-server-util": "^4.8.3",
+    "electrode-ota-server-diregister": "^4.8.4",
+    "electrode-ota-server-util": "^4.8.4",
     "inert": "^4.0.1"
   },
   "devDependencies": {
-    "electrode-ota-server-util-dev": "^4.8.3"
+    "electrode-ota-server-util-dev": "^4.8.4"
   }
 }
