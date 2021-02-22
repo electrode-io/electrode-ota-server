@@ -8,5 +8,5 @@ export const PackageContentQueries = {
 
     insertPackageContent : `INSERT INTO package_content
                             (package_hash, content)
-                            VALUES(?, ?)`,
+                            VALUES(?, ?) ON DUPLICATE KEY UPDATE package_hash = package_hash`,
 };
