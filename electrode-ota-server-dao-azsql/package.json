@@ -1,0 +1,73 @@
+{
+  "name": "electrode-ota-server-dao-azsql",
+  "version": "4.8.4",
+  "description": "Electrode OTA - AzureSQL driver",
+  "author": "Charles Selvarajan <charles.selvarajan@walmart.com>",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/electrode-io/electrode-ota-server",
+  "bugs": {
+    "url": "https://github.com/electrode-io/electrode-ota-server/issues"
+  },
+  "homepage": "https://github.com/electrode-io/electrode-ota-server",
+  "main": "lib/index",
+  "typings": "lib/index",
+  "scripts": {
+    "test": "nyc mocha --compilers ts-node/register --require source-map-support/register --full-trace --bail test/**/*-spec.ts --reporter spec --timeout 100000",
+    "lint": "tslint --project .; exit 0",
+    "build": "rimraf ./lib && tsc -v && tsc && echo 'build complete'",
+    "prepublishOnly": "npm run build"
+  },
+  "nyc": {
+    "check-coverage": true,
+    "all": true,
+    "lines": 0,
+    "include": [
+      "src/**/*.ts"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "exclude": [
+      "src/dto"
+    ],
+    "reporter": [
+      "text",
+      "html",
+      "lcov"
+    ],
+    "report-dir": "coverage/js"
+  },
+  "keywords": [
+    "code-push",
+    "ota",
+    "electrode",
+    "react-native",
+    "cordova"
+  ],
+  "devDependencies": {
+    "@types/chai": "^4.0.4",
+    "@types/lodash": "4.14.108",
+    "@types/mocha": "^2.2.42",
+    "@types/mssql": "7.1.2",
+    "@types/semver": "7.1.0",
+    "@types/sinon": "4.3.3",
+    "chai": "^4.1.1",
+    "mocha": "^3.5.0",
+    "nyc": "^11.1.0",
+    "rimraf": "^2.6.1",
+    "semver": "^5.6.0",
+    "sinon": "7.4.1",
+    "source-map-support": "^0.4.16",
+    "ts-node": "^3.3.0",
+    "tslint": "^5.6.0",
+    "typescript": "2.4.2"
+  },
+  "dependencies": {
+    "@types/node": "^8.0.24",
+    "bluebird": "^3.5.1",
+    "electrode-ota-server-diregister": "^4.8.4",
+    "electrode-ota-server-util": "^4.8.4",
+    "lodash": ">=4.17.11",
+    "mssql": "^7.1.3"
+  }
+}
